@@ -8,25 +8,18 @@
   <link rel="icon" href="/favicon.svg" />
   <style>
     :root {
-      /* Soft & Relaxing Ocean Blue Palette */
       --bg-gradient: linear-gradient(135deg, #0f172a 0%, #0e2a47 50%, #1e3a8a 100%);
       --card-bg: rgba(255, 255, 255, 0.05);
       --card-hover-bg: rgba(255, 255, 255, 0.12);
       --card-border: rgba(255, 255, 255, 0.1);
-      
       --text-main: #f0f9ff;
       --text-muted: #93c5fd;
-      
       --accent-blue: #38bdf8;
       --accent-hover: #7dd3fc;
-      
-      /* Level Badge Colors */
-      --badge-a2: #38bdf8;
-      --badge-b1: #818cf8;
-      --badge-b2: #c084fc;
-      --badge-c1: #f472b6;
+      --badge-1: #38bdf8;
+      --badge-2: #818cf8;
+      --badge-3: #c084fc;
       --badge-default: #94a3b8;
- 
       --radius-lg: 16px;
       --radius-md: 10px;
       --radius-full: 9999px;
@@ -117,7 +110,6 @@
       color: rgba(147, 197, 253, 0.5);
     }
 
-    /* Filter Tag Buttons */
     .filter-tags {
       display: flex;
       gap: 6px;
@@ -142,7 +134,6 @@
       border-color: var(--accent-blue);
     }
 
-    /* 4-Column Grid Layout */
     .link-grid {
       display: grid;
       grid-template-columns: repeat(1, 1fr);
@@ -166,7 +157,6 @@
       margin: 0;
     }
 
-    /* Interactive Button Card Style */
     .exercise-btn {
       display: flex;
       flex-direction: column;
@@ -209,23 +199,20 @@
       line-height: 1.3;
     }
 
-    /* Badge Tags */
     .tag {
       font-size: 0.7rem;
       font-weight: 700;
       padding: 2px 8px;
       border-radius: var(--radius-full);
-      text-transform: uppercase;
       letter-spacing: 0.05em;
       color: #0f172a;
       flex-shrink: 0;
       white-space: nowrap;
     }
 
-    .tag-a2, .tag-a2-b1 { background: var(--badge-a2); }
-    .tag-b1, .tag-b1-b2 { background: var(--badge-b1); }
-    .tag-b2, .tag-b2-c1 { background: var(--badge-b2); }
-    .tag-c1 { background: var(--badge-c1); }
+    .tag-1 { background: var(--badge-1); }
+    .tag-2 { background: var(--badge-2); }
+    .tag-3 { background: var(--badge-3); }
     .tag-none { background: var(--badge-default); }
 
     .btn-footer {
@@ -319,25 +306,6 @@
       let currentLevel = 'all';
       const repoUrl = 'https://api.github.com/repos/Balmain-English/decisionmaker-pro/contents';
 
-      const levelMap = {
-        'A2': '1',
-        'B1': '2',
-        'B2': '3',
-        'C1': '3',
-        'A2-B1': '1',
-        'B1-B2': '2',
-        'B2-C1': '3'
-      };
-
-      function rewriteBadgesInDOM() {
-        document.querySelectorAll('.tag').forEach(tagEl => {
-          const txt = tagEl.textContent.trim().toUpperCase();
-          if (levelMap[txt]) {
-            tagEl.textContent = levelMap[txt];
-          }
-        });
-      }
-
       function updateCount(){
         const visible = items.filter(li => li.style.display !== 'none').length;
         count.textContent = visible;
@@ -348,16 +316,7 @@
         items.forEach(li => {
           const text = li.textContent.toLowerCase();
           const tag = li.querySelector('.tag');
-
-          if (tag) {
-            const txt = tag.textContent.trim().toUpperCase();
-            if (levelMap[txt]) {
-              tag.textContent = levelMap[txt];
-            }
-          }
-
           const level = tag ? tag.textContent.trim().toLowerCase() : '';
-
           const matchesQuery = query === '' || text.includes(query);
           const matchesLevel = currentLevel === 'all' || level === currentLevel.toLowerCase();
 
@@ -397,8 +356,6 @@
 
       input.addEventListener('input', debounce(applyFilters, 150));
 
-      rewriteBadgesInDOM();
-
       fetch(repoUrl + '?ref=main&t=' + Date.now())
         .then(res => {
           if (!res.ok) {
@@ -417,13 +374,12 @@
             const safeHref = encodeURI(name);
             const base = name.replace(/\.html$/i, '');
 
-            const levelMatch = base.match(/-(a2|b1\+|b1|b2|c1)$/i);
-            const rawLevel = levelMatch ? levelMatch[1].toUpperCase().replace('+','') : null;
-            const displayLevel = rawLevel ? (levelMap[rawLevel] || rawLevel) : null;
-            const tagClass = rawLevel ? ('tag-' + rawLevel.toLowerCase()) : 'tag-none';
-            const tagText = displayLevel || '—';
+            const levelMatch = base.match(/-(\d+)(?:[a-z])?$/i);
+            const rawLevel = levelMatch ? String(levelMatch[1]) : null;
+            const tagClass = rawLevel ? 'tag-' + rawLevel : 'tag-none';
+            const tagText = rawLevel || '—';
 
-            let title = base.replace(/-(a2|b1\+|b1|b2|c1)$/i, '').replace(/-/g, ' ');
+            let title = base.replace(/-(\d+)(?:[a-z])?$/i, '').replace(/-/g, ' ');
             title = title.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
             const li = document.createElement('li');
