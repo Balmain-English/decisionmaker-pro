@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Are You a Teamworker? (IT &amp; Systems Edition)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        sky: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        },
+                        slate: {
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .meter-transition {
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50 border-b border-slate-800">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-sky-600 p-2 rounded-lg text-white font-bold text-xl flex items-center justify-center">
+                    💻🩺
+                </div>
+                <div>
+                    <h1 class="font-bold text-base sm:text-lg leading-tight">Are You a Teamworker? <span class="text-sky-400 font-normal text-xs sm:text-sm block sm:inline">(IT &amp; Systems Edition)</span></h1>
+                    <p class="text-[11px] text-slate-400">Health Garment Sector • Multidisciplinary B1 Training</p>
+                </div>
+            </div>
+            <button id="downloadBtn" onclick="downloadApp()" class="bg-sky-600 hover:bg-sky-500 text-white text-xs sm:text-sm font-semibold py-2 px-3 sm:px-4 rounded-lg shadow transition flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span class="hidden sm:inline">Download App (.html)</span>
+                <span class="sm:hidden">Download</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- ================= SCREEN 1: WELCOME & INTRODUCTORY EXERCISES ================= -->
+        <section id="screen-intro" class="space-y-6 fade-in">
+            
+            <!-- Welcome Banner -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <span class="inline-block px-3 py-1 bg-sky-100 text-sky-800 font-semibold text-xs rounded-full mb-3">Module 1: Professional IT Context</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">IT Collaboration in Health Garments</h2>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
+                    As an <strong>IT / CRM Specialist</strong> in a medical clothing company, you connect technology with human needs. Your CRM and ERP systems hold essential data for <strong>Sales, Marketing, HR, Finance, Logistics, Production, and Clinical Quality Assurance</strong>.
+                </p>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                    Good IT teamwork isn't just about writing code or fixing database bugs—it is about understanding business processes, communicating technical concepts simply, and helping non-technical colleagues serve medical patients effectively.
+                </p>
+            </div>
+
+            <!-- Vocabulary Exercise -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center space-x-2">
+                    <span>📚</span>
+                    <span>Exercise A: IT &amp; Business Vocabulary Check</span>
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 mb-4">Match each technical term to its correct business definition.</p>
+
+                <!-- Word Bank -->
+                <div class="flex flex-wrap gap-2 mb-6 p-3 bg-slate-100 rounded-xl text-xs sm:text-sm font-medium text-sky-900">
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">CRM Integration</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">Stakeholder</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">Data Integrity</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">User Adoption</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">Workflow Alignment</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border border-slate-200">Troubleshoot</span>
+                </div>
+
+                <!-- Questions -->
+                <div class="space-y-3" id="vocabQuestions">
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700 font-medium">1. The accuracy, completeness, and consistency of medical and sales records in your system.</p>
+                        <select data-correct="Data Integrity" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct term --</option>
+                            <option value="CRM Integration">CRM Integration</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Data Integrity">Data Integrity</option>
+                            <option value="User Adoption">User Adoption</option>
+                            <option value="Workflow Alignment">Workflow Alignment</option>
+                            <option value="Troubleshoot">Troubleshoot</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700 font-medium">2. Any person or department (e.g., Sales, HR, Finance) who uses or relies on the software.</p>
+                        <select data-correct="Stakeholder" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct term --</option>
+                            <option value="CRM Integration">CRM Integration</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Data Integrity">Data Integrity</option>
+                            <option value="User Adoption">User Adoption</option>
+                            <option value="Workflow Alignment">Workflow Alignment</option>
+                            <option value="Troubleshoot">Troubleshoot</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700 font-medium">3. Connecting customer software with other applications (like manufacturing ERP or shipping software).</p>
+                        <select data-correct="CRM Integration" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct term --</option>
+                            <option value="CRM Integration">CRM Integration</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Data Integrity">Data Integrity</option>
+                            <option value="User Adoption">User Adoption</option>
+                            <option value="Workflow Alignment">Workflow Alignment</option>
+                            <option value="Troubleshoot">Troubleshoot</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700 font-medium">4. How effectively and regularly employees actually use new software features in their daily work.</p>
+                        <select data-correct="User Adoption" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct term --</option>
+                            <option value="CRM Integration">CRM Integration</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Data Integrity">Data Integrity</option>
+                            <option value="User Adoption">User Adoption</option>
+                            <option value="Workflow Alignment">Workflow Alignment</option>
+                            <option value="Troubleshoot">Troubleshoot</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700 font-medium">5. Making sure software processes match the real daily work steps of different business teams.</p>
+                        <select data-correct="Workflow Alignment" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct term --</option>
+                            <option value="CRM Integration">CRM Integration</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Data Integrity">Data Integrity</option>
+                            <option value="User Adoption">User Adoption</option>
+                            <option value="Workflow Alignment">Workflow Alignment</option>
+                            <option value="Troubleshoot">Troubleshoot</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700 font-medium">6. To analyze, diagnose, and fix technical bugs or system errors systematically.</p>
+                        <select data-correct="Troubleshoot" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct term --</option>
+                            <option value="CRM Integration">CRM Integration</option>
+                            <option value="Stakeholder">Stakeholder</option>
+                            <option value="Data Integrity">Data Integrity</option>
+                            <option value="User Adoption">User Adoption</option>
+                            <option value="Workflow Alignment">Workflow Alignment</option>
+                            <option value="Troubleshoot">Troubleshoot</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between">
+                    <button onclick="checkVocab()" class="bg-sky-700 hover:bg-sky-800 text-white font-semibold py-2 px-4 rounded-lg text-xs sm:text-sm transition">
+                        Check Vocabulary Answers
+                    </button>
+                    <span id="vocabResult" class="text-xs sm:text-sm font-bold"></span>
+                </div>
+            </div>
+
+            <!-- Discussion Starters -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <span>💬</span>
+                    <span>Exercise B: Cross-Functional Discussion Starters</span>
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 mb-4">Discuss these two situations with a colleague or think about your real workplace experiences:</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-sky-50/70 rounded-xl border border-sky-100">
+                        <p class="font-semibold text-sky-900 text-xs sm:text-sm">Discussion Question 1:</p>
+                        <p class="text-slate-700 text-xs sm:text-sm mt-1">How do you explain technical IT issues or CRM system updates to non-technical colleagues in Sales or Logistics without using confusing jargon?</p>
+                    </div>
+                    <div class="p-4 bg-sky-50/70 rounded-xl border border-sky-100">
+                        <p class="font-semibold text-sky-900 text-xs sm:text-sm">Discussion Question 2:</p>
+                        <p class="text-slate-700 text-xs sm:text-sm mt-1">When Sales or Finance asks for an urgent custom feature in the CRM that breaks standard data security rules, how do you respond constructively?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Quiz Button -->
+            <div class="text-center py-4">
+                <button onclick="startQuiz()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold py-3.5 px-8 rounded-xl text-sm sm:text-base shadow-lg transition transform hover:-translate-y-0.5">
+                    Start Interactive Quiz (12 Situations) →
+                </button>
+            </div>
+
+        </section>
+
+        <!-- ================= SCREEN 2: 12-SITUATION QUIZ ================= -->
+        <section id="screen-quiz" class="hidden space-y-6">
+
+            <!-- STICKY TEAMWORK METER BAR -->
+            <div class="sticky top-[60px] z-40 bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-2">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-700">
+                    <span class="flex items-center space-x-1">
+                        <span>⚠️ Isolated</span>
+                    </span>
+                    <div class="text-center flex items-center space-x-2">
+                        <span id="meterLabel" class="text-sky-700 font-bold">Score: 0 / 24</span>
+                        <span id="creativityLabel" class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded-full font-bold">Creativity: +0</span>
+                    </div>
+                    <span class="flex items-center space-x-1">
+                        <span>Synergistic (+24) 🤝</span>
+                    </span>
+                </div>
+                <!-- Dynamic Progress Bar (Starts at 0% width) -->
+                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5 border border-slate-300">
+                    <div id="meterBar" class="bg-gradient-to-r from-amber-500 via-sky-500 to-emerald-600 h-full rounded-full meter-transition" style="width: 0%;"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 font-medium px-1">
+                    <span>0 (Start)</span>
+                    <span>6</span>
+                    <span>12</span>
+                    <span>18</span>
+                    <span>24 (Max)</span>
+                </div>
+            </div>
+
+            <!-- QUESTION CARD -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6 fade-in">
+                
+                <!-- Question Header -->
+                <div class="flex justify-between items-center border-b pb-4 border-slate-100">
+                    <span id="questionNum" class="text-xs font-bold uppercase tracking-wider text-sky-700 bg-sky-50 px-3 py-1 rounded-full border border-sky-200">
+                        Situation 1 of 12
+                    </span>
+                    <span id="roleTag" class="text-xs font-medium text-slate-500 italic">
+                        Context: Sales &amp; Marketing
+                    </span>
+                </div>
+
+                <!-- Scenario Description -->
+                <div>
+                    <h3 id="scenarioTitle" class="text-lg sm:text-xl font-bold text-slate-900 mb-2">
+                        <!-- Dynamic Title -->
+                    </h3>
+                    <p id="scenarioText" class="text-slate-600 text-xs sm:text-sm leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <!-- Dynamic Scenario -->
+                    </p>
+                </div>
+
+                <!-- Answer Choices (Radio Group) -->
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Dynamic Options -->
+                </div>
+
+                <!-- Option 5: Open 'Something Else' Input -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="quizOption" value="custom" class="w-4 h-4 text-sky-600 focus:ring-sky-500" onchange="toggleCustomInput(true)">
+                        <span class="font-semibold text-xs sm:text-sm text-slate-800">E) Something else (Write your own practical IT/business idea for classroom discussion):</span>
+                    </label>
+                    <textarea id="customIdeaText" disabled="" placeholder="Type your alternative technical or communication solution here..." class="w-full mt-2 p-2.5 text-xs sm:text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400" rows="2"></textarea>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="pt-2">
+                    <button id="submitAnswerBtn" onclick="submitAnswer()" class="w-full bg-sky-700 hover:bg-sky-800 text-white font-bold py-3 px-6 rounded-xl text-xs sm:text-sm shadow-md transition">
+                        Submit Decision &amp; See Teamwork Impact
+                    </button>
+                </div>
+
+                <!-- FEEDBACK CARD -->
+                <div id="feedbackCard" class="hidden p-5 rounded-xl border fade-in space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <span id="feedbackBadge" class="px-2.5 py-0.5 text-xs font-bold rounded-full"></span>
+                        <h4 id="feedbackTitle" class="font-bold text-xs sm:text-sm"></h4>
+                    </div>
+                    <p id="feedbackText" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        <!-- feedback text -->
+                    </p>
+                    <div class="pt-2 flex justify-end">
+                        <button id="nextQuestionBtn" onclick="nextQuestion()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2 px-5 rounded-lg text-xs sm:text-sm shadow transition flex items-center space-x-2">
+                            <span>Next Situation</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 3: DEBRIEFING & FINAL RESULTS ================= -->
+        <section id="screen-results" class="hidden space-y-6 fade-in">
+            <!-- Overall Score Card -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-4">
+                <span class="px-3 py-1 bg-sky-100 text-sky-800 font-semibold text-xs rounded-full">Assessment Complete</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Your IT Teamwork Assessment</h2>
+                
+                <!-- Final Gauge -->
+                <div class="max-w-md mx-auto space-y-2 my-4">
+                    <div class="flex justify-between items-center text-xs font-semibold text-slate-600">
+                        <span>0 (Isolated IT Admin)</span>
+                        <div class="flex items-center space-x-2">
+                            <span id="finalScoreText" class="text-sky-700 text-base font-bold">0 / 24 Points</span>
+                            <span id="finalCreativityText" class="bg-purple-100 text-purple-800 text-xs px-2.5 py-0.5 rounded-full font-bold">Creativity: +0</span>
+                        </div>
+                        <span>+24 (Strategic IT Partner)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-5 overflow-hidden p-0.5 border border-slate-300">
+                        <div id="finalMeterBar" class="bg-gradient-to-r from-amber-500 via-sky-500 to-emerald-600 h-full rounded-full meter-transition" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <div class="p-5 rounded-xl bg-sky-50 border border-sky-200 max-w-2xl mx-auto text-left">
+                    <h3 id="resultTitle" class="text-base sm:text-lg font-bold text-sky-900 mb-2"></h3>
+                    <p id="resultEducativeText" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        <!-- 60-80 words final feedback -->
+                    </p>
+                </div>
+            </div>
+
+            <!-- Competency Breakdown -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                    <span>📊</span>
+                    <span>Core IT Teamworking Competencies in Health Garments</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">1. Cross-Departmental Communication</p>
+                        <p class="text-slate-600">Translating complex CRM architectures and data security requirements into clear, simple business terms for Sales and HR.</p>
+                    </div>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">2. Non-Technical User Empathy</p>
+                        <p class="text-slate-600">Understanding daily pain points in garment sizing, shipping logs, and billing without dismissing non-technical user frustration.</p>
+                    </div>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">3. Collaborative Problem-Solving</p>
+                        <p class="text-slate-600">Finding safe, creative technical compromises that protect system stability while satisfying urgent sales and production goals.</p>
+                    </div>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">4. Data Integrity &amp; Compliance</p>
+                        <p class="text-slate-600">Maintaining strict patient data privacy (GDPR) and accurate medical billing codes without slowing down operational workflows.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reflection Questions -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <span>💡</span>
+                    <span>Post-Quiz Group Reflection Questions</span>
+                </h3>
+                <ul class="space-y-2 text-xs sm:text-sm text-slate-700 list-disc list-inside leading-relaxed">
+                    <li>Which non-technical department (Sales, HR, Logistics, Finance) is hardest for you to communicate with, and how can you improve mutual trust?</li>
+                    <li>Did you select <em>"Something else"</em> for any scenario? Share your practical IT solution with the group.</li>
+                    <li>How can IT prevent last-minute emergencies caused by other departments launching marketing campaigns or changing logistics schedules?</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 py-4">
+                <button onclick="window.print()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 px-6 rounded-xl text-xs sm:text-sm transition shadow flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <span>Print / Save PDF Report</span>
+                </button>
+                <button onclick="resetQuiz()" class="w-full sm:w-auto bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-xl text-xs sm:text-sm transition shadow">
+                    Retake Quiz 🔄
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 mt-auto">
+        <div class="max-w-5xl mx-auto px-4 text-center space-y-1">
+            <p>Multidisciplinary Health Garment Sector • IT &amp; Systems Professional Collaboration Program (B1 Level)</p>
+            <p class="text-slate-500">Interactive standalone application. Suitable for classroom training and self-assessment.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ================= 12 IT SCENARIOS DATA =================
+        const situations = [
+            {
+                role: "Sales & Marketing",
+                title: "1. Complex Medical Garment Sizing Interface",
+                scenario: "Sales representatives complain that the CRM interface for inputting custom medical compression sleeve measurements is too slow and complicated, causing them to lose sales time.",
+                options: [
+                    {
+                        text: "Shadow a sales rep during a real customer session, identify confusing input fields, and design a simplified quick-entry screen together.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Outstanding IT empathy! Direct observation helps you streamline technical data entry without compromising required medical compression specifications."
+                    },
+                    {
+                        text: "Organize a brief online training session to explain why each data field is technically necessary for production.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Good communication effort, though modifying difficult UI design is often more effective than just retraining frustrated end-users."
+                    },
+                    {
+                        text: "Send sales reps an email reminder that all CRM fields are mandatory for medical garment quality control.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Neutral response. While data requirements are real, simply enforcing rules does not resolve underlying user adoption bottlenecks."
+                    },
+                    {
+                        text: "Tell the Sales Director that salespeople should adapt to the system software rather than complaining.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Poor response. Dismissing end-user pain damages cross-departmental trust and encourages sales staff to bypass the CRM entirely."
+                    }
+                ]
+            },
+            {
+                role: "Logistics & Production",
+                title: "2. Maintenance Window vs. Urgent Orthotic Shipment",
+                scenario: "Logistics urgently needs automated tracking in the CRM for a priority shipment of custom orthotic braces, but your IT team has scheduled a system maintenance window at the exact same time.",
+                options: [
+                    {
+                        text: "Meet with Logistics to agree on a short 30-minute maintenance postponement or prepare a manual temporary workaround for this shipment.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Excellent business alignment! Balancing system stability with urgent customer delivery shows flexible and constructive IT leadership."
+                    },
+                    {
+                        text: "Delay the system maintenance window by 24 hours to give Logistics time to complete all evening shipments.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Helpful to Logistics, but ensure delaying security patches or system updates doesn't create larger technical risks for the company."
+                    },
+                    {
+                        text: "Proceed with the scheduled maintenance as planned, telling Logistics to wait until the system is back online.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Rigid approach. Adhering strictly to IT schedules without evaluating business impact creates unnecessary operational friction."
+                    },
+                    {
+                        text: "Cancel the maintenance window completely without informing the rest of your IT security team.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Unsafe choice. Making unilateral IT decisions without consulting your sysadmin colleagues endangers overall system security."
+                    }
+                ]
+            },
+            {
+                role: "Finance & Billing",
+                title: "3. Inconsistent Medical Insurance Billing Codes",
+                scenario: "Finance reports that sales reps are selecting incorrect health insurance reimbursement codes in the CRM, leading to delayed payments for adaptive clothing orders.",
+                options: [
+                    {
+                        text: "Collaborate with Finance and Sales to implement smart dropdown logic and auto-validation rules in the CRM.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Brilliant technical solution! Using system constraints to prevent user error bridges the gap between Sales speed and Finance accuracy."
+                    },
+                    {
+                        text: "Create a simple PDF user guide with code definitions and ask Sales managers to distribute it.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Helpful documentation, but automated CRM safeguards are far more reliable than relying on printed manuals."
+                    },
+                    {
+                        text: "Tell Finance that data input errors are a Sales management responsibility, not an IT issue.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Passes the blame. While input errors belong to users, IT has the power to design systems that make errors difficult to commit."
+                    },
+                    {
+                        text: "Lock the billing fields so only the Finance team can manually type insurance codes after sales are closed.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Creates a major bottleneck. Shifting data entry work entirely onto Finance slows down order processing significantly."
+                    }
+                ]
+            },
+            {
+                role: "IT Internal Team",
+                title: "4. Junior Colleague Database Mistake",
+                scenario: "A junior IT colleague accidentally executed an incorrect query during peak hours, causing a 15-minute CRM slowdown for sales staff.",
+                options: [
+                    {
+                        text: "Help fix the database issue immediately, reassure the junior colleague, and conduct a blame-free team review to prevent future occurrences.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Outstanding internal IT teamwork! Supporting colleagues during crises builds strong team psychological safety and improves long-term system resilience."
+                    },
+                    {
+                        text: "Fix the database issue and explain privately to the junior team member how to safely test queries on non-production servers.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Good mentoring, though discussing systemic safety protocols with the entire IT team adds even greater value."
+                    },
+                    {
+                        text: "Fix the bug silently without discussing it with your colleague or the rest of the IT team.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Missed learning opportunity. If errors are swept under the rug without discussion, similar mistakes will happen again."
+                    },
+                    {
+                        text: "Criticize the junior colleague in the department chat group and report them immediately to the IT Director.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Destructive behavior. Publicly shaming teammates destroys morale and discourages people from admitting technical errors early."
+                    }
+                ]
+            },
+            {
+                role: "Management & Executive Strategy",
+                title: "5. Urgent Executive Reporting Request",
+                scenario: "Executive management requests a complex new CRM dashboard for a new line of smart wearable health garments by next Monday, giving you only two days.",
+                options: [
+                    {
+                        text: "Present a realistic plan: deliver a core functional dashboard by Monday, followed by full advanced reporting the following week.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Superb agile negotiation! Delivering essential metrics quickly while setting realistic expectations builds executive confidence."
+                    },
+                    {
+                        text: "Agree to work late over the weekend alone to complete the entire requested dashboard on time.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Dedicated effort, but burning out to meet unrealistic deadlines without setting long-term expectations is unsustainable."
+                    },
+                    {
+                        text: "Inform management that standard IT development cycles require a minimum of two weeks notice.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Technically correct, but rigid communication without offering a flexible alternative makes IT appear unhelpful."
+                    },
+                    {
+                        text: "Accept the deadline immediately without checking if your database server can process the required queries safely.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Dangerous over-promising. Rushing complex database changes without testing can compromise system integrity."
+                    }
+                ]
+            },
+            {
+                role: "HR & Training",
+                title: "6. Low CRM System Adoption Among Senior Staff",
+                scenario: "HR reports that senior sales consultants who handle specialized hospital accounts prefer using paper notebooks instead of logging client health profiles in the CRM.",
+                options: [
+                    {
+                        text: "Partner with HR to offer small personalized coaching sessions, showing senior staff how CRM mobile features save them time.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Perfect collaborative approach! Addressing user resistance with empathy and tailored training drives genuine user adoption."
+                    },
+                    {
+                        text: "Ask HR to make CRM usage a mandatory requirement in annual employee performance reviews.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Enforces compliance, but policy alone without friendly practical assistance often leads to resentment and poor data quality."
+                    },
+                    {
+                        text: "Send senior staff standard video tutorials showing basic CRM record creation steps.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Low effort. Reluctant software users rarely watch generic video guides without hands-on encouragement."
+                    },
+                    {
+                        text: "Ignore the issue since paper users will eventually retire or adapt on their own.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Passive neglect. Fragmented customer data in paper notebooks creates severe business risks if staff leave."
+                    }
+                ]
+            },
+            {
+                role: "Quality Assurance & Clinical Oversight",
+                title: "7. Patient Privacy & GDPR Regulation Update",
+                scenario: "Quality Assurance informs you that patient data protection rules for health garments have changed, requiring immediate CRM permission restriction updates.",
+                options: [
+                    {
+                        text: "Work with QA to audit user roles immediately and configure permission levels that ensure compliance without blocking daily work.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Top-tier cross-functional work! Securing sensitive medical data while maintaining smooth daily business operations is essential."
+                    },
+                    {
+                        text: "Apply maximum security restrictions to all CRM user accounts immediately and resolve blocked user access as complaints arrive.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Ensures legal safety, but disruptive security rollouts disrupt active sales and order processing needlessly."
+                    },
+                    {
+                        text: "Ask QA to write a technical specification document before you make any changes in the system.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Slow administrative response. Legal privacy compliance requires active guidance and swift technical partnership."
+                    },
+                    {
+                        text: "Delay changes because restricting CRM access will generate too many user support tickets for your IT desk.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Unacceptable risk. Ignoring medical data privacy rules exposes the company to massive legal fines and reputational loss."
+                    }
+                ]
+            },
+            {
+                role: "Cross-Functional Project Team",
+                title: "8. Argument Over Order Address Ownership",
+                scenario: "Sales and Logistics argue in a meeting about who is responsible for updating patient delivery addresses in the CRM when custom garments are resized.",
+                options: [
+                    {
+                        text: "Propose a clear automated CRM workflow rule: Sales manages initial address creation, Logistics confirms final dispatch changes.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Exceptional process mediation! IT serves as an effective mediator by creating clear system rules for inter-departmental workflows."
+                    },
+                    {
+                        text: "Offer to modify the CRM screen so both teams have equal permission to edit delivery addresses anytime.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Flexibility is good, but without clear business responsibility, duplicate or overwriting errors will occur."
+                    },
+                    {
+                        text: "Remain silent during the meeting and let departmental managers resolve their operational argument.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Passive stance. IT professionals can actively guide process efficiency by proposing clear software workflow boundaries."
+                    },
+                    {
+                        text: "Lock address editing fields completely and require all changes to go through an IT helpdesk ticket.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Creates unnecessary administrative red tape. IT support should facilitate business communication, not become a bottleneck."
+                    }
+                ]
+            },
+            {
+                role: "Customer Support & Post-Sales",
+                title: "9. Request for Additional CRM Ticket Fields",
+                scenario: "Customer Support requests 8 new custom fields in the CRM to track detailed garment fitting complaints, but your IT team worries about database bloat.",
+                options: [
+                    {
+                        text: "Review support workflows together to consolidate the request into 2 smart categorizations and a simple drop-down menu.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Excellent technical design! Simplifying user requests protects system architecture while delivering valuable feedback data."
+                    },
+                    {
+                        text: "Add all 8 requested fields directly into the CRM interface to make the support team happy.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Responsive service, but overloading database forms leads to messy UI and lower user data entry consistency."
+                    },
+                    {
+                        text: "Reject the request completely, stating that the current CRM schema cannot be expanded further.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Unhelpful refusal. Technology must evolve to help the business track product quality defects."
+                    },
+                    {
+                        text: "Tell support staff to record their detailed complaint notes in a shared spreadsheet instead.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Siloes data. Moving customer complaint data outside the central CRM destroys data integrity and tracking."
+                    }
+                ]
+            },
+            {
+                role: "IT & Marketing Integration",
+                title: "10. Surprise Marketing Campaign Server Surge",
+                scenario: "Marketing launches a major online promotion for new adaptive clothing without telling IT, causing a massive surge in web traffic and CRM API slowdowns.",
+                options: [
+                    {
+                        text: "Stabilize server performance immediately, then establish a joint promotional calendar with Marketing for future campaigns.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Brilliant proactive leadership! Resolving the immediate crisis constructively leads to long-term cross-departmental alignment."
+                    },
+                    {
+                        text: "Upgrade API bandwidth limits temporarily and send a polite email asking Marketing for advance notice next time.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Effective crisis management, though establishing formal campaign communication channels ensures permanent reliability."
+                    },
+                    {
+                        text: "Temporarily disable public API connections to protect internal factory CRM stability.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Protects internal systems, but shutting down public forms during an active campaign hurts company revenue."
+                    },
+                    {
+                        text: "Send an angry email to the Marketing Director accusing them of unprofessional behavior.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Damages working relationships. Emotional reactions create hostility instead of solving technical coordination gaps."
+                    }
+                ]
+            },
+            {
+                role: "External Vendor / Integration",
+                title: "11. External Software Vendor Missed Deadline",
+                scenario: "An external vendor integrating your CRM with new factory ERP software misses a critical delivery deadline right before launch.",
+                options: [
+                    {
+                        text: "Organize an urgent alignment meeting with the vendor and internal leads to build a prioritized fallback launch plan.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Strong pragmatic management! Bringing stakeholders together to create realistic backup plans keeps projects moving forward."
+                    },
+                    {
+                        text: "Work extra hours to code a temporary custom API script yourself to bridge the missing link.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Resourceful effort, but writing temporary code without team documentation can create future technical debt."
+                    },
+                    {
+                        text: "Passively wait for the vendor to deliver their corrected software update.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Risky passivity. IT specialists must actively monitor vendor progress to protect business launch commitments."
+                    },
+                    {
+                        text: "Blame the vendor publicly in the executive project meeting to protect IT's reputation.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Unprofessional attitude. Shifting blame does not solve technical project delays for company stakeholders."
+                    }
+                ]
+            },
+            {
+                role: "Personal Priorities & Team Support",
+                title: "12. Urgent HR Support vs. Personal Coding Priority",
+                scenario: "You are finishing a critical individual bug fix when an HR colleague urgently contacts you because a new employee cannot log into the CRM.",
+                options: [
+                    {
+                        text: "Spend 5 minutes resetting the HR access issue immediately or arrange for an IT colleague to help them without delay.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Superb customer orientation! Prioritizing immediate colleague onboarding demonstrates strong service-minded teamwork."
+                    },
+                    {
+                        text: "Ask the HR colleague to submit a formal helpdesk ticket so you can address it after finishing your task.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Follows standard protocol, but offering quick personal assistance for onboarding leaves a great impression."
+                    },
+                    {
+                        text: "Tell HR that user login support is handled strictly during afternoon helpdesk hours.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Inflexible response. Rigid adherence to support hours frustrates new hires and department managers."
+                    },
+                    {
+                        text: "Ignore the message from HR until you finish your own work at the end of the day.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Poor service behavior. Ignoring colleagues leaves new employees unable to work for hours."
+                    }
+                ]
+            }
+        ];
+
+        // ================= STATE VARIABLES =================
+        let currentQuestionIndex = 0;
+        let meterScore = 0; // Starts exact 0 (Scale: 0 to 24)
+        let creativityScore = 0; // Tracks creativity points
+        let userAnswers = [];
+
+        // ================= VOCABULARY EXERCISE LOGIC =================
+        function checkVocab() {
+            const selects = document.querySelectorAll('.vocab-select');
+            let correctCount = 0;
+            selects.forEach(select => {
+                const target = select.getAttribute('data-correct');
+                if (select.value === target) {
+                    select.classList.remove('border-slate-300', 'border-red-500');
+                    select.classList.add('border-emerald-500', 'bg-emerald-50');
+                    correctCount++;
+                } else {
+                    select.classList.remove('border-slate-300', 'border-emerald-500');
+                    select.classList.add('border-red-500', 'bg-red-50');
+                }
+            });
+
+            const resultEl = document.getElementById('vocabResult');
+            if (correctCount === 6) {
+                resultEl.className = "text-xs sm:text-sm font-bold text-emerald-600";
+                resultEl.textContent = "Perfect! 6/6 Correct!";
+            } else {
+                resultEl.className = "text-xs sm:text-sm font-bold text-amber-600";
+                resultEl.textContent = `Score: ${correctCount}/6. Review highlighted answers!`;
+            }
+        }
+
+        // ================= QUIZ NAVIGATION & RENDER =================
+        function startQuiz() {
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            currentQuestionIndex = 0;
+            meterScore = 0;
+            creativityScore = 0;
+            userAnswers = [];
+            updateMeterUI(0, "Quiz Started");
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function loadQuestion(index) {
+            const q = situations[index];
+            
+            document.getElementById('questionNum').textContent = `Situation ${index + 1} of 12`;
+            document.getElementById('roleTag').textContent = `Department: ${q.role}`;
+            document.getElementById('scenarioTitle').textContent = q.title;
+            document.getElementById('scenarioText').textContent = q.scenario;
+
+            // Reset Feedback Card & Textarea
+            document.getElementById('feedbackCard').classList.add('hidden');
+            const customText = document.getElementById('customIdeaText');
+            customText.value = '';
+            customText.disabled = true;
+
+            // Render Options
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            const shuffledOptions = shuffleArray([...q.options]);
+
+            shuffledOptions.forEach((opt, idx) => {
+                const optionHtml = `
+                    <label class="flex items-start space-x-3 p-3 bg-slate-50 hover:bg-sky-50/50 rounded-xl border border-slate-200 cursor-pointer transition">
+                        <input type="radio" name="quizOption" value="${opt.score}" data-feedback="${encodeURIComponent(opt.feedback)}" data-type="${opt.type}" class="mt-1 w-4 h-4 text-sky-600 focus:ring-sky-500" onchange="toggleCustomInput(false)">
+                        <span class="text-xs sm:text-sm text-slate-800 leading-relaxed">${opt.text}</span>
+                    </label>
+                `;
+                optionsContainer.insertAdjacentHTML('beforeend', optionHtml);
+            });
+
+            // Enable submit
+            document.getElementById('submitAnswerBtn').disabled = false;
+            document.getElementById('submitAnswerBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function toggleCustomInput(isCustom) {
+            const customText = document.getElementById('customIdeaText');
+            if (isCustom) {
+                customText.disabled = false;
+                customText.focus();
+            } else {
+                customText.disabled = true;
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ================= SUBMIT & SCORING =================
+        function submitAnswer() {
+            const selectedRadio = document.querySelector('input[name="quizOption"]:checked');
+            if (!selectedRadio) {
+                alert("Please select an option or choose 'Something else' before submitting.");
+                return;
+            }
+
+            let pointChange = 0;
+            let feedback = "";
+            let badgeClass = "";
+            let badgeText = "";
+            let cardBorder = "";
+
+            if (selectedRadio.value === 'custom') {
+                const customIdea = document.getElementById('customIdeaText').value.trim();
+                if (customIdea.length < 5) {
+                    alert("Please type a short explanation for your custom idea.");
+                    return;
+                }
+                pointChange = 1;
+                meterScore += 1;
+                creativityScore += 1;
+                feedback = `Your idea ("${customIdea.substring(0, 40)}...") is a great contribution! Proposing creative IT solutions shows strong initiative for group discussion.`;
+                badgeClass = "bg-purple-100 text-purple-800";
+                badgeText = "Creative Solution";
+                cardBorder = "border-purple-300 bg-purple-50/50";
+            } else {
+                const scoreVal = parseInt(selectedRadio.value, 10);
+                feedback = decodeURIComponent(selectedRadio.getAttribute('data-feedback'));
+                pointChange = scoreVal;
+                meterScore += scoreVal;
+
+                if (scoreVal === 2) {
+                    badgeClass = "bg-emerald-100 text-emerald-800";
+                    badgeText = "Very Good";
+                    cardBorder = "border-emerald-300 bg-emerald-50/50";
+                } else if (scoreVal === 1) {
+                    badgeClass = "bg-sky-100 text-sky-800";
+                    badgeText = "Good";
+                    cardBorder = "border-sky-300 bg-sky-50/50";
+                } else if (scoreVal === 0) {
+                    badgeClass = "bg-amber-100 text-amber-800";
+                    badgeText = "Neutral";
+                    cardBorder = "border-amber-300 bg-amber-50/50";
+                } else if (scoreVal === -1) {
+                    badgeClass = "bg-rose-100 text-rose-800";
+                    badgeText = "Poor";
+                    cardBorder = "border-rose-300 bg-rose-50/50";
+                }
+            }
+
+            updateMeterUI(pointChange, badgeText);
+
+            userAnswers.push({
+                question: currentQuestionIndex + 1,
+                pointChange: pointChange
+            });
+
+            const feedbackCard = document.getElementById('feedbackCard');
+            const feedbackBadge = document.getElementById('feedbackBadge');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackText = document.getElementById('feedbackText');
+
+            feedbackCard.className = `p-5 rounded-xl border fade-in space-y-2 ${cardBorder}`;
+            feedbackBadge.className = `px-2.5 py-0.5 text-xs font-bold rounded-full ${badgeClass}`;
+            feedbackBadge.textContent = badgeText;
+            feedbackTitle.textContent = "Teamwork Impact Analysis:";
+            feedbackText.textContent = feedback;
+
+            feedbackCard.classList.remove('hidden');
+
+            document.getElementById('submitAnswerBtn').disabled = true;
+            document.getElementById('submitAnswerBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function updateMeterUI(change, label) {
+            const meterBar = document.getElementById('meterBar');
+            const meterLabel = document.getElementById('meterLabel');
+            const creativityLabel = document.getElementById('creativityLabel');
+
+            // Bar starts at 0% width for score 0, and reaches 100% at max score 24
+            let pct = Math.max(0, Math.min(100, (meterScore / 24) * 100));
+            meterBar.style.width = `${pct}%`;
+
+            let stateText = "Neutral";
+            if (meterScore >= 18) stateText = "Strategic IT Partner 🌟";
+            else if (meterScore >= 10) stateText = "Collaborative Systems Specialist 👍";
+            else if (meterScore >= 2) stateText = "Technical Contributor ⚖️";
+            else stateText = "Isolated System Admin ⚠️";
+
+            meterLabel.textContent = `Score: ${meterScore} / 24 (${stateText})`;
+            if (creativityLabel) {
+                creativityLabel.textContent = `Creativity: +${creativityScore}`;
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < situations.length) {
+                loadQuestion(currentQuestionIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        // ================= FINAL RESULTS DEBRIEFING =================
+        function showResults() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+
+            const finalMeterBar = document.getElementById('finalMeterBar');
+            const finalScoreText = document.getElementById('finalScoreText');
+            const finalCreativityText = document.getElementById('finalCreativityText');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultEducativeText = document.getElementById('resultEducativeText');
+
+            let pct = Math.max(0, Math.min(100, (meterScore / 24) * 100));
+            finalMeterBar.style.width = `${pct}%`;
+            finalScoreText.textContent = `${meterScore} / 24 Points`;
+            if (finalCreativityText) {
+                finalCreativityText.textContent = `Creativity Scale: +${creativityScore} pt${creativityScore !== 1 ? 's' : ''}`;
+            }
+
+            if (meterScore >= 18) {
+                resultTitle.textContent = "🏆 Strategic IT Partner";
+                resultEducativeText.textContent = "You excel at combining technical expertise with genuine business collaboration! You understand that CRM systems succeed only when non-technical staff—such as Sales, HR, and Logistics—feel supported and understood. By communicating clearly, protecting patient data integrity, and solving problems flexibly without technical jargon, you make IT a key driver of health garment manufacturing excellence. Keep inspiring team-wide collaboration across departments!";
+            } else if (meterScore >= 8) {
+                resultTitle.textContent = "🤝 Collaborative Systems Specialist";
+                resultEducativeText.textContent = "You show a solid foundation in IT teamwork! You balance system security with everyday user needs effectively. To elevate your impact further, focus on involving department leaders even earlier during system updates or process redesigns. Proactive listening and empathy for non-technical user frustrations will help you build even smoother workflows across Sales, Finance, and Quality Assurance teams.";
+            } else {
+                resultTitle.textContent = "🌱 Technical Specialist (Focus on Business Collaboration)";
+                resultEducativeText.textContent = "You have strong individual technical awareness, but your choices show a tendency to view IT tasks in isolation. In a multidisciplinary health garment company, software is only as good as the people who use it. Try to communicate more openly with non-technical colleagues, listen to their operational challenges, and look for safe compromises that support business goals while maintaining system security.";
+            }
+        }
+
+        function resetQuiz() {
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-intro').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================= DOWNLOAD APP UTILITY =================
+        function downloadApp() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Are_You_A_Teamworker_IT_Edition.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body>
+</html>

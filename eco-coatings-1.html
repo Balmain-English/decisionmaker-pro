@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eco-Coatings Sales Simulator: A2 Level</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --eco-green: #2e8b57;
+        --wood-brown: #a0522d;
+        --light-green: #e8f5e9;
+        --red: #d32f2f;
+        --bg: #f4f6f4;
+        --dark: #2f3542;
+        --border-color: #c8e6c9;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg);
+        color: var(--dark);
+        line-height: 1.6;
+    }
+
+    header {
+        background: var(--eco-green);
+        color: white;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 5px solid var(--wood-brown);
+    }
+
+    .score-container { text-align: right; }
+    .score-label { font-size: 0.85rem; text-transform: uppercase; color: #fff9c4; font-weight: 800; letter-spacing: 1px; }
+    .score-num { font-family: 'Roboto Mono', monospace; font-size: 2rem; }
+
+    .wrapper { max-width: 850px; margin: 2rem auto; padding: 0 1rem; }
+
+    .card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        display: none;
+        border-top: 8px solid var(--eco-green);
+    }
+    .card.active { display: block; animation: slideUp 0.4s ease-out; }
+
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    h2 { margin-bottom: 1rem; color: var(--eco-green); text-transform: uppercase; }
+    .intro-text { font-size: 1.1rem; margin-bottom: 2rem; color: #4a4a4a; }
+
+    .options-list { display: grid; gap: 12px; margin-bottom: 2rem; }
+    .opt-btn {
+        background: #fff;
+        border: 2px solid var(--border-color);
+        padding: 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: 0.2s;
+        display: block;
+        width: 100%;
+        color: var(--dark);
+    }
+    .opt-btn:hover:not(:disabled) { border-color: var(--eco-green); background: var(--light-green); transform: translateX(4px); }
+    .opt-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .feedback-panel {
+        display: none;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        border-left: 6px solid #ccc;
+        background: #fdfdfd;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        color: white;
+        border-radius: 4px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        font-size: 0.85rem;
+    }
+
+    .nav-btn {
+        margin-top: 2rem;
+        background: var(--dark);
+        color: white;
+        border: none;
+        padding: 1.2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 800;
+        text-transform: uppercase;
+        display: none;
+    }
+    #start-action-btn, #reset-btn { background: var(--eco-green); display: block; }
+    #reset-btn { margin-top: 1rem; background: var(--wood-brown); }
+
+    .emergency-tag {
+        background: var(--red);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+
+    @media (max-width: 600px) {
+        .card { padding: 1.5rem; }
+        .score-num { font-size: 1.5rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1 style="margin:0; font-size: 1.2rem; letter-spacing: 1px;">NATURA-COAT EUROPE</h1>
+        <small>Sales Simulation (CEFR A2)</small>
+    </div>
+    <div class="score-container">
+        <div class="score-label">Sales Points</div>
+        <div class="score-num" id="global-score">0</div>
+    </div>
+</header>
+
+<div class="wrapper">
+    <div class="card active" id="screen-intro">
+        <h2>Your New Job</h2>
+        <p class="intro-text">Welcome! You are a salesperson for Natura-Coat. We make eco-friendly varnishes and lacquers for wood. Your job is to sell our products in Europe.</p>
+        <p><strong>Rules:</strong> You will make 12 business decisions and face 2 emergencies.<br><strong>Goal:</strong> Get as many points as possible and do not lose your biggest customers.</p>
+        <button id="start-action-btn" class="nav-btn" onclick="beginGame()">Start Working</button>
+        <button id="reset-btn" class="nav-btn" onclick="clearSave()">Restart Game</button>
+    </div>
+
+    <div id="screen-main" class="card">
+        <div id="emergency-notice"></div>
+        <h2 id="question-title"></h2>
+        <p id="question-text" class="intro-text"></p>
+        <div class="options-list" id="options-grid"></div>
+        
+        <div id="result-feedback" class="feedback-panel" aria-live="polite">
+            <span id="point-tag" class="status-badge"></span>
+            <p id="feedback-msg"></p>
+        </div>
+        
+        <button id="next-step-btn" class="nav-btn">Next Step</button>
+    </div>
+
+    <div id="screen-end" class="card">
+        <h2>End of Year Review</h2>
+        <div id="final-total" style="font-size: 2.5rem; text-align: center; margin: 1.5rem 0; font-weight: 800;"></div>
+        <div id="evaluation-box" style="padding: 2rem; border-radius: 8px; text-align: center;"></div>
+        <button class="nav-btn" style="display:block; background: var(--eco-green);" onclick="clearSave()">Play Again</button>
+    </div>
+</div>
+
+<script>
+const gameData = {
+    d1: {
+        title: "Decision 1: The First Meeting",
+        text: "A big furniture maker in Germany wants to buy your natural varnish. But he says, 'Your product is very expensive.' What do you say?",
+        choices: [
+            { text: "Yes, but our natural varnish lasts longer and is safer for your workers.", pts: 4, fb: "Great! You explained why it costs more. Safe and long-lasting is a strong message." },
+            { text: "I can give you a small discount for your first order.", pts: 3, fb: "Okay. A discount helps you get the customer, but you make less money." },
+            { text: "Cheap varnish is bad for the environment.", pts: 2, fb: "True, but this sounds a little angry. It is better to talk about why your product is good, not why others are bad." },
+            { text: "Just look at the bottle. It is a very nice bottle.", pts: 1, fb: "A nice bottle is not a good reason to spend a lot of money. The customer is not happy." },
+            { text: "If you do not have money, buy the cheap one.", pts: -1, fb: "This is rude! The customer leaves and will never buy from you." }
+        ],
+        next: "d2"
+    },
+    d2: {
+        title: "Decision 2: The Product Test",
+        text: "You visit a customer in Spain. You need to show that your eco-lacquer is safe and has no bad chemicals. How do you show this?",
+        choices: [
+            { text: "Paint a piece of wood in front of them without a mask, because there is no bad smell.", pts: 4, fb: "Perfect! Seeing is believing. This shows you trust your product completely." },
+            { text: "Give them a paper that lists all the natural ingredients.", pts: 3, fb: "Good. A list is very professional and helps them understand." },
+            { text: "Tell them to read about it on the internet later.", pts: 2, fb: "This is a little lazy. You are the salesperson, you need to show them now." },
+            { text: "Just say, 'Trust me, it is green and natural.'", pts: 1, fb: "Saying 'trust me' is not enough for business. They want proof." },
+            { text: "Drink a little bit of the lacquer to prove it is safe.", pts: -1, fb: "No! Never drink paint or lacquer! This is dangerous and very unprofessional." }
+        ],
+        next: "d3"
+    },
+    d3: {
+        title: "Decision 3: The Toy Maker",
+        text: "A company that makes wooden toys for children wants to buy lacquer. What is the most important thing to tell them?",
+        choices: [
+            { text: "Our lacquer is 100% natural, so it is completely safe if children put the toys in their mouths.", pts: 4, fb: "Excellent! Safety for children is the most important thing for a toy maker." },
+            { text: "The colors are very bright and look beautiful on toys.", pts: 3, fb: "Good. Beautiful colors help sell toys, but safety is still more important." },
+            { text: "Our lacquer dries very fast in your factory.", pts: 2, fb: "This helps the factory work faster, but it does not help the children." },
+            { text: "We are the cheapest company in Europe.", pts: 1, fb: "Cheap is okay, but toy makers care more about quality than just price." },
+            { text: "The lacquer is strong, but you must wash the toys with soap first.", pts: -1, fb: "This is confusing. Now the toy maker thinks they have to do extra work." }
+        ],
+        next: "d4"
+    },
+    d4: {
+        title: "Decision 4: The Long Drying Time",
+        text: "A client calls you. 'Your eco-varnish takes 24 hours to dry. Normal varnish takes 2 hours. This is too slow!' What do you do?",
+        choices: [
+            { text: "Explain how to use a warm room to make it dry faster, and help them change their schedule.", pts: 4, fb: "Very smart! You helped them fix the problem by changing how they work." },
+            { text: "Say sorry and explain that natural products need more time to be perfect.", pts: 3, fb: "Honest and polite. Most people understand that natural things take longer." },
+            { text: "Give them some money back because they are unhappy.", pts: 2, fb: "You lose money, and it does not fix the drying time problem." },
+            { text: "Tell them they just need to wait and be patient.", pts: 1, fb: "This is not very helpful. They have a business to run." },
+            { text: "Tell them they are painting it wrong and hang up the phone.", pts: -1, fb: "Very bad! You cannot hang up on a customer. You lose this client." }
+        ],
+        next: "e1"
+    },
+    e1: {
+        title: "EMERGENCY: The Winter Storm",
+        isEmergency: true,
+        text: "A big snow storm in the Alps stops a truck. The truck has a lot of lacquer for a very important customer in Italy. The customer needs it tomorrow!",
+        choices: [
+            { text: "Call another factory in Italy and pay them to send emergency lacquer to the customer.", type: "good", fb: "Great job! You spent money, but you saved the customer. They will remember your help." },
+            { text: "Call the customer, say sorry, and drive a small amount in your own car so they can start working.", type: "good", fb: "Very good! You worked hard to help them. This builds strong trust." },
+            { text: "Do not answer the phone because you cannot change the weather.", type: "bad", gameOver: true, fb: "GAME OVER. The customer lost a lot of money and fired your company. You must always answer the phone in an emergency." }
+        ],
+        next: "d5"
+    },
+    d5: {
+        title: "Decision 5: The Trade Show",
+        text: "You are at a big design show in Milan. Many people are walking by your table. How do you make them stop?",
+        choices: [
+            { text: "Paint live on a beautiful wooden table so people can see the quality.", pts: 4, fb: "Excellent! People love to watch things being made. This is great marketing." },
+            { text: "Give them a small, beautiful piece of wood with your lacquer on it as a gift.", pts: 3, fb: "Very nice. A physical gift helps them remember your company." },
+            { text: "Stand and smile with a big sign that says 'Eco-Friendly'.", pts: 2, fb: "This is okay, but it is a little boring. Many tables have signs." },
+            { text: "Sit on your chair and read emails until someone asks a question.", pts: 1, fb: "Very bad. You must stand up and be active to get customers." },
+            { text: "Shout very loudly at people walking by to come and buy.", pts: -1, fb: "Too aggressive! You scare the people away." }
+        ],
+        next: "d6"
+    },
+    d6: {
+        title: "Decision 6: The Asian Competitor",
+        text: "A customer says, 'A company from Asia sells lacquer for half the price.' What is your answer?",
+        choices: [
+            { text: "Explain that our lacquer is made in Europe with strict environmental rules, which is better for their brand.", pts: 4, fb: "Perfect! You sold the value of European rules and a good green brand." },
+            { text: "Show them that they need to use less of our product to get the same result.", pts: 3, fb: "Good math. If they use less, it is not actually more expensive." },
+            { text: "Tell them the Asian company has bad quality.", pts: 2, fb: "It is better to talk about your strong points, not their weak points." },
+            { text: "Ask your boss to make your price cheaper too.", pts: 1, fb: "You give up too fast. You must try to sell the quality first." },
+            { text: "Say 'Okay, go buy from them.'", pts: -1, fb: "You did not even try! A salesperson must fight for the sale." }
+        ],
+        next: "d7"
+    },
+    d7: {
+        title: "Decision 7: The Wrong Label",
+        text: "The factory puts the wrong color label on 50 boxes. The lacquer is red, but the label says 'Clear Varnish'. What do you do?",
+        choices: [
+            { text: "Call all the customers, explain the mistake, and send the correct boxes immediately.", pts: 4, fb: "Honest and fast! Fixing mistakes quickly makes customers trust you more." },
+            { text: "Send an email to everyone and wait for them to ask for new boxes.", pts: 3, fb: "This is okay, but an email is slower than a phone call." },
+            { text: "Tell the factory workers to be careful next time, but do nothing about the sold boxes.", pts: 2, fb: "This is bad. The customers will be very angry when they open the red lacquer." },
+            { text: "Wait to see if the customers notice the color is wrong.", pts: 1, fb: "They will notice, and they will be very unhappy. Do not hide mistakes." },
+            { text: "Blame the delivery company.", pts: -1, fb: "Lying is always a bad idea in business. The truth always comes out." }
+        ],
+        next: "d8"
+    },
+    d8: {
+        title: "Decision 8: The Angry Boss",
+        text: "Your manager says you are spending too much time talking to small customers who do not buy much. What do you say?",
+        choices: [
+            { text: "Show the manager that small customers often grow into big customers if we build trust early.", pts: 4, fb: "Smart thinking. You showed your boss you have a long-term plan." },
+            { text: "Agree, and plan specific times for small customers so you can focus on big ones.", pts: 3, fb: "Good compromise. You listened to your boss and organized your time better." },
+            { text: "Say 'I like talking to them' and ignore the manager's advice.", pts: 2, fb: "You cannot ignore your boss. This will cause problems later." },
+            { text: "Stop answering calls from all small customers immediately.", pts: 1, fb: "This is too extreme. You lose all your future small sales." },
+            { text: "Tell your manager they do not understand how sales work.", pts: -1, fb: "Never insult your boss. This is very unprofessional." }
+        ],
+        next: "d9"
+    },
+    d9: {
+        title: "Decision 9: The New Restaurant",
+        text: "A famous new restaurant in Paris wants to use your varnish on their tables. But they want it for free, for 'good advertising'.",
+        choices: [
+            { text: "Offer them a 50% discount if they put a small sign saying 'Tables protected by Natura-Coat' on the menu.", pts: 4, fb: "Excellent! You get paid some money, and you get guaranteed advertising." },
+            { text: "Give it for free, but make them sign a contract to buy more next year.", pts: 3, fb: "Good business. You lose money now, but you guarantee a sale later." },
+            { text: "Say no. You never give things for free.", pts: 2, fb: "You keep your rules, but you lose a very famous customer." },
+            { text: "Give it to them for free and just hope they tell people.", pts: 1, fb: "Hope is not a business strategy. They will probably forget to tell anyone." },
+            { text: "Go to the restaurant and eat a free dinner without asking.", pts: -1, fb: "This makes no sense and is very rude. They call the police." }
+        ],
+        next: "d10"
+    },
+    d10: {
+        title: "Decision 10: The Packaging Change",
+        text: "Your company changes the metal cans to recycled plastic bottles. Some old customers do not like the new plastic.",
+        choices: [
+            { text: "Show them a video of how the new bottles help clean the ocean and are easier to use.", pts: 4, fb: "Great! You turned a negative change into a positive environmental story." },
+            { text: "Give them a free sample so they can feel that the new bottle is strong.", pts: 3, fb: "Good. Letting them touch it helps them stop worrying." },
+            { text: "Explain that metal is too expensive now.", pts: 2, fb: "It is true, but customers do not like hearing about your money problems." },
+            { text: "Tell them the lacquer inside is the same, so they should not worry.", pts: 1, fb: "This is true, but it ignores their feelings." },
+            { text: "Tell them they are old-fashioned and need to change.", pts: -1, fb: "Insulting your customers is always the wrong answer." }
+        ],
+        next: "e2"
+    },
+    e2: {
+        title: "EMERGENCY: The Chemical Mix",
+        isEmergency: true,
+        text: "A client mixed your natural varnish with a strong chemical cleaner by mistake. Now there is a terrible smoke in their shop!",
+        choices: [
+            { text: "Tell them to open all windows, leave the room immediately, and call a professional cleaner.", type: "good", fb: "Very good. Safety is first! You gave clear and safe instructions." },
+            { text: "Drive there quickly with special natural soap to help them clean it safely.", type: "good", fb: "Brave and helpful! You went above and beyond to save the client's shop." },
+            { text: "Tell them it is their fault and hang up the phone.", type: "bad", gameOver: true, fb: "GAME OVER. Someone got hurt by the smoke, and the client sued your company. You must help in emergencies." }
+        ],
+        next: "d11"
+    },
+    d11: {
+        title: "Decision 11: Online Reviews",
+        text: "Someone writes a bad review on the internet. They say your eco-lacquer is 'too sticky'. What do you do?",
+        choices: [
+            { text: "Write a polite public reply. Offer to call them to teach them the correct way to apply it.", pts: 4, fb: "Perfect! Everyone sees that you are helpful and professional." },
+            { text: "Ask three happy customers to write good reviews to balance it.", pts: 3, fb: "Smart marketing. Good reviews push the bad review down." },
+            { text: "Send a private message and offer their money back.", pts: 2, fb: "This makes one person happy, but the public still sees the bad review." },
+            { text: "Ignore it. Only one bad review does not matter.", pts: 1, fb: "In the internet age, one bad review can lose you many customers." },
+            { text: "Reply and say 'You do not know how to paint.'", pts: -1, fb: "Never fight on the internet! You look very unprofessional to everyone." }
+        ],
+        next: "d12"
+    },
+    d12: {
+        title: "Decision 12: End of the Year",
+        text: "It is December. You need to sell 500 more liters to get your bonus money. How do you do it?",
+        choices: [
+            { text: "Call your best clients and offer a 'Spring Preparation' deal if they buy now.", pts: 4, fb: "Brilliant! You created a good reason for them to buy early." },
+            { text: "Visit new shops and give them a special winter discount.", pts: 3, fb: "Good hard work. Finding new shops is a great way to end the year." },
+            { text: "Buy internet advertisements and hope people click them.", pts: 2, fb: "This costs money and takes time. You need sales now." },
+            { text: "Ask your family to buy some.", pts: 1, fb: "Your family does not need 500 liters of varnish. This is not real sales." },
+            { text: "Lie on your sales paper and say you sold it.", pts: -1, fb: "You are fired! Lying about sales is against the law." }
+        ],
+        next: "final"
+    }
+};
+
+const levels = [
+    { min: -15, max: 19, name: "The Beginner", color: "var(--red)", msg: "You made some mistakes and lost customers. You need to focus more on listening and helping people." },
+    { min: 20, max: 33, name: "The Good Salesperson", color: "var(--wood-brown)", msg: "Good job. You made steady sales. Try to find more creative ways to explain why natural products are the best." },
+    { min: 34, max: 44, name: "The Regional Manager", color: "var(--eco-green)", msg: "Great work! You balance honesty, safety, and business very well. Your customers trust you." },
+    { min: 45, max: 48, name: "The Sales Director", color: "#2c3e50", msg: "Perfect! You handled every problem perfectly. You are an expert at selling eco-friendly products!" }
+];
+
+let currentScore = 0;
+let activeStep = "d1";
+
+function fisherYatesShuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function initGame() {
+    const savedStep = localStorage.getItem('ecoSalesStep');
+    const savedScore = localStorage.getItem('ecoSalesScore');
+    
+    if (savedStep && savedScore !== null) {
+        activeStep = savedStep;
+        currentScore = parseInt(savedScore, 10);
+        document.getElementById('global-score').innerText = currentScore;
+        if (activeStep === "final") {
+            finishShift();
+        } else {
+            transitionTo('main');
+            loadTask();
+        }
+    }
+}
+
+function saveGame() {
+    localStorage.setItem('ecoSalesStep', activeStep);
+    localStorage.setItem('ecoSalesScore', currentScore);
+}
+
+function clearSave() {
+    localStorage.removeItem('ecoSalesStep');
+    localStorage.removeItem('ecoSalesScore');
+    location.reload();
+}
+
+function beginGame() {
+    currentScore = 0;
+    activeStep = "d1";
+    document.getElementById('global-score').innerText = currentScore;
+    saveGame();
+    transitionTo('main');
+    loadTask();
+}
+
+function transitionTo(screenId) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.getElementById('screen-' + screenId).classList.add('active');
+}
+
+function loadTask() {
+    const data = gameData[activeStep];
+    if (!data) return;
+
+    document.getElementById('question-title').innerText = data.title;
+    document.getElementById('question-text').innerText = data.text;
+    document.getElementById('emergency-notice').innerHTML = data.isEmergency ? `<div class="emergency-tag">URGENT EMERGENCY</div>` : "";
+    
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = "";
+    document.getElementById('result-feedback').style.display = "none";
+    document.getElementById('next-step-btn').style.display = "none";
+
+    const randomized = fisherYatesShuffle([...data.choices]);
+
+    randomized.forEach(choice => {
+        const b = document.createElement('button');
+        b.className = "opt-btn";
+        b.innerText = choice.text;
+        b.onclick = () => selectOption(choice, b);
+        grid.appendChild(b);
+    });
+}
+
+function selectOption(choice, btn) {
+    const data = gameData[activeStep];
+    const fbPanel = document.getElementById('result-feedback');
+    const badge = document.getElementById('point-tag');
+    const msg = document.getElementById('feedback-msg');
+
+    if (choice.gameOver) {
+        badge.innerText = "YOU LOST THE CLIENT";
+        badge.style.background = "var(--red)";
+        msg.innerText = choice.fb;
+        fbPanel.style.display = "block";
+        document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+        localStorage.removeItem('ecoSalesStep');
+        localStorage.removeItem('ecoSalesScore');
+        setTimeout(() => { alert("CRITICAL FAILURE: " + choice.fb); location.reload(); }, 3500);
+        return;
+    }
+
+    if (choice.pts === -1) {
+        currentScore -= 1;
+        document.getElementById('global-score').innerText = currentScore;
+        badge.innerText = "-1 POINT";
+        badge.style.background = "var(--red)";
+        msg.innerText = choice.fb;
+        fbPanel.style.display = "block";
+        btn.disabled = true;
+        btn.style.opacity = "0.3";
+        saveGame();
+        return;
+    }
+
+    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    btn.style.borderColor = "var(--eco-green)";
+    btn.style.background = "var(--light-green)";
+
+    if (data.isEmergency) {
+        badge.innerText = "EMERGENCY FIXED";
+        badge.style.background = "var(--eco-green)";
+    } else {
+        currentScore += choice.pts;
+        document.getElementById('global-score').innerText = currentScore;
+        badge.innerText = "+" + choice.pts + " POINTS";
+        badge.style.background = choice.pts > 2 ? "var(--eco-green)" : "var(--wood-brown)";
+    }
+
+    msg.innerText = choice.fb;
+    fbPanel.style.display = "block";
+    fbPanel.style.borderLeftColor = badge.style.background;
+
+    const nextBtn = document.getElementById('next-step-btn');
+    nextBtn.style.display = "block";
+    nextBtn.onclick = () => {
+        activeStep = data.next;
+        saveGame();
+        if (activeStep === "final") finishShift(); else loadTask();
+    };
+}
+
+function finishShift() {
+    transitionTo('end');
+    document.getElementById('final-total').innerText = currentScore + " / 48 Points";
+    const band = levels.find(l => currentScore >= l.min && currentScore <= l.max) || levels[0];
+    const box = document.getElementById('evaluation-box');
+    box.style.border = "3px solid " + band.color;
+    box.innerHTML = `<h2 style="color:${band.color}">${band.name}</h2><p style="font-size:1.1rem; margin-top:10px;">${band.msg}</p>`;
+    // Clear save so next visit starts fresh, unless they refresh right now.
+    localStorage.removeItem('ecoSalesStep');
+    localStorage.removeItem('ecoSalesScore');
+}
+
+window.onload = initGame;
+</script>
+</body>
+</html>

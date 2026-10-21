@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Natura-Coat Europe: B2B Commercial Sales & ESP Simulator</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --eco-green: #1b5e20;
+        --eco-light: #e8f5e9;
+        --wood-brown: #795548;
+        --wood-light: #efebe9;
+        --accent-blue: #1565c0;
+        --accent-light: #e3f2fd;
+        --red: #c62828;
+        --red-light: #ffebee;
+        --bg: #f4f6f8;
+        --dark: #1e293b;
+        --border-color: #cbd5e1;
+        --card-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg);
+        color: var(--dark);
+        line-height: 1.6;
+    }
+
+    header {
+        background: var(--eco-green);
+        color: white;
+        padding: 1.25rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 5px solid var(--wood-brown);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .header-title h1 { margin: 0; font-size: 1.3rem; letter-spacing: 0.5px; font-weight: 800; }
+    .header-title small { color: #a5d6a7; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+    .score-container { text-align: right; }
+    .score-label { font-size: 0.75rem; text-transform: uppercase; color: #c8e6c9; font-weight: 800; letter-spacing: 1px; }
+    .score-num { font-family: 'Roboto Mono', monospace; font-size: 1.8rem; font-weight: 700; color: #ffffff; }
+
+    /* Navigation Tabs */
+    .nav-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        background: #ffffff;
+        border-bottom: 2px solid var(--border-color);
+        max-width: 1000px;
+        margin: 1.5rem auto 0;
+        border-radius: 8px 8px 0 0;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    .tab-btn {
+        flex: 1;
+        min-width: 150px;
+        padding: 1rem 0.75rem;
+        border: none;
+        background: #f8fafc;
+        color: #64748b;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+        border-bottom: 3px solid transparent;
+    }
+    .tab-btn:hover { background: #f1f5f9; color: var(--dark); }
+    .tab-btn.active {
+        background: #ffffff;
+        color: var(--eco-green);
+        border-bottom: 3px solid var(--eco-green);
+    }
+
+    .wrapper { max-width: 1000px; margin: 0 auto 3rem; padding: 0 1rem; }
+
+    .tab-content { display: none; margin-top: 1.5rem; }
+    .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+        background: var(--card-bg);
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        border-top: 6px solid var(--eco-green);
+        margin-bottom: 1.5rem;
+    }
+
+    h2 { margin-bottom: 1rem; color: var(--eco-green); font-size: 1.4rem; text-transform: uppercase; letter-spacing: 0.5px; }
+    h3 { margin: 1.2rem 0 0.6rem; color: var(--dark); font-size: 1.1rem; }
+    p { margin-bottom: 1rem; color: #334155; }
+
+    /* Exercise Styles */
+    .discussion-box {
+        background: var(--eco-light);
+        border-left: 5px solid var(--eco-green);
+        padding: 1.25rem;
+        border-radius: 6px;
+        margin-bottom: 1.25rem;
+    }
+    .discussion-box h4 { color: var(--eco-green); margin-bottom: 0.4rem; font-size: 1rem; }
+
+    /* Vocabulary Matching */
+    .vocab-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    @media (max-width: 768px) { .vocab-grid { grid-template-columns: 1fr; } }
+
+    .vocab-list, .def-list { display: flex; flex-direction: column; gap: 0.75rem; }
+    
+    .vocab-item, .def-item {
+        padding: 0.85rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        background: #fff;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+    }
+    .vocab-item:hover, .def-item:hover { border-color: var(--accent-blue); background: var(--accent-light); }
+    .vocab-item.selected { border-color: var(--accent-blue); background: var(--accent-light); font-weight: 700; }
+    .vocab-item.matched, .def-item.matched {
+        border-color: var(--eco-green);
+        background: var(--eco-light);
+        color: var(--eco-green);
+        cursor: default;
+        font-weight: 600;
+    }
+
+    /* True/False Questions */
+    .tf-item {
+        padding: 1.2rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 1rem;
+        background: #f8fafc;
+    }
+    .tf-question { font-weight: 600; margin-bottom: 0.75rem; color: var(--dark); }
+    .tf-options { display: flex; gap: 1rem; }
+    .tf-btn {
+        padding: 0.5rem 1.25rem;
+        border: 2px solid var(--border-color);
+        background: #fff;
+        border-radius: 6px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .tf-btn:hover { border-color: var(--accent-blue); }
+    .tf-btn.correct { background: var(--eco-green); color: white; border-color: var(--eco-green); }
+    .tf-btn.incorrect { background: var(--red); color: white; border-color: var(--red); }
+    .tf-explanation { margin-top: 0.75rem; font-size: 0.85rem; display: none; padding: 0.5rem 0.75rem; border-radius: 4px; }
+
+    /* Gap Fill Drag and Drop */
+    .word-bank {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        padding: 1.25rem;
+        background: #f1f5f9;
+        border: 2px dashed var(--border-color);
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        min-height: 80px;
+    }
+    .draggable-word {
+        padding: 0.4rem 0.85rem;
+        background: var(--dark);
+        color: white;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        cursor: grab;
+        user-select: none;
+        display: inline-block;
+    }
+    .draggable-word.dragging { opacity: 0.5; }
+    .draggable-word.used { opacity: 0.3; cursor: not-allowed; }
+
+    .text-passage {
+        line-height: 2.2;
+        font-size: 1rem;
+        background: #fff;
+        padding: 1.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+    }
+    .drop-target {
+        display: inline-block;
+        min-width: 120px;
+        height: 1.9rem;
+        border-bottom: 2px solid var(--accent-blue);
+        background: var(--accent-light);
+        vertical-align: middle;
+        margin: 0 0.3rem;
+        text-align: center;
+        font-weight: 700;
+        color: var(--accent-blue);
+        border-radius: 4px 4px 0 0;
+        line-height: 1.8;
+        padding: 0 0.4rem;
+    }
+    .drop-target.correct { border-bottom-color: var(--eco-green); background: var(--eco-light); color: var(--eco-green); }
+    .drop-target.incorrect { border-bottom-color: var(--red); background: var(--red-light); color: var(--red); }
+
+    /* Game Controls & Feedback */
+    .options-list { display: grid; gap: 12px; margin-bottom: 1.5rem; }
+    .opt-btn {
+        background: #fff;
+        border: 2px solid var(--border-color);
+        padding: 1.1rem 1.25rem;
+        border-radius: 8px;
+        cursor: pointer;
+        text-align: left;
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.2s;
+        display: block;
+        width: 100%;
+        color: var(--dark);
+    }
+    .opt-btn:hover:not(:disabled) { border-color: var(--eco-green); background: var(--eco-light); transform: translateX(4px); }
+    .opt-btn:disabled { cursor: not-allowed; opacity: 0.65; }
+
+    .feedback-panel {
+        display: none;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-top: 1rem;
+        border-left: 6px solid #ccc;
+        background: #f8fafc;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 6px 14px;
+        color: white;
+        border-radius: 4px;
+        font-weight: 800;
+        margin-bottom: 10px;
+        font-size: 0.8rem;
+        letter-spacing: 0.5px;
+    }
+
+    .nav-btn {
+        margin-top: 1.5rem;
+        background: var(--dark);
+        color: white;
+        border: none;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        cursor: pointer;
+        width: 100%;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: background 0.2s;
+    }
+    .nav-btn:hover { background: #0f172a; }
+    #start-action-btn { background: var(--eco-green); }
+    #start-action-btn:hover { background: #14532d; }
+
+    .emergency-tag {
+        background: var(--red);
+        color: white;
+        padding: 6px 14px;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 900;
+        margin-bottom: 15px;
+        display: inline-block;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.03); }
+        100% { transform: scale(1); }
+    }
+
+    .debrief-card {
+        background: #f8fafc;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    @media (max-width: 600px) {
+        header { padding: 1rem; }
+        .card { padding: 1.25rem; }
+        .score-num { font-size: 1.4rem; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-title">
+        <h1>NATURA-COAT EUROPE</h1>
+        <small>B2B Commercial Sales & ESP Module</small>
+    </div>
+    <div class="score-container">
+        <div class="score-label">Commercial Performance Points</div>
+        <div class="score-num" id="global-score">0</div>
+    </div>
+</header>
+
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab('tab-warmup')">1. Warm-Up Discussion</button>
+    <button class="tab-btn" onclick="switchTab('tab-vocab')">2. Vocabulary Match (20)</button>
+    <button class="tab-btn" onclick="switchTab('tab-tf')">3. True / False (12)</button>
+    <button class="tab-btn" onclick="switchTab('tab-cloze')">4. Cloze Text Completion</button>
+    <button class="tab-btn" onclick="switchTab('tab-sim')">5. B2B Sales Simulation</button>
+</div>
+
+<div class="wrapper">
+
+    <!-- TAB 1: WARM-UP DISCUSSION -->
+    <div id="tab-warmup" class="tab-content active">
+        <div class="card">
+            <h2>Commercial Strategy: Warm-Up Discussion</h2>
+            <p>Review the following corporate sales scenarios with a colleague or trainer before launching the simulation.</p>
+            
+            <div class="discussion-box">
+                <h4>1. Addressing Premium Price Objections</h4>
+                <p>How can commercial sales professionals effectively articulate total cost of ownership (TCO) and long-term value when prospective clients express hesitation regarding the higher unit cost of sustainable, low-VOC coatings?</p>
+            </div>
+
+            <div class="discussion-box">
+                <h4>2. Regulatory Compliance & Environmental Marketing</h4>
+                <p>In what ways do European environmental mandates (such as REACH and strict low-VOC emission standards) serve as powerful sales catalysts during technical negotiations with commercial furniture manufacturers?</p>
+            </div>
+
+            <div class="discussion-box">
+                <h4>3. Supply Chain Crisis Management</h4>
+                <p>When unexpected supply chain bottlenecks or delivery failures threaten a key account’s manufacturing timetable, what protocols best preserve client trust and safeguard commercial partnerships?</p>
+            </div>
+            
+            <button class="nav-btn" style="background: var(--eco-green);" onclick="switchTab('tab-vocab')">Proceed to Vocabulary Exercise &rarr;</button>
+        </div>
+    </div>
+
+    <!-- TAB 2: VOCABULARY MATCHING -->
+    <div id="tab-vocab" class="tab-content">
+        <div class="card">
+            <h2>Industrial Terminology Matching</h2>
+            <p>Match each commercial term on the left with its corresponding professional definition on the right. Select a term, then click its definition.</p>
+            
+            <div style="margin-bottom: 1rem; font-weight: 700; color: var(--eco-green);" id="vocab-score-display">Matched Pairs: 0 / 20</div>
+
+            <div class="vocab-grid">
+                <div class="vocab-list" id="vocab-terms-container"></div>
+                <div class="def-list" id="vocab-defs-container"></div>
+            </div>
+
+            <button class="nav-btn" style="background: var(--eco-green);" onclick="switchTab('tab-tf')">Proceed to True / False Questions &rarr;</button>
+        </div>
+    </div>
+
+    <!-- TAB 3: TRUE / FALSE -->
+    <div id="tab-tf" class="tab-content">
+        <div class="card">
+            <h2>Industry & Commercial Knowledge Audit</h2>
+            <p>Evaluate the following 12 statements regarding industrial coatings, regulatory compliance, and commercial sales practices.</p>
+            
+            <div style="margin-bottom: 1.5rem; font-weight: 700; color: var(--eco-green);" id="tf-score-display">Score: 0 / 12</div>
+
+            <div id="tf-container"></div>
+
+            <button class="nav-btn" style="background: var(--eco-green);" onclick="switchTab('tab-cloze')">Proceed to Text Completion &rarr;</button>
+        </div>
+    </div>
+
+    <!-- TAB 4: CLOZE TEXT COMPLETION -->
+    <div id="tab-cloze" class="tab-content">
+        <div class="card">
+            <h2>Executive Briefing: Text Completion</h2>
+            <p>Complete the executive summary below by placing the appropriate terms into the 12 target blanks. Select or drag words from the bank into the text.</p>
+
+            <div class="word-bank" id="word-bank"></div>
+
+            <div class="text-passage">
+                In modern industrial manufacturing, transitioning to eco-friendly finishes represents a strategic 
+                <span class="drop-target" data-answer="priority" onclick="handleSlotClick(this)"></span>. 
+                Companies seeking to reduce their environmental 
+                <span class="drop-target" data-answer="footprint" onclick="handleSlotClick(this)"></span> 
+                are replacing traditional solvent finishes with sustainable alternatives. These advanced 
+                <span class="drop-target" data-answer="formulations" onclick="handleSlotClick(this)"></span> 
+                drastically minimize hazardous volatile organic 
+                <span class="drop-target" data-answer="emissions" onclick="handleSlotClick(this)"></span>, 
+                ensuring full compliance with stringent European 
+                <span class="drop-target" data-answer="regulations" onclick="handleSlotClick(this)"></span>. 
+                While initial material expenditure may appear elevated, long-term operational 
+                <span class="drop-target" data-answer="efficiency" onclick="handleSlotClick(this)"></span> 
+                and improved workplace safety yield a significant competitive 
+                <span class="drop-target" data-answer="advantage" onclick="handleSlotClick(this)"></span>. 
+                During client consultations, sales representatives must emphasize mechanical 
+                <span class="drop-target" data-answer="durability" onclick="handleSlotClick(this)"></span> 
+                and controlled chemical 
+                <span class="drop-target" data-answer="curing" onclick="handleSlotClick(this)"></span> 
+                times. Providing comprehensive technical 
+                <span class="drop-target" data-answer="documentation" onclick="handleSlotClick(this)"></span> 
+                assists commercial procurement teams in justifying their purchasing decisions. By maintaining proactive 
+                <span class="drop-target" data-answer="communication" onclick="handleSlotClick(this)"></span> 
+                and reliable technical support, suppliers foster lasting client 
+                <span class="drop-target" data-answer="loyalty" onclick="handleSlotClick(this)"></span>.
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <button class="nav-btn" style="background: var(--accent-blue); flex: 1;" onclick="checkCloze()">Validate Answers</button>
+                <button class="nav-btn" style="background: var(--eco-green); flex: 1;" onclick="switchTab('tab-sim')">Launch B2B Sales Simulation &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 5: B2B SALES SIMULATION -->
+    <div id="tab-sim" class="tab-content">
+        <!-- SIMULATION INTRO CARD (NO RESTART BUTTON) -->
+        <div class="card active-sim-screen" id="screen-intro">
+            <h2>Natura-Coat Commercial Sales Simulation</h2>
+            <p class="intro-text">You represent Natura-Coat Europe as Senior Commercial Account Executive for industrial wood coatings, high-performance lacquers, and eco-friendly finishes across European manufacturing sectors.</p>
+            
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); padding: 1.25rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <strong style="color: var(--eco-green);">Simulation Parameters & Rules:</strong>
+                <ul style="margin-left: 1.25rem; margin-top: 0.5rem; color: #475569;">
+                    <li>Navigate <strong>12 commercial decision scenarios</strong> and respond to <strong>2 critical operational emergencies</strong>.</li>
+                    <li>Negotiate contracts, defend profit margins, ensure chemical compliance, and resolve supply chain crises.</li>
+                    <li><strong>Goal:</strong> Maximize Commercial Performance Points through strategic decision-making and risk mitigation.</li>
+                </ul>
+            </div>
+
+            <button id="start-action-btn" class="nav-btn" onclick="beginGame()">Begin B2B Sales Simulation</button>
+        </div>
+
+        <!-- MAIN SIMULATION CARD -->
+        <div id="screen-main" class="card" style="display:none;">
+            <div id="emergency-notice"></div>
+            <h2 id="question-title"></h2>
+            <p id="question-text" class="intro-text" style="font-size: 1.05rem; color: #334155; font-weight: 500;"></p>
+            <div class="options-list" id="options-grid"></div>
+            
+            <div id="result-feedback" class="feedback-panel" aria-live="polite">
+                <span id="point-tag" class="status-badge"></span>
+                <p id="feedback-msg" style="margin-top: 8px; font-size: 0.95rem; color: #1e293b;"></p>
+            </div>
+            
+            <button id="next-step-btn" class="nav-btn" style="display:none;">Proceed to Next Commercial Scenario &rarr;</button>
+        </div>
+
+        <!-- END SIMULATION CARD -->
+        <div id="screen-end" class="card" style="display:none;">
+            <h2>Executive Performance Review</h2>
+            <p>Your commercial performance across the fiscal year has been audited and compiled below.</p>
+            
+            <div id="final-total" style="font-size: 2.5rem; text-align: center; margin: 1rem 0; font-weight: 800; color: var(--eco-green);"></div>
+            <div id="evaluation-box" style="padding: 1.5rem; border-radius: 8px; text-align: center; margin-bottom: 1.5rem;"></div>
+
+            <div class="debrief-card" id="debrief-details">
+                <h3>Detailed Commercial Analysis</h3>
+                <div id="debrief-text" style="margin-top: 0.75rem; color: #334155;"></div>
+            </div>
+
+            <button class="nav-btn" style="display:block; background: var(--eco-green); margin-top: 2rem;" onclick="restartSimulation()">Re-initialize Simulation</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+/* TAB NAVIGATION */
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    const targetContent = document.getElementById(tabId);
+    if (targetContent) targetContent.classList.add('active');
+    
+    // Highlight correct tab button
+    const buttons = document.querySelectorAll('.tab-btn');
+    const tabIndex = ['tab-warmup', 'tab-vocab', 'tab-tf', 'tab-cloze', 'tab-sim'].indexOf(tabId);
+    if (tabIndex !== -1 && buttons[tabIndex]) {
+        buttons[tabIndex].classList.add('active');
+    }
+}
+
+/* ----------------------------------------------------
+   1. VOCABULARY MATCHING DATA & LOGIC (20 ITEMS)
+---------------------------------------------------- */
+const vocabData = [
+    { id: 1, term: "Volatile Organic Compounds (VOCs)", def: "Carbon-based chemicals that evaporate at room temperature, causing air pollution and indoor toxicity." },
+    { id: 2, term: "Substrate", def: "The underlying physical surface (e.g., wood, metal, plastic) onto which a coating is applied." },
+    { id: 3, term: "Curing Time", def: "The duration required for a chemical coating to fully polymerize, dry, and reach ultimate hardness." },
+    { id: 4, term: "Total Cost of Ownership (TCO)", def: "A financial estimate covering direct unit price plus indirect operational, safety, and disposal costs." },
+    { id: 5, term: "Formulation", def: "The specific combination of chemical ingredients blended to create a specialized functional finish." },
+    { id: 6, term: "REACH Compliance", def: "Adherence to European Union regulations governing the safe registration and usage of industrial chemicals." },
+    { id: 7, term: "Margin Defense", def: "Sales strategy focused on preserving profit percentages rather than offering excessive discounts." },
+    { id: 8, term: "Viscosity", def: "The internal fluid resistance to flow, determining how easily paint or varnish can be sprayed." },
+    { id: 9, term: "Key Account", def: "A strategic, high-volume client generating significant long-term commercial revenue." },
+    { id: 10, term: "Saliva Resistance", def: "A critical safety standard ensuring toxic chemicals do not leach out when products are handled by young children." },
+    { id: 11, term: "Ecolabel Certification", def: "Third-party seal verifying environmental performance throughout a product's life cycle." },
+    { id: 12, term: "Crosslinking", def: "The formation of chemical bonds between polymer chains during the curing process, enhancing finish strength." },
+    { id: 13, term: "Procurement Protocol", def: "The formalized corporate purchasing process required to approve vendor bids and raw material sourcing." },
+    { id: 14, term: "Off-Gassing", def: "The release of airborne vapors or fumes from materials during or after chemical application." },
+    { id: 15, term: "Adhesion", def: "The molecular force holding a dry coating film securely to the underlying substrate surface." },
+    { id: 16, term: "Rebate Agreement", def: "A retroactive financial return paid to a client after achieving pre-agreed annual purchasing volumes." },
+    { id: 17, term: "Abrasive Wear", def: "Surface degradation caused by friction, rubbing, or contact with rough materials." },
+    { id: 18, term: "Safety Data Sheet (SDS)", def: "Official document outlining chemical properties, health hazards, protective measures, and spill protocols." },
+    { id: 19, term: "Throughput", def: "The rate at which a manufacturing plant processes and finishes units of production." },
+    { id: 20, term: "Retention Rate", def: "The percentage of long-term commercial clients retained over a specific fiscal period." }
+];
+
+let selectedTerm = null;
+let matchedCount = 0;
+
+function initVocabExercise() {
+    const termsContainer = document.getElementById('vocab-terms-container');
+    const defsContainer = document.getElementById('vocab-defs-container');
+    termsContainer.innerHTML = '';
+    defsContainer.innerHTML = '';
+    
+    const shuffledTerms = [...vocabData].sort(() => Math.random() - 0.5);
+    const shuffledDefs = [...vocabData].sort(() => Math.random() - 0.5);
+    
+    shuffledTerms.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'vocab-item';
+        div.innerText = item.term;
+        div.dataset.id = item.id;
+        div.onclick = () => selectTerm(div);
+        termsContainer.appendChild(div);
+    });
+
+    shuffledDefs.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'def-item';
+        div.innerText = item.def;
+        div.dataset.id = item.id;
+        div.onclick = () => matchDefinition(div);
+        defsContainer.appendChild(div);
+    });
+}
+
+function selectTerm(elem) {
+    if (elem.classList.contains('matched')) return;
+    document.querySelectorAll('.vocab-item').forEach(i => i.classList.remove('selected'));
+    elem.classList.add('selected');
+    selectedTerm = elem;
+}
+
+function matchDefinition(defElem) {
+    if (!selectedTerm || defElem.classList.contains('matched')) return;
+    
+    if (selectedTerm.dataset.id === defElem.dataset.id) {
+        selectedTerm.classList.remove('selected');
+        selectedTerm.classList.add('matched');
+        defElem.classList.add('matched');
+        selectedTerm = null;
+        matchedCount++;
+        document.getElementById('vocab-score-display').innerText = `Matched Pairs: ${matchedCount} / 20`;
+    } else {
+        defElem.style.borderColor = 'var(--red)';
+        setTimeout(() => { defElem.style.borderColor = 'var(--border-color)'; }, 600);
+    }
+}
+
+/* ----------------------------------------------------
+   2. TRUE / FALSE DATA & LOGIC (12 QUESTIONS)
+---------------------------------------------------- */
+const tfData = [
+    { id: 1, q: "Water-borne industrial varnishes emit lower volatile organic compounds (VOCs) than solvent coatings.", ans: true, exp: "Correct. Water-borne formulations significantly decrease dangerous VOC emissions, safeguarding worker health." },
+    { id: 2, q: "Offering immediate price discounts on every customer query effectively defends long-term profit margins.", ans: false, exp: "False. Unconditional discounting erodes brand authority and severely degrades gross operating margins." },
+    { id: 3, q: "REACH compliance is optional for foreign suppliers distributing chemical coatings within the EU.", ans: false, exp: "False. REACH compliance is mandatory for all chemical products placed on the European single market." },
+    { id: 4, q: "High humidity levels inside a spraying booth slow down the evaporation rate of water-based finishes.", ans: true, exp: "Correct. Excessive ambient humidity retards water evaporation, extending curing times significantly." },
+    { id: 5, q: "EN 71-3 toxicity compliance is the primary safety benchmark for coatings used on wooden children's toys.", ans: true, exp: "Correct. EN 71-3 regulates heavy metal migration limits to prevent toxic exposure." },
+    { id: 6, q: "A lower initial unit purchase price guarantees a lower Total Cost of Ownership (TCO) for commercial clients.", ans: false, exp: "False. Inferior coatings often require additional coats, frequent maintenance, and higher disposal costs." },
+    { id: 7, q: "Proactive communication during supply chain disruptions helps preserve long-term account retention.", ans: true, exp: "Correct. Transparent updates build institutional trust and allow clients to adjust operational schedules." },
+    { id: 8, q: "Mixing solvent-based thinners directly into water-borne lacquer improves drying speeds without chemical risk.", ans: false, exp: "False. Incompatible chemical mixing can cause immediate destabilization, coagulation, and hazardous fumes." },
+    { id: 9, term: "Ecolabel certification serves as independent verification of eco-friendly manufacturing compliance.", ans: true, exp: "Correct. Third-party certifications provide objective proof of environmental compliance to cautious buyers." },
+    { id: 10, q: "Commercial client retention is less valuable than continually acquiring small, one-off purchasers.", ans: false, exp: "False. Retaining high-volume key accounts yields far higher strategic stability and lifetime margin." },
+    { id: 11, q: "Addressing critical public reviews online with professional technical support demonstrates strong brand assurance.", ans: true, exp: "Correct. Constructive public engagement highlights product reliability and dedication to customer service." },
+    { id: 12, q: "Accelerated infrared (IR) drying systems can reduce cure times for eco-friendly finishes without compromising durability.", ans: true, exp: "Correct. Controlled thermal IR radiation accelerates water evaporation while establishing strong crosslinking." }
+];
+
+let tfScore = 0;
+
+function initTFExercise() {
+    const container = document.getElementById('tf-container');
+    container.innerHTML = '';
+    
+    tfData.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = 'tf-item';
+        div.innerHTML = `
+            <div class="tf-question">${idx + 1}. ${item.q}</div>
+            <div class="tf-options">
+                <button class="tf-btn" onclick="answerTF(${idx}, true, this)">True</button>
+                <button class="tf-btn" onclick="answerTF(${idx}, false, this)">False</button>
+            </div>
+            <div class="tf-explanation" id="tf-exp-${idx}"></div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function answerTF(idx, userAns, btn) {
+    const parent = btn.parentElement;
+    const buttons = parent.querySelectorAll('.tf-btn');
+    buttons.forEach(b => b.disabled = true);
+
+    const item = tfData[idx];
+    const expDiv = document.getElementById(`tf-exp-${idx}`);
+    
+    if (userAns === item.ans) {
+        btn.classList.add('correct');
+        tfScore++;
+        expDiv.style.background = 'var(--eco-light)';
+        expDiv.style.color = 'var(--eco-green)';
+    } else {
+        btn.classList.add('incorrect');
+        expDiv.style.background = 'var(--red-light)';
+        expDiv.style.color = 'var(--red)';
+    }
+
+    expDiv.innerText = item.exp;
+    expDiv.style.display = 'block';
+    document.getElementById('tf-score-display').innerText = `Score: ${tfScore} / 12`;
+}
+
+/* ----------------------------------------------------
+   3. CLOZE TEXT COMPLETION LOGIC
+---------------------------------------------------- */
+const wordBankWords = [
+    "priority", "footprint", "formulations", "emissions", "regulations", 
+    "efficiency", "advantage", "durability", "curing", "documentation", 
+    "communication", "loyalty", "discount", "friction"
+];
+
+let selectedWordForCloze = null;
+
+function initClozeExercise() {
+    const bank = document.getElementById('word-bank');
+    bank.innerHTML = '';
+    
+    const shuffled = [...wordBankWords].sort(() => Math.random() - 0.5);
+    shuffled.forEach(word => {
+        const span = document.createElement('span');
+        span.className = 'draggable-word';
+        span.innerText = word;
+        span.onclick = () => selectWordForSlot(span);
+        bank.appendChild(span);
+    });
+}
+
+function selectWordForSlot(elem) {
+    if (elem.classList.contains('used')) return;
+    document.querySelectorAll('.draggable-word').forEach(w => w.style.outline = 'none');
+    elem.style.outline = '2px solid var(--accent-blue)';
+    selectedWordForCloze = elem;
+}
+
+function handleSlotClick(slot) {
+    if (selectedWordForCloze && !slot.classList.contains('correct')) {
+        // Clear previous word if exists
+        if (slot.dataset.currentWord) {
+            const prevWordElem = Array.from(document.querySelectorAll('.draggable-word')).find(w => w.innerText === slot.dataset.currentWord);
+            if (prevWordElem) prevWordElem.classList.remove('used');
+        }
+
+        slot.innerText = selectedWordForCloze.innerText;
+        slot.dataset.currentWord = selectedWordForCloze.innerText;
+        selectedWordForCloze.classList.add('used');
+        selectedWordForCloze.style.outline = 'none';
+        selectedWordForCloze = null;
+    } else if (!selectedWordForCloze && slot.dataset.currentWord && !slot.classList.contains('correct')) {
+        // Return word to bank
+        const prevWordElem = Array.from(document.querySelectorAll('.draggable-word')).find(w => w.innerText === slot.dataset.currentWord);
+        if (prevWordElem) prevWordElem.classList.remove('used');
+        slot.innerText = '';
+        delete slot.dataset.currentWord;
+    }
+}
+
+function checkCloze() {
+    let correct = 0;
+    document.querySelectorAll('.drop-target').forEach(slot => {
+        const userWord = slot.innerText.trim();
+        const correctWord = slot.dataset.answer;
+        if (userWord === correctWord) {
+            slot.classList.add('correct');
+            slot.classList.remove('incorrect');
+            correct++;
+        } else {
+            slot.classList.add('incorrect');
+            slot.classList.remove('correct');
+        }
+    });
+    alert(`Validation Complete: ${correct} out of 12 target words placed correctly.`);
+}
+
+/* ----------------------------------------------------
+   4. B2B SALES SIMULATION DATA & ENGINE
+---------------------------------------------------- */
+const gameData = {
+    d1: {
+        title: "Decision 1: Defending Premium Price Positioning",
+        text: "A premier furniture manufacturer in Westphalia, Germany, express keen interest in adopting your eco-friendly water-borne varnish. However, their procurement director challenges your quotation: 'Your solution is 25% more expensive than standard polyurethane finishes.' How do you respond?",
+        choices: [
+            { 
+                text: "Demonstrate Total Cost of Ownership (TCO), emphasizing reduced toxic off-gassing, enhanced worker safety, lower factory ventilation expenditures, and superior long-term coating durability.", 
+                pts: 4, 
+                fb: "Excellent strategic response! By framing the discussion around TCO, regulatory compliance, and occupational safety, you effectively shift the client's focus away from initial unit price to holistic long-term value." 
+            },
+            { 
+                text: "Propose an immediate 10% introductory rebate on the trial order to secure the supply contract.", 
+                pts: 3, 
+                fb: "Acceptable compromise. Offering a modest volume rebate lowers initial buyer friction, though it slightly erodes operating margin and sets an early precedent for price concessions." 
+            },
+            { 
+                text: "Highlight that cheap conventional finishes violate European environmental guidelines and harm indoor air quality.", 
+                pts: 2, 
+                fb: "Factual statement, but adopting a confrontational tone regarding competitor products can alienate procurement managers. Always anchor arguments on your product's technical merits." 
+            },
+            { 
+                text: "Emphasize the luxury appearance of our recyclable container packaging and branding design.", 
+                pts: 1, 
+                fb: "Superficial argument. Commercial B2B buyers prioritize performance specifications, safety compliance, and cost efficiency over packaging aesthetics." 
+            },
+            { 
+                text: "State that if their budget is inadequate for premium finishes, they should remain with low-grade solvent products.", 
+                pts: -1, 
+                fb: "Highly unprofessional. Dismissive comments undermine client relations, damage brand reputation, and close off future negotiation opportunities." 
+            }
+        ],
+        next: "d2"
+    },
+    d2: {
+        title: "Decision 2: Verifying Chemical Safety & Indoor Air Quality",
+        text: "During technical evaluations with a major architectural woodworker in Valencia, Spain, the safety director demands rigorous proof that your eco-lacquer emits zero toxic solvent vapors during application. How do you validate your claim?",
+        choices: [
+            { 
+                text: "Conduct an live application trial on sample timber inside their facility without requiring heavy industrial respirators, illustrating low odor and instant safety.", 
+                pts: 4, 
+                fb: "Outstanding initiative! Live practical demonstrations build supreme technical credibility, allowing client engineers to directly experience application safety and low volatility." 
+            },
+            { 
+                text: "Supply comprehensive ISO 14001 certification, independent laboratory analysis, and official European REACH Safety Data Sheets (SDS).", 
+                pts: 3, 
+                fb: "Solid commercial procedure. Independent laboratory verification provides formal proof of compliance required by corporate legal and safety compliance departments." 
+            },
+            { 
+                text: "Direct their technical team to review verified client case studies and video testimonials on our corporate website.", 
+                pts: 2, 
+                fb: "Passive tactic. While third-party testimonials offer reassurance, commercial buyers expect direct, customized technical documentation during formal audits." 
+            },
+            { 
+                text: "Provide verbal assurance that Natura-Coat products strictly adhere to green chemical standards.", 
+                pts: 1, 
+                fb: "Inadequate approach. Verbal statements carry zero weight during legal and technical safety compliance audits." 
+            },
+            { 
+                text: "Apply coating samples using unapproved industrial equipment to prove extreme product versatility.", 
+                pts: -1, 
+                fb: "Dangerous protocol breach! Deviating from established application safety guidelines creates liability risks and damages technical credibility." 
+            }
+        ],
+        next: "d3"
+    },
+    d3: {
+        title: "Decision 3: Regulatory Compliance for Children's Products",
+        text: "A commercial manufacturer of wooden educational toys in Gothenburg requests supply quotations. What critical selling proposition must you lead with to secure this key account?",
+        choices: [
+            { 
+                text: "Highlight strict EN 71-3 toxicity compliance, heavy-metal-free organic formulation, and complete saliva resistance for infant safety.", 
+                pts: 4, 
+                fb: "Perfect targeting! Compliance with EN 71-3 European toy safety directives is mandatory for toy manufacturers; placing safety front and center addresses their primary operational risk." 
+            },
+            { 
+                text: "Present our extensive spectrum of high-gloss color pigments and customizable aesthetic wood finishes.", 
+                pts: 3, 
+                fb: "Relevant secondary benefit. Aesthetic variety is attractive to product designers, but regulatory safety compliance remains the non-negotiable prerequisite." 
+            },
+            { 
+                text: "Stress accelerated drying times that maximize factory throughput and conveyor line efficiency.", 
+                pts: 2, 
+                fb: "Operational throughput appeals to production managers, but fails to address core product safety requirements for end-consumers." 
+            },
+            { 
+                text: "Offer aggressive volume discounting structures for multi-year supply contracts.", 
+                pts: 1, 
+                fb: "Premature focus on pricing. In specialized compliance sectors, establishing technical suitability must precede financial terms." 
+            },
+            { 
+                text: "Recommend applying standard polyurethane finishes capped with an external clear organic sealant.", 
+                pts: -1, 
+                fb: "Inappropriate technical recommendation! Combining toxic primers with organic topcoats risks chemical leeching, violating toy safety directives." 
+            }
+        ],
+        next: "d4"
+    },
+    d4: {
+        title: "Decision 4: Managing Technical Curing Timetables",
+        text: "An industrial cabinetry client contacts customer support: 'Your water-borne coating requires 24 hours to cure completely at room temperature, whereas synthetic solvent finishes cure in 2 hours. This bottleneck disrupts our production flow!' How do you resolve this?",
+        choices: [
+            { 
+                text: "Conduct an on-site technical audit to optimize spray booth ambient humidity, forced air circulation, and infrared (IR) curing lamps.", 
+                pts: 4, 
+                fb: "Masterful technical support! Assisting the client in optimizing forced thermal air systems reduces water-borne cure times dramatically without sacrificing environmental benefits." 
+            },
+            { 
+                text: "Explain transparently that water-borne crosslinking requires controlled evaporation, helping them adjust staging schedules.", 
+                pts: 3, 
+                fb: "Honest and consultative. Transparently educating clients on chemical curing mechanisms builds trust, though technical optimization offers a faster solution." 
+            },
+            { 
+                text: "Issue a credit note covering operational delays to maintain account goodwill.", 
+                pts: 2, 
+                fb: "Costly temporary fix. Financial compensation mitigates immediate frustration but fails to resolve the underlying technical production bottleneck." 
+            },
+            { 
+                text: "Advise their facility manager to extend worker shift hours to absorb the longer drying duration.", 
+                pts: 1, 
+                fb: "Impractical suggestion. Expecting clients to increase labor overhead rather than offering technical solutions risks losing the account." 
+            },
+            { 
+                text: "Claim their application technique is flawed and decline technical intervention.", 
+                pts: -1, 
+                fb: "Destructive account management! Deflecting responsibility destroys client relationships and generates severe commercial fallout." 
+            }
+        ],
+        next: "e1"
+    },
+    e1: {
+        title: "EMERGENCY: Alpine Logistics Bottleneck",
+        isEmergency: true,
+        text: "An unexpected blizzard halts Alpine freight transport. A heavy truck carrying 3,000 liters of specialized coating destined for a major Italian furniture client is stranded. The client's assembly line will freeze tomorrow morning if stock fails to arrive!",
+        choices: [
+            { 
+                text: "Authorize emergency freight dispatch from an Italian secondary warehouse at company expense to guarantee morning line operation.", 
+                type: "good", 
+                fb: "Decisive leadership! Incurring short-term logistics expense to prevent a client assembly line stoppage safeguards millions in contractual revenue and earns absolute client loyalty." 
+            },
+            { 
+                text: "Personally transport a emergency supply of core concentrate in your commercial vehicle to initiate trial batching on-site.", 
+                type: "good", 
+                fb: "Exceptional dedication! Extraordinary client intervention during supply chain disruptions solidifies your reputation as an irreplaceable partner." 
+            },
+            { 
+                text: "Avoid client telephone calls until transport routes reopen to avoid committing to unfulfilled delivery timelines.", 
+                type: "bad", 
+                gameOver: true, 
+                fb: "CRITICAL FAILURE: Evading client communication during operational emergencies causes total breakdown of commercial trust. The client terminated the corporate account immediately." 
+            }
+        ],
+        next: "d5"
+    },
+    d5: {
+        title: "Decision 5: Commercial Engagement at Trade Exhibitions",
+        text: "At the International Design & Architectural Exposition in Milan, high-profile commercial architects and interior designers are visiting your stand. How do you maximize lead conversion?",
+        choices: [
+            { 
+                text: "Perform live finishing demonstrations on reclaimed architectural timber, inviting visitors to test surface hardness and chemical resistance.", 
+                pts: 4, 
+                fb: "Exceptional exhibition strategy! Experiential, interactive demonstrations attract heavy booth traffic and provide immediate visual proof of premium finish quality." 
+            },
+            { 
+                text: "Distribute custom finished wood substrate blocks embedded with digital technical specification QR codes.", 
+                pts: 3, 
+                fb: "Effective professional networking. High-quality physical samples combined with modern digital datasheets leave a lasting impression on architectural specifiers." 
+            },
+            { 
+                text: "Display prominent corporate banners detailing green environmental accreditations and carbon reduction metrics.", 
+                pts: 2, 
+                fb: "Standard marketing presentation. Informative visuals reinforce brand identity but lack the interactive engagement needed to capture trade leads." 
+            },
+            { 
+                text: "Remain seated behind the reception counter waiting for prospective clients to initiate technical inquiries.", 
+                pts: 1, 
+                fb: "Passive booth strategy. In commercial trade environments, proactive engagement is essential to capture high-value architectural leads." 
+            },
+            { 
+                text: "Aggressively approach delegates walking past in corridors to hand out marketing flyers.", 
+                pts: -1, 
+                fb: "Intrusive conduct. Overly aggressive sales tactics alienate professional trade buyers and project a desperate brand image." 
+            }
+        ],
+        next: "d6"
+    },
+    d6: {
+        title: "Decision 6: Countering Low-Cost Overseas Competition",
+        text: "A key account informs you that a non-EU chemical exporter has offered synthetic polyurethane finish at 50% below your quoted contract price. How do you defend your business?",
+        choices: [
+            { 
+                text: "Frame the commercial proposal around strict EU regulatory compliance, guaranteed supply chain stability, and brand risk mitigation.", 
+                pts: 4, 
+                fb: "Brilliant value defense! Highlighting regulatory security, local technical support, and ethical supply chains effectively neutralizes low-cost overseas price pressure." 
+            },
+            { 
+                text: "Provide a coverage calculation proving Natura-Coat finishes require fewer applied grams per square meter to reach target dry film thickness.", 
+                pts: 3, 
+                fb: "Strong analytical proof. Demonstrating applied material efficiency proves that lower unit price does not equal lower applied job cost." 
+            },
+            { 
+                text: "Question the manufacturing standards and quality control of the non-EU competitor.", 
+                pts: 2, 
+                fb: "Risky tactic. Criticizing competitors without verified technical test data can be interpreted as defensive or speculative by corporate buyers." 
+            },
+            { 
+                text: "Petition executive management for special pricing authorization to match the competitor's discount.", 
+                pts: 1, 
+                fb: "Margin-eroding response. Unnecessarily matching aggressive low-cost competitors destroys profitability and devalues your premium market positioning." 
+            },
+            { 
+                text: "Advise the client to accept the competitor's quotation if price is their sole purchasing criterion.", 
+                pts: -1, 
+                fb: "Surrender of business. A senior account representative must articulate value rather than abandoning key commercial accounts without negotiation." 
+            }
+        ],
+        next: "d7"
+    },
+    d7: {
+        title: "Decision 7: Managing Supply Chain Packaging Errors",
+        text: "A plant dispatch error results in 50 drums of dark oak stain being labeled as clear protective varnish and shipped to major commercial accounts. How do you handle this crisis?",
+        choices: [
+            { 
+                text: "Contact all affected accounts immediately, halt product application, and arrange rapid courier replacement for incorrect stock at full company expense.", 
+                pts: 4, 
+                fb: "Exemplary crisis control! Immediate, proactive intervention prevents costly production damages on client factory floors and reinforces corporate integrity." 
+            },
+            { 
+                text: "Issue a priority service advisory email instructing clients to verify batch codes prior to opening drums.", 
+                pts: 3, 
+                fb: "Prompt notification, but email communications may be missed by busy factory floor operators. Direct phone intervention remains superior." 
+            },
+            { 
+                text: "Alert internal quality assurance teams while delaying client outreach until specific complaints are logged.", 
+                pts: 2, 
+                fb: "Passive exposure risk. Delaying notification permits mislabeled stock to enter production lines, exposing your firm to massive damage claims." 
+            },
+            { 
+                text: "Wait for client feedback to identify which specific shipments contained incorrect labels.", 
+                pts: 1, 
+                fb: "High-risk negligence. Allowing clients to discover errors on active finishing lines severely compromises professional credibility." 
+            },
+            { 
+                text: "Attribute the error entirely to third-party freight contractors.", 
+                pts: -1, 
+                fb: "Blame shifting. Denying organizational accountability destroys commercial reputation and alienates supply chain partners." 
+            }
+        ],
+        next: "d8"
+    },
+    d8: {
+        title: "Decision 8: Strategic Alignment with Corporate Sales Objectives",
+        text: "Your Regional Sales Director instructs you to curtail field visits to small boutique furniture makers and direct 90% of your calendar toward enterprise accounts. How do you address this strategy?",
+        choices: [
+            { 
+                text: "Present market data showing boutique accounts serve as vital design influencers, proposing a digital portal to service them efficiently while prioritizing enterprise clients.", 
+                pts: 4, 
+                fb: "Strategic alignment! You respected executive directives while leveraging digital tools to preserve growth in emerging market segments." 
+            },
+            { 
+                text: "Comply fully with management directives, reallocating field time strictly to enterprise procurement leads.", 
+                pts: 3, 
+                fb: "Disciplined execution. Realigning focus to enterprise accounts maximizes short-term revenue generation in accordance with corporate goals." 
+            },
+            { 
+                text: "Maintain existing field schedules unchanged, arguing that all clients deserve equal face-to-face attention.", 
+                pts: 2, 
+                fb: "Insubordinate scheduling. Ignoring management strategic direction leads to organizational misalignment and misallocated sales resources." 
+            },
+            { 
+                text: "Immediately terminate commercial communication with all boutique client accounts.", 
+                pts: 1, 
+                fb: "Overreaction. Abruptly abandoning existing accounts damages brand goodwill and forfeits recurring baseline revenue." 
+            },
+            { 
+                text: "Publicly dispute corporate commercial strategy during general regional sales meetings.", 
+                pts: -1, 
+                fb: "Unprofessional conduct. Disagreements regarding corporate sales strategy must be addressed constructively in private executive sessions." 
+            }
+        ],
+        next: "d9"
+    },
+    d9: {
+        title: "Decision 9: High-Visibility Promotional Sponsorships",
+        text: "A flagship luxury boutique hotel development in Paris offers to specify Natura-Coat eco-varnishes exclusively for all interior woodwork in exchange for full material sponsorship (100% free supply). How do you proceed?",
+        choices: [
+            { 
+                text: "Negotiate a co-sponsorship structure offering a 50% material discount in exchange for guaranteed credit in architectural press releases and promotional signage.", 
+                pts: 4, 
+                fb: "Outstanding commercial balance! Securing shared marketing investment protects financial margins while capturing high-value public relations exposure." 
+            },
+            { 
+                text: "Grant full product sponsorship contingent upon securing a binding multi-year commercial maintenance and refinishing contract.", 
+                pts: 3, 
+                fb: "Solid forward strategy. Accepting short-term material costs to lock in lucrative long-term recurring maintenance contracts is commercially sound." 
+            },
+            { 
+                text: "Decline the sponsorship request, citing strict corporate policies against uncompensated product distribution.", 
+                pts: 2, 
+                fb: "Risk-averse position. While defending pricing integrity, you forfeit a prestige branding opportunity in a major European capital." 
+            },
+            { 
+                text: "Provide all requested materials completely free of charge on an informal promotional agreement.", 
+                pts: 1, 
+                fb: "Uncontrolled marketing spend. Sponsoring commercial projects without binding promotional guarantees often results in wasted capital." 
+            },
+            { 
+                text: "Demand complimentary executive hotel lodging in exchange for material deliveries.", 
+                pts: -1, 
+                fb: "Ethical violation! Solicitating personal perks during commercial negotiations breaches corporate governance guidelines." 
+            }
+        ],
+        next: "d10"
+    },
+    d10: {
+        title: "Decision 10: Managing Product Packaging Redesigns",
+        text: "Natura-Coat transitions from traditional steel drums to 100% recycled high-density polymer containers. Traditional industrial clients express skepticism regarding container durability during heavy material handling. How do you overcome this barrier?",
+        choices: [
+            { 
+                text: "Provide life-cycle technical data illustrating weight reductions, carbon savings, and drop-test certification proving structural equivalency to steel.", 
+                pts: 4, 
+                fb: "Persuasive technical selling! Presenting objective structural engineering data turns client skepticism into confidence regarding modern recycled materials." 
+            },
+            { 
+                text: "Supply sample polymer containers for trial load testing on the client's automated conveyor and forklift lines.", 
+                pts: 3, 
+                fb: "Practical validation. Allowing client logistics managers to test packaging durability in their own facility removes operational anxiety." 
+            },
+            { 
+                text: "Explain that raw steel cost inflation rendered metal packaging commercially unviable.", 
+                pts: 2, 
+                fb: "Defensive justification. Clients care about packaging reliability and safety, not your internal supply chain cost pressures." 
+            },
+            { 
+                text: "Reassure clients verbally that the internal chemical formulation remains identical.", 
+                pts: 1, 
+                fb: "Misses the core objection. The client's concern is container structural integrity during industrial transport, not chemical formulation." 
+            },
+            { 
+                text: "Inform resistant accounts that packaging decisions are non-negotiable corporate policy.", 
+                pts: -1, 
+                fb: "Rigid posture. Imposing operational changes without client consultation creates friction and drives accounts toward competitors." 
+            }
+        ],
+        next: "e2"
+    },
+    e2: {
+        title: "EMERGENCY: Operational Chemical Contamination",
+        isEmergency: true,
+        text: "A client's finishing shop operator mistakenly mixed aggressive industrial solvent thinners into a 500-liter spray vat of your water-borne varnish, triggering an immediate exothermic reaction and severe chemical off-gassing inside their spraying facility!",
+        choices: [
+            { 
+                text: "Order immediate facility evacuation, command proper cross-ventilation, and supply formal emergency chemical neutralization protocols to their safety manager.", 
+                type: "good", 
+                fb: "Flawless emergency leadership! Prioritizing human life, occupational safety, and rapid containment mitigates health risks and catastrophic liability." 
+            },
+            { 
+                text: "Dispatch an emergency technical specialist equipped with containment gear to supervise safe chemical recovery on site.", 
+                type: "good", 
+                fb: "Proactive crisis mitigation! On-site technical assistance during industrial accidents prevents environmental contamination and cements client trust." 
+            },
+            { 
+                text: "Disclaim corporate liability over the telephone and instruct the client to manage the emergency independently.", 
+                type: "bad", 
+                gameOver: true, 
+                fb: "CRITICAL FAILURE: Abdicating responsibility during chemical emergencies resulted in worker injury and severe legal proceedings. Natura-Coat terminated your employment." 
+            }
+        ],
+        next: "d11"
+    },
+    d11: {
+        title: "Decision 11: Managing Public Commercial Feedback",
+        text: "An independent flooring contractor publishes a critical review on an industry forum, claiming Natura-Coat lacquer produced uneven streaking across a 500m² commercial installation. How do you respond publicly?",
+        choices: [
+            { 
+                text: "Post a professional public response offering an immediate on-site technical audit to assess ambient humidity, wood moisture levels, and application technique.", 
+                pts: 4, 
+                fb: "Masterclass in public relations! Demonstrating willingness to provide expert technical assistance publicly highlights brand accountability and technical authority." 
+            },
+            { 
+                text: "Mobilize satisfied enterprise clients to submit verified positive case studies on the portal to reinforce overall brand rating.", 
+                pts: 3, 
+                fb: "Effective brand reinforcement. Expanding positive commercial reviews balances public perception with genuine user feedback." 
+            },
+            { 
+                text: "Issue a private message offering a full refund on condition that the negative review is removed.", 
+                pts: 2, 
+                fb: "Short-term tactical fix. While satisfying the individual contractor, it leaves public criticism unaddressed and risks appearing evasive." 
+            },
+            { 
+                text: "Leave the online critique unaddressed to avoid drawing additional visibility.", 
+                pts: 1, 
+                fb: "Passive exposure. Unanswered public complaints linger online, quietly eroding confidence among prospective commercial buyers." 
+            },
+            { 
+                text: "Publish an aggressive rebuttal accusing the contractor of amateur application technique.", 
+                pts: -1, 
+                fb: "Public relations disaster! Engaging in public disputes destroys professional reputation and alienates the trade community." 
+            }
+        ],
+        next: "d12"
+    },
+    d12: {
+        title: "Decision 12: Year-End Revenue Target Execution",
+        text: "With two weeks remaining in the fiscal year, you require 1,000 additional liters in sales volume to surpass your annual commercial targets and unlock executive performance bonuses. How do you close the period?",
+        choices: [
+            { 
+                text: "Structure an advance purchase incentive for key accounts offering locked-in annual pricing and deferred Q1 delivery schedules.", 
+                pts: 4, 
+                fb: "Brilliant commercial structuring! Advance purchase contracts secure guaranteed volume immediately while providing tangible financial benefits to loyal client accounts." 
+            },
+            { 
+                text: "Conduct target outreach to high-probability prospect accounts with an introductory year-end trial package.", 
+                pts: 3, 
+                fb: "Proactive business development. Converting prospective accounts at year-end expands baseline client portfolio for the incoming fiscal year." 
+            },
+            { 
+                text: "Increase general digital advertising expenditures across commercial trade platforms.", 
+                pts: 2, 
+                fb: "Slow lead generation. Digital marketing campaigns require time to mature and rarely convert fast enough to meet short-term deadlines." 
+            },
+            { 
+                text: "Procure excess stock personally under dummy account records to artificially achieve quota targets.", 
+                pts: 1, 
+                fb: "Severe breach of sales ethics. Manipulating inventory numbers violates corporate compliance policies and risks immediate dismissal." 
+            },
+            { 
+                text: "Log unconfirmed purchase commitments into the CRM system as finalized enterprise orders.", 
+                pts: -1, 
+                fb: "Fraudulent reporting! Falsifying sales documentation is a criminal breach of financial compliance resulting in summary termination." 
+            }
+        ],
+        next: "final"
+    }
+};
+
+const levels = [
+    { min: -15, max: 22, name: "Junior Account Trainee", color: "var(--red)", msg: "Your performance indicates fundamental challenges in defending profit margins, handling client objections, and managing technical crises. Strategic focus on technical product knowledge and B2B communication is strongly advised." },
+    { min: 23, max: 35, name: "Commercial Account Specialist", color: "var(--wood-brown)", msg: "Solid commercial execution. You successfully maintained client accounts and delivered steady sales revenue. To advance to senior management, focus on proactive risk mitigation, TCO positioning, and advanced technical consultation." },
+    { min: 36, max: 44, name: "Senior Commercial Manager", color: "var(--eco-green)", msg: "Excellent commercial leadership! You demonstrated strong value-based positioning, defended key profit margins, and navigated complex regulatory compliance effectively across European markets." },
+    { min: 45, max: 48, name: "Vice President of European Sales", color: "var(--dark)", msg: "Outstanding executive performance! You mastered high-stakes B2B negotiations, crisis intervention, margin defense, and sustainable brand positioning. An exemplary standard for commercial sales excellence." }
+];
+
+let currentScore = 0;
+let activeStep = "d1";
+
+function fisherYatesShuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function initGame() {
+    const savedStep = localStorage.getItem('ecoSalesStep_v2');
+    const savedScore = localStorage.getItem('ecoSalesScore_v2');
+    
+    if (savedStep && savedScore !== null) {
+        activeStep = savedStep;
+        currentScore = parseInt(savedScore, 10);
+        document.getElementById('global-score').innerText = currentScore;
+        if (activeStep === "final") {
+            finishShift();
+        } else {
+            showSimScreen('main');
+            loadTask();
+        }
+    }
+}
+
+function saveGame() {
+    localStorage.setItem('ecoSalesStep_v2', activeStep);
+    localStorage.setItem('ecoSalesScore_v2', currentScore);
+}
+
+function restartSimulation() {
+    localStorage.removeItem('ecoSalesStep_v2');
+    localStorage.removeItem('ecoSalesScore_v2');
+    currentScore = 0;
+    activeStep = "d1";
+    document.getElementById('global-score').innerText = currentScore;
+    showSimScreen('intro');
+}
+
+function beginGame() {
+    currentScore = 0;
+    activeStep = "d1";
+    document.getElementById('global-score').innerText = currentScore;
+    saveGame();
+    showSimScreen('main');
+    loadTask();
+}
+
+function showSimScreen(screenId) {
+    document.getElementById('screen-intro').style.display = 'none';
+    document.getElementById('screen-main').style.display = 'none';
+    document.getElementById('screen-end').style.display = 'none';
+    
+    const target = document.getElementById('screen-' + screenId);
+    if (target) target.style.display = 'block';
+}
+
+function loadTask() {
+    const data = gameData[activeStep];
+    if (!data) return;
+
+    document.getElementById('question-title').innerText = data.title;
+    document.getElementById('question-text').innerText = data.text;
+    document.getElementById('emergency-notice').innerHTML = data.isEmergency ? `<div class="emergency-tag">CRITICAL OPERATIONAL EMERGENCY</div>` : "";
+    
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = "";
+    document.getElementById('result-feedback').style.display = "none";
+    document.getElementById('next-step-btn').style.display = "none";
+
+    const randomized = fisherYatesShuffle([...data.choices]);
+
+    randomized.forEach(choice => {
+        const b = document.createElement('button');
+        b.className = "opt-btn";
+        b.innerText = choice.text;
+        b.onclick = () => selectOption(choice, b);
+        grid.appendChild(b);
+    });
+}
+
+function selectOption(choice, btn) {
+    const data = gameData[activeStep];
+    const fbPanel = document.getElementById('result-feedback');
+    const badge = document.getElementById('point-tag');
+    const msg = document.getElementById('feedback-msg');
+
+    if (choice.gameOver) {
+        badge.innerText = "ACCOUNT TERMINATED - CRITICAL FAILURE";
+        badge.style.background = "var(--red)";
+        msg.innerText = choice.fb;
+        fbPanel.style.display = "block";
+        document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+        localStorage.removeItem('ecoSalesStep_v2');
+        localStorage.removeItem('ecoSalesScore_v2');
+        setTimeout(() => { alert("CRITICAL TERMINATION: " + choice.fb); restartSimulation(); }, 4000);
+        return;
+    }
+
+    if (choice.pts === -1) {
+        currentScore -= 1;
+        document.getElementById('global-score').innerText = currentScore;
+        badge.innerText = "-1 PERFORMANCE POINT";
+        badge.style.background = "var(--red)";
+        msg.innerText = choice.fb;
+        fbPanel.style.display = "block";
+        btn.disabled = true;
+        btn.style.opacity = "0.3";
+        saveGame();
+        return;
+    }
+
+    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    btn.style.borderColor = "var(--eco-green)";
+    btn.style.background = "var(--eco-light)";
+
+    if (data.isEmergency) {
+        badge.innerText = "EMERGENCY RESOLVED";
+        badge.style.background = "var(--eco-green)";
+    } else {
+        currentScore += choice.pts;
+        document.getElementById('global-score').innerText = currentScore;
+        badge.innerText = "+" + choice.pts + " PERFORMANCE POINTS";
+        badge.style.background = choice.pts > 2 ? "var(--eco-green)" : "var(--wood-brown)";
+    }
+
+    msg.innerText = choice.fb;
+    fbPanel.style.display = "block";
+    fbPanel.style.borderLeftColor = badge.style.background;
+
+    const nextBtn = document.getElementById('next-step-btn');
+    nextBtn.style.display = "block";
+    nextBtn.onclick = () => {
+        activeStep = data.next;
+        saveGame();
+        if (activeStep === "final") finishShift(); else loadTask();
+    };
+}
+
+function finishShift() {
+    showSimScreen('end');
+    document.getElementById('final-total').innerText = currentScore + " / 48 Points";
+    const band = levels.find(l => currentScore >= l.min && currentScore <= l.max) || levels[0];
+    const box = document.getElementById('evaluation-box');
+    box.style.border = "3px solid " + band.color;
+    box.innerHTML = `<h2 style="color:${band.color}; margin:0;">${band.name}</h2><p style="font-size:1.05rem; margin-top:10px; color:#334155;">${band.msg}</p>`;
+    
+    // Executive Debrief
+    const debriefText = document.getElementById('debrief-text');
+    debriefText.innerHTML = `
+        <p><strong>1. Value Positioning & Financial Integrity:</strong> ${currentScore >= 36 ? 'You demonstrated strong pricing discipline, defending gross operating margins against low-cost competitors by emphasizing Total Cost of Ownership (TCO).' : 'There were moments of unnecessary price discounting. Moving forward, anchor client negotiations on technical compliance and long-term operating savings.'}</p>
+        <p><strong>2. Crisis Leadership & Client Retention:</strong> ${currentScore >= 30 ? 'Your proactive communication during logistics and operational crises preserved key enterprise accounts and prevented severe legal liabilities.' : 'Crisis response times could be improved. Always prioritize transparent communication and rapid field intervention during operational bottlenecks.'}</p>
+        <p><strong>3. Technical & Regulatory Expertise:</strong> You effectively leveraged European environmental compliance (REACH, EN 71-3, low-VOC directives) as a core competitive differentiator in commercial negotiations.</p>
+    `;
+
+    localStorage.removeItem('ecoSalesStep_v2');
+    localStorage.removeItem('ecoSalesScore_v2');
+}
+
+/* INITIALIZATION ON LOAD */
+window.onload = function() {
+    initVocabExercise();
+    initTFExercise();
+    initClozeExercise();
+    initGame();
+};
+</script>
+</body>
+</html>

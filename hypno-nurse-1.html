@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinical Communication Simulator: Nurse Alex</title>
+  <style>
+    :root {
+      --bg-color: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #cbd5e1;
+      --primary-color: #0f172a;
+      --primary-hover: #334155;
+      --accent-color: #2563eb;
+      --accent-hover: #1d4ed8;
+      
+      --color-excellent: #059669;
+      --bg-excellent: #ecfdf5;
+      --color-good: #2563eb;
+      --bg-good: #eff6ff;
+      --color-average: #d97706;
+      --bg-average: #fffbeb;
+      --color-bad: #e11d48;
+      --bg-bad: #fff1f2;
+      --color-emergency: #9f1239;
+    }
+
+    body {
+      font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .game-container {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      max-width: 850px;
+      width: 100%;
+      padding: 30px;
+      border: 1px solid var(--border-color);
+    }
+
+    .landing-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .landing-header h1 {
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .landing-header h3 {
+      color: #64748b;
+      font-weight: 400;
+      margin-top: 0;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid var(--border-color);
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+    }
+
+    .status-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .day-badge {
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      align-self: flex-start;
+    }
+
+    .emergency-badge {
+      background-color: var(--color-emergency) !important;
+      animation: flash 1.5s infinite;
+    }
+
+    @keyframes flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .score-tracker {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-color);
+    }
+
+    .resources-bar {
+      display: flex;
+      gap: 15px;
+      margin-top: 10px;
+      background: #f8fafc;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #e2e8f0;
+    }
+
+    .resource {
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .res-val {
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: white;
+    }
+
+    .story-text {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .prompt-text {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .choices-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .choice-btn {
+      background-color: #ffffff;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 15px;
+      font-size: 1rem;
+      color: var(--text-color);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .choice-btn:hover {
+      border-color: var(--accent-color);
+      background-color: #f8fafc;
+    }
+
+    .feedback-box {
+      padding: 15px;
+      border-radius: 6px;
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 15px;
+      border-left: 5px solid;
+      display: none;
+    }
+
+    .feedback-box.excellent { background-color: var(--bg-excellent); color: var(--color-excellent); border-color: var(--color-excellent); }
+    .feedback-box.good { background-color: var(--bg-good); color: var(--color-good); border-color: var(--color-good); }
+    .feedback-box.average { background-color: var(--bg-average); color: var(--color-average); border-color: var(--color-average); }
+    .feedback-box.bad { background-color: var(--bg-bad); color: var(--color-bad); border-color: var(--color-bad); }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-btn {
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 600;
+      flex: 1;
+      text-align: center;
+    }
+
+    .action-btn:hover { background-color: var(--accent-hover); }
+    .action-btn.secondary { background-color: #64748b; }
+    .action-btn.secondary:hover { background-color: #475569; }
+
+    .review-container {
+      margin-top: 20px;
+      display: none;
+      border-top: 2px dashed var(--border-color);
+      padding-top: 15px;
+    }
+
+    .review-item {
+      margin-bottom: 15px;
+      padding: 10px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+    }
+
+    .puzzle-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      margin-bottom: 15px;
+      box-sizing: border-box;
+    }
+
+    .intro-list {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 6px;
+      border-left: 4px solid var(--primary-color);
+      line-height: 1.6;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    
+    <!-- LANDING PAGE -->
+    <div id="landing-page">
+      <div class="landing-header">
+        <h1>Clinical Communication Simulator</h1>
+        <h3>Professional B1 Medical English Training</h3>
+      </div>
+      
+      <p class="story-text">
+        Welcome to St. Jude’s Medical Centre. You are <strong>Nurse Alex</strong>, specialized in patient relaxation and pain control. Over three days, you will manage 12 clinical situations, 2 sudden emergencies, and face extra puzzles.
+      </p>
+
+      <div class="intro-list">
+        <strong>Simulation Rules:</strong>
+        <ul style="margin-top: 10px; padding-left: 20px;">
+          <li><strong>Score:</strong> Progressive points based on the quality of your communication. Maximum score is hidden.</li>
+          <li><strong>Resources:</strong> You must manage <strong>Time</strong>, <strong>Budget</strong>, and <strong>Patience</strong>. If any drop to zero, the game ends immediately.</li>
+          <li><strong>Scoring:</strong>
+            <ul>
+              <li>🟩 Excellent (+3 pts) - Ideal clinical English. Boosts resources.</li>
+              <li>🟦 Good (+2 pts) - Clear and safe. Minor resource cost.</li>
+              <li>🟧 Average (+1 pt) - Too casual or passive. Moderate resource cost.</li>
+              <li>🟥 Bad (-1 pt) - Unprofessional. High resource cost. You must try again!</li>
+            </ul>
+          </li>
+          <li><strong>Bonus & Puzzles:</strong> Solve clinical riddles to earn clues for a final reward. Bonus scenarios may appear if you miss points early on.</li>
+        </ul>
+      </div>
+
+      <button class="action-btn" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="startGame()">Start Day 1: Monday →</button>
+    </div>
+
+    <!-- GAMEPLAY PAGE -->
+    <div id="gameplay-page" style="display: none;">
+      <div class="top-bar">
+        <div class="status-group">
+          <span id="day-badge" class="day-badge">Day 1</span>
+          <span id="progress" style="font-size: 0.9rem; color: #64748b; font-weight: 600;">Scenario 1</span>
+        </div>
+        <div id="score" class="score-tracker">Score: 0</div>
+      </div>
+      
+      <div class="resources-bar">
+        <div class="resource">Time: <span id="res-time" class="res-val" style="background: #0ea5e9;">100</span></div>
+        <div class="resource">Budget: <span id="res-budget" class="res-val" style="background: #10b981;">100</span></div>
+        <div class="resource">Patience: <span id="res-patience" class="res-val" style="background: #8b5cf6;">100</span></div>
+      </div>
+
+      <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 20px 0;">
+
+      <div id="story" class="story-text">Loading...</div>
+      
+      <!-- PUZZLE UI -->
+      <div id="puzzle-ui" style="display: none;">
+        <input type="text" id="puzzle-answer" class="puzzle-input" placeholder="Type your one-word answer here...">
+        <button class="action-btn" onclick="submitPuzzle()">Submit Answer</button>
+      </div>
+
+      <div id="feedback" class="feedback-box"></div>
+      <div id="prompt" class="prompt-text"></div>
+      <div id="choices" class="choices-grid"></div>
+      
+      <div id="review-container" class="review-container"></div>
+
+      <div class="action-row" id="action-row" style="display: none;">
+        <button id="review-btn" class="action-btn secondary" onclick="showReview()">Review All Options</button>
+        <button id="next-btn" class="action-btn" onclick="advanceStep()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- END PAGE -->
+    <div id="end-page" style="display: none;">
+      <h2 style="color: var(--primary-color);">End of Week Review</h2>
+      <p id="end-summary" class="story-text"></p>
+      
+      <div class="intro-list" style="margin-bottom: 20px;">
+        <strong>Reward Unlock:</strong>
+        <p>Enter the 4-letter secret word using the clues you collected from the puzzles.</p>
+        <p>Your Clues: <strong id="clue-display"></strong></p>
+        <input type="text" id="final-reward-input" class="puzzle-input" placeholder="Enter 4-letter word...">
+        <button class="action-btn" onclick="checkFinalReward()">Unlock Reward</button>
+        <p id="reward-feedback" style="font-weight: bold; margin-top: 10px;"></p>
+      </div>
+
+      <button class="action-btn secondary" style="width: 100%;" onclick="location.reload()">Restart Simulation</button>
+    </div>
+
+  </div>
+
+  <!-- GAME OVER MODAL -->
+  <div id="game-over-modal" class="modal-overlay">
+    <div class="modal-content">
+      <h2 style="color: var(--color-bad); margin-top: 0;">Simulation Failed</h2>
+      <p id="game-over-reason"></p>
+      <button class="action-btn" onclick="location.reload()">Restart Simulation</button>
+    </div>
+  </div>
+
+  <script>
+    // --- GAME DATA ---
+    const steps = [
+      // DAY 1
+      {
+        type: 'scenario', id: 1, day: 'Day 1: Monday', title: 'The Nervous Patient',
+        text: 'Your first patient, Mr. Smith, is here for a small skin surgery. He crosses his arms and says: "Relaxation therapy? I think this is fake medicine. Are you going to control my mind?"',
+        prompt: 'How do you reply to his worries?',
+        choices: [
+          { text: 'Smile and say: "I understand your worry. This is just a medical way to help your brain focus and feel less pain. You are in control the whole time."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Perfect balance. You respect his feelings and explain clearly in simple terms.' },
+          { text: 'Say: "We use standardized neurological focus techniques to block pain signals alongside normal medicine."', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Professional, but "neurological focus techniques" is too complex for a nervous patient.' },
+          { text: 'Give him a paper: "It is normal to be nervous. Please read this paper about it while I prepare the tools."', pts: 1, res: {t:-5, b:-2, p:-2}, type: 'average', fb: 'Safe, but giving a paper instead of talking misses a chance to build trust.' },
+          { text: 'Say firmly: "This is a real hospital. If you don\'t want to do it, we can cancel your surgery today."', pts: -1, res: {t:-10, b:-5, p:-10}, type: 'bad', fb: 'Too aggressive! Giving a threat destroys patient trust.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 2, day: 'Day 1: Monday', title: 'Finding a Safe Space',
+        text: 'You ask Mrs. Lee to imagine a safe, calm place. She looks nervous. "I hate the beach, and the forest has bugs. I don\'t know what to imagine!"',
+        prompt: 'How do you help her?',
+        choices: [
+          { text: 'Say softly: "That is perfectly fine. What about inside? A quiet library, your living room, or a warm bed?"', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Excellent. You offer simple, relatable indoor options without pressure.' },
+          { text: 'Say: "We can use a sensory-neutral indoor room to reach deep physical relaxation safely."', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Effective, but sounds a bit cold and robotic.' },
+          { text: 'Say: "Let us just imagine a plain white room with no noise at all."', pts: 1, res: {t:-5, b:0, p:-2}, type: 'average', fb: 'A plain white room can feel like a hospital, which doesn\'t help her relax.' },
+          { text: 'Say: "Try harder to imagine a clean beach with no bugs. It is the best way to relax."', pts: -1, res: {t:-10, b:0, p:-10}, type: 'bad', fb: 'Never force a patient to imagine something they already said they dislike.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 3, day: 'Day 1: Monday', title: 'The TV Prop',
+        text: 'A patient brings a swinging pocket watch. "I saw on TV that you swing this to put me to sleep!" he says happily.',
+        prompt: 'How do you correct him?',
+        choices: [
+          { text: 'Smile and say: "TV shows love those! But in real hospitals, we use calm breathing and listening. It works much better for pain."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Friendly and educational. You correct the myth without making him feel silly.' },
+          { text: 'Say: "Visual objects were used in the past, but modern medicine uses verbal instructions instead."', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Accurate and polite, though slightly formal.' },
+          { text: 'Put it away and say: "We do not need that. Please just sit down so we can begin the real procedure."', pts: 1, res: {t:-5, b:0, p:-3}, type: 'average', fb: 'Direct, but dismissive. It does not explain *why*.' },
+          { text: 'Say: "We can use it for one minute if you want, but then we must do it my way."', pts: -1, res: {t:-10, b:0, p:-10}, type: 'bad', fb: 'Using fake props in a hospital wastes time and supports false medical ideas.' }
+        ]
+      },
+      {
+        type: 'puzzle', id: 'p1', day: 'Day 1: Monday', title: 'Clinical Puzzle 1',
+        text: 'Solve this riddle to earn your first clue letter.',
+        question: 'I pump blood through your body, but I am not a machine. I beat faster when you are nervous. What am I?',
+        answer: 'heart', clue: 'H'
+      },
+      {
+        type: 'scenario', id: 4, day: 'Day 2: Tuesday', title: 'The Loud Interruption',
+        text: 'You are helping a patient relax. Suddenly, a worker opens the door loudly and shouts: "Did you take the extra bandages?" The patient jumps in fear.',
+        prompt: 'How do you handle the worker and the patient?',
+        choices: [
+          { text: 'Tell the worker quietly: "Please wait outside." Then tell the patient: "You are safe. Let that noise fade away as you take a deep breath."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Perfect. You protect the room and calmly refocus the patient.' },
+          { text: 'Tell the worker: "I am busy." Then say: "Okay, let us start the breathing exercise again from the beginning."', pts: 2, res: {t:-3, b:0, p:0}, type: 'good', fb: 'Clear boundary, but restarting from the beginning breaks the flow.' },
+          { text: 'Answer the worker: "They are in the cabinet!" Then say: "Sorry about that. Where were we?"', pts: 1, res: {t:-5, b:0, p:-5}, type: 'average', fb: 'Answering the worker shows the patient they are not your top priority.' },
+          { text: 'Say loudly to the worker: "Can\'t you see I am with a patient? Get out!"', pts: -1, res: {t:-10, b:0, p:-15}, type: 'bad', fb: 'Shouting creates more stress in the room for the patient.' }
+        ]
+      },
+      {
+        type: 'emergency', id: 'e1', day: 'Day 2: Tuesday', title: 'EMERGENCY: Breathing Problem',
+        text: '🚨 Suddenly, the patient starts coughing heavily. Her face turns pale, she holds her chest, and cannot get enough air. She has asthma.',
+        prompt: 'What is your immediate action?',
+        choices: [
+          { text: 'Stop immediately. Help her sit up, give her asthma medicine (inhaler), and call a doctor.', pts: 3, res: {t:-5, b:-10, p:0}, type: 'excellent', fb: 'CRISIS AVERTED. Physical emergencies need physical medicine immediately.' },
+          { text: 'Stop the relaxation. Ask her to breathe into a paper bag to calm her panic.', pts: 1, res: {t:-15, b:0, p:-10}, type: 'average', fb: 'RISKY. A paper bag is for panic, but asthma is a blocked airway. She needs medicine.' },
+          { text: 'Tell her: "Imagine your lungs opening up and filling with cool, fresh air. Relax your chest."', pts: -1, res: {t:-50, b:-50, p:-50}, type: 'bad', fb: 'FATAL ERROR. You cannot cure an asthma attack with imagination. The patient collapsed.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 5, day: 'Day 2: Tuesday', title: 'The Rushed Doctor',
+        text: 'Dr. Evans enters the room early. "Nurse, stop this talking. We have no time for relaxation today. I want to start the surgery right now!"',
+        prompt: 'How do you keep professional boundaries?',
+        choices: [
+          { text: 'Say calmly: "Doctor, this two-minute prep lowers their heart rate and helps the surgery go faster. We will be ready in exactly two minutes."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Assertive and smart. You explained the medical benefit to the doctor.' },
+          { text: 'Say: "This is part of the approved plan for this patient. I am finishing now."', pts: 2, res: {t:-2, b:0, p:-2}, type: 'good', fb: 'Firm and professional, but slightly defensive.' },
+          { text: 'Say: "Okay, doctor." Then tell the patient: "We have to stop and do the surgery now."', pts: 1, res: {t:-10, b:0, p:-5}, type: 'average', fb: 'You gave up patient care just because the doctor was impatient.' },
+          { text: 'Say: "If you interrupt me, I will report you to the manager for breaking protocol."', pts: -1, res: {t:-15, b:0, p:-15}, type: 'bad', fb: 'Threatening the doctor in front of the patient creates a hostile environment.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 6, day: 'Day 2: Tuesday', title: 'The Talkative Mother',
+        text: 'A young patient is trying to relax, but his mother keeps interrupting: "Are you asleep yet, honey? Does it work?"',
+        prompt: 'How do you manage the mother?',
+        choices: [
+          { text: 'Say warmly: "Your support is great, but he needs silence to focus. Could you just hold his hand quietly?"', pts: 3, res: {t:0, b:0, p:3}, type: 'excellent', fb: 'Tactful. You gave her a quiet job so she feels helpful, not rejected.' },
+          { text: 'Say: "Madam, we need a completely quiet room for this to work. Please stop talking."', pts: 2, res: {t:-2, b:0, p:-2}, type: 'good', fb: 'Clear boundary, but a bit cold to a worried mother.' },
+          { text: 'Try to ignore her and just speak louder to the patient.', pts: 1, res: {t:-8, b:0, p:-5}, type: 'average', fb: 'Ignoring the problem means the interruptions will continue.' },
+          { text: 'Say: "You are ruining his progress. Go wait outside immediately."', pts: -1, res: {t:-15, b:0, p:-15}, type: 'bad', fb: 'Too aggressive. The mother is now angry and the patient is stressed.' }
+        ]
+      },
+      {
+        type: 'bonus', id: 'b1', threshold: 18, day: 'Day 2: Tuesday', title: 'Bonus: The Missing Form',
+        text: 'Because you lost some points earlier, here is a chance to recover. The patient forgot their consent form.',
+        prompt: 'What do you do?',
+        choices: [
+          { text: 'Print a new form, explain it briefly, and have them sign it before starting.', pts: 2, res: {t:-5, b:-2, p:5}, type: 'excellent', fb: 'Safe and legally correct.' },
+          { text: 'Just start the relaxation and ask them to sign it later.', pts: -1, res: {t:-20, b:0, p:-10}, type: 'bad', fb: 'Illegal! You must have consent before treatment.' }
+        ]
+      },
+      {
+        type: 'puzzle', id: 'p2', day: 'Day 2: Tuesday', title: 'Clinical Puzzle 2',
+        text: 'Solve this riddle to earn your second clue letter.',
+        question: 'I have two holes for your eyes, but I am not a mask. Actually, wait. The clue word relates to vision. What part of the body do you use to see?',
+        answer: 'eye', clue: 'E'
+      },
+      {
+        type: 'scenario', id: 7, day: 'Day 3: Wednesday', title: 'The Language Barrier',
+        text: 'Your patient speaks very little English. You need to explain that their hand will feel completely numb (no feeling), like wearing a thick glove.',
+        prompt: 'How do you explain this easily?',
+        choices: [
+          { text: 'Use slow words and hands: "Imagine your hand is in cold ice water. It feels heavy and thick, like a big winter glove."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Perfect. Physical examples (ice water, heavy glove) cross language barriers easily.' },
+          { text: 'Show a real glove: "Your hand will feel covered and protected like this glove."', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Good visual aid, though combining it with feeling (cold/heavy) is better.' },
+          { text: 'Say: "We will create peripheral somatic analgesia to block the nerve signals."', pts: 1, res: {t:-5, b:0, p:-5}, type: 'average', fb: 'Way too complex. A beginner English speaker will not understand this.' },
+          { text: 'Speak very loudly: "YOU WILL FEEL NO PAIN IN YOUR HAND!"', pts: -1, res: {t:-10, b:0, p:-10}, type: 'bad', fb: 'Speaking louder does not help someone understand a language!' }
+        ]
+      },
+      {
+        type: 'scenario', id: 8, day: 'Day 3: Wednesday', title: 'The Crying Patient',
+        text: 'While relaxing with her eyes closed, the patient suddenly starts crying. She remembers a sad childhood memory.',
+        prompt: 'How do you handle this emotion safely?',
+        choices: [
+          { text: 'Say: "You are safe here in the clinic with Nurse Alex. Take a breath, let the memory fade, and feel the chair supporting you."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Excellent grounding technique. It brings her safely back to the present.' },
+          { text: 'Count her out: "I will count to 3 and you will wake up safely. 1, 2, 3."', pts: 2, res: {t:-2, b:0, p:-2}, type: 'good', fb: 'Safe exit, but grounding her while still relaxed is slightly smoother.' },
+          { text: 'Say: "It is okay to cry. Let it all out, we will wait."', pts: 1, res: {t:-10, b:0, p:-5}, type: 'average', fb: 'Kind, but allowing a full emotional breakdown delays the medical surgery.' },
+          { text: 'Ask: "Tell me about this memory. Who hurt you?"', pts: -1, res: {t:-15, b:0, p:-15}, type: 'bad', fb: 'You are a nurse, not a psychologist. Do not dig into deep trauma here.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 9, day: 'Day 3: Wednesday', title: 'The Journalist',
+        text: 'A journalist stops you in the hall. "I heard a famous politician was your patient today for surgery anxiety. Is it true?"',
+        prompt: 'How do you answer?',
+        choices: [
+          { text: 'Say: "I cannot confirm or deny information about any patient. It is the law. Please contact our PR department."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Perfect privacy compliance. You gave no clues at all.' },
+          { text: 'Say: "Patient records are strictly private. I cannot talk to you."', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Good boundary, but directing them to PR is more professional.' },
+          { text: 'Say: "We see many people. I don\'t really pay attention to famous people."', pts: 1, res: {t:-5, b:0, p:-5}, type: 'average', fb: 'Casual answers can accidentally confirm things. Stick to official rules.' },
+          { text: 'Say quietly: "I can\'t say his name, but yes, even politicians get scared of needles!"', pts: -1, res: {t:-20, b:0, p:-20}, type: 'bad', fb: 'Severe privacy violation! You just confirmed the story.' }
+        ]
+      },
+      {
+        type: 'puzzle', id: 'p3', day: 'Day 3: Wednesday', title: 'Clinical Puzzle 3',
+        text: 'Solve this riddle to earn your third clue letter.',
+        question: 'I connect your shoulder to your hand. You bend me at the elbow. What body part am I?',
+        answer: 'arm', clue: 'A'
+      },
+      {
+        type: 'scenario', id: 10, day: 'Day 3: Wednesday', title: 'Checking the Pain',
+        text: 'The surgery is over. You need to write down how much pain the patient felt for the official hospital records.',
+        prompt: 'How do you ask?',
+        choices: [
+          { text: 'Ask: "On a scale from 0 to 10, where 0 is no pain and 10 is the worst pain, what was your number?"', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Standard clinical perfection. Numbers provide exact data for records.' },
+          { text: 'Ask: "How would you describe the pain: mild, medium, or severe?"', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Good, but numbers are preferred in standard medical charts.' },
+          { text: 'Ask: "The relaxation worked well, right? You didn\'t feel much pain?"', pts: 1, res: {t:-5, b:0, p:-5}, type: 'average', fb: 'This is a "leading question". It forces the patient to agree with you.' },
+          { text: 'Do not ask. Just write "0 pain" because the patient was quiet.', pts: -1, res: {t:-15, b:-10, p:-15}, type: 'bad', fb: 'Falsifying records! Being quiet does not mean zero pain.' }
+        ]
+      },
+      {
+        type: 'emergency', id: 'e2', day: 'Day 3: Wednesday', title: 'EMERGENCY: Medicine Reaction',
+        text: '🚨 During an injection of local numbing medicine, the patient says there is a weird metal taste in her mouth. Her ears are ringing, and her hands start shaking fast.',
+        prompt: 'What is happening?',
+        choices: [
+          { text: 'Recognize medicine toxicity. Stop the injection immediately and call for emergency help.', pts: 3, res: {t:-5, b:-10, p:0}, type: 'excellent', fb: 'CRISIS AVERTED. Metal taste and shaking are early signs of local anesthetic toxicity.' },
+          { text: 'Stop the injection and wait 5 minutes to see if she feels better.', pts: 1, res: {t:-15, b:-5, p:-10}, type: 'average', fb: 'RISKY. You stopped the medicine, but waiting is dangerous. She needs a doctor now.' },
+          { text: 'Tell her it is just anxiety and tell her to breathe deeper.', pts: -1, res: {t:-50, b:-50, p:-50}, type: 'bad', fb: 'FATAL ERROR. You ignored physical poisoning. The patient had a seizure.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 11, day: 'Day 3: Wednesday', title: 'The Team Meeting',
+        text: 'In a meeting, the manager asks you: "Alex, how can we make our other nurses better at helping patients relax before surgery?"',
+        prompt: 'How do you share your idea?',
+        choices: [
+          { text: 'Say: "I suggest a short 15-minute training for nurses on basic calming words and a simple checklist."', pts: 3, res: {t:0, b:0, p:2}, type: 'excellent', fb: 'Practical and structured. You respect their busy schedule.' },
+          { text: 'Say: "We should give papers to patients so they can learn to relax at home first."', pts: 2, res: {t:-2, b:-5, p:0}, type: 'good', fb: 'Good idea, but training the staff has a stronger hospital impact.' },
+          { text: 'Say: "Doctors just need to spend more time talking to patients."', pts: 1, res: {t:-5, b:0, p:-5}, type: 'average', fb: 'Doctors are already too busy. This is not a practical system solution.' },
+          { text: 'Complain: "First, the staff needs to stop treating my job like a joke."', pts: -1, res: {t:-15, b:0, p:-15}, type: 'bad', fb: 'Unprofessional. Do not bring personal complaints into strategy meetings.' }
+        ]
+      },
+      {
+        type: 'scenario', id: 12, day: 'Day 3: Wednesday', title: 'End of the Week',
+        text: 'It is Friday 6:00 PM. You have treated 20 patients and feel very tired mentally.',
+        prompt: 'How do you finish your week?',
+        choices: [
+          { text: 'Take 5 minutes to sit quietly, breathe, turn off your work phone, and go home.', pts: 3, res: {t:0, b:0, p:5}, type: 'excellent', fb: 'Perfect self-care. Clear boundaries prevent nurse burnout.' },
+          { text: 'Clean your desk quickly and rush to your car to go home.', pts: 2, res: {t:-2, b:0, p:0}, type: 'good', fb: 'Good, but a short mental break helps you switch off better.' },
+          { text: 'Think about all your difficult patients while driving home to find better words for next week.', pts: 1, res: {t:-5, b:0, p:-5}, type: 'average', fb: 'Thinking about work during rest time leads to exhaustion.' },
+          { text: 'Send text messages from your personal phone to patients to check on them.', pts: -1, res: {t:-15, b:0, p:-20}, type: 'bad', fb: 'Boundary violation! Never use a personal phone for hospital patients.' }
+        ]
+      },
+      {
+        type: 'bonus', id: 'b2', threshold: 35, day: 'Day 3: Wednesday', title: 'Bonus: The Tired Coworker',
+        text: 'A younger nurse looks stressed and says: "I had a terrible day. Patients were so angry." (Bonus for extra points!)',
+        prompt: 'What do you say?',
+        choices: [
+          { text: 'Say: "It happens to all of us. Let\'s go get a coffee and you can talk about it."', pts: 2, res: {t:-5, b:-5, p:5}, type: 'excellent', fb: 'Great peer support.' },
+          { text: 'Say: "You need to be stronger if you want to work here."', pts: -1, res: {t:-10, b:0, p:-10}, type: 'bad', fb: 'Very harsh. Support your team.' }
+        ]
+      },
+      {
+        type: 'puzzle', id: 'p4', day: 'Day 3: Wednesday', title: 'Clinical Puzzle 4',
+        text: 'Solve your final riddle to get the last clue letter.',
+        question: 'We are two pink bags in your chest. We fill with air when you breathe in. What are we?',
+        answer: 'lungs', clue: 'L'
+      }
+    ];
+
+    // --- GAME STATE ---
+    let currentStepIdx = 0;
+    let score = 0;
+    let resources = { time: 50, budget: 50, patience: 50 };
+    let clues = [];
+    let currentChoices = [];
+    let perfectScorePossible = 0;
+
+    // --- DOM ELEMENTS ---
+    const els = {
+      landing: document.getElementById('landing-page'),
+      gameplay: document.getElementById('gameplay-page'),
+      end: document.getElementById('end-page'),
+      story: document.getElementById('story'),
+      prompt: document.getElementById('prompt'),
+      choices: document.getElementById('choices'),
+      feedback: document.getElementById('feedback'),
+      actionRow: document.getElementById('action-row'),
+      nextBtn: document.getElementById('next-btn'),
+      reviewBtn: document.getElementById('review-btn'),
+      reviewContainer: document.getElementById('review-container'),
+      puzzleUI: document.getElementById('puzzle-ui'),
+      puzzleInput: document.getElementById('puzzle-answer'),
+      score: document.getElementById('score'),
+      resTime: document.getElementById('res-time'),
+      resBudget: document.getElementById('res-budget'),
+      resPatience: document.getElementById('res-patience'),
+      dayBadge: document.getElementById('day-badge'),
+      progress: document.getElementById('progress'),
+      gameOverModal: document.getElementById('game-over-modal'),
+      gameOverReason: document.getElementById('game-over-reason')
+    };
+
+    function shuffleArray(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function updateUI() {
+      els.score.innerText = `Score: ${score}`;
+      els.resTime.innerText = resources.time;
+      els.resBudget.innerText = resources.budget;
+      els.resPatience.innerText = resources.patience;
+      
+      if (resources.time <= 0) triggerGameOver("You ran out of Time!");
+      if (resources.budget <= 0) triggerGameOver("You ran out of Budget!");
+      if (resources.patience <= 0) triggerGameOver("You ran out of Patience (Burnout)!");
+    }
+
+    function triggerGameOver(reason) {
+      els.gameOverReason.innerText = reason;
+      els.gameOverModal.style.display = 'flex';
+    }
+
+    function startGame() {
+      els.landing.style.display = 'none';
+      els.gameplay.style.display = 'block';
+      renderStep();
+    }
+
+    function renderStep() {
+      if (currentStepIdx >= steps.length) {
+        showEndPage();
+        return;
+      }
+
+      let step = steps[currentStepIdx];
+
+      // Check Bonus conditions
+      if (step.type === 'bonus') {
+        if (score >= step.threshold) {
+          // Skip bonus because they are doing perfectly
+          currentStepIdx++;
+          renderStep();
+          return;
+        }
+      }
+
+      els.feedback.style.display = 'none';
+      els.actionRow.style.display = 'none';
+      els.reviewContainer.style.display = 'none';
+      els.choices.style.display = 'flex';
+      els.puzzleUI.style.display = 'none';
+
+      els.dayBadge.innerText = step.day;
+      if (step.type === 'emergency') els.dayBadge.classList.add('emergency-badge');
+      else els.dayBadge.classList.remove('emergency-badge');
+
+      els.progress.innerText = step.title;
+      els.story.innerHTML = `<strong>${step.title}</strong><br><br>${step.text}`;
+      els.prompt.innerText = step.prompt || '';
+
+      els.choices.innerHTML = '';
+
+      if (step.type === 'puzzle') {
+        els.prompt.innerText = step.question;
+        els.choices.style.display = 'none';
+        els.puzzleUI.style.display = 'block';
+        els.puzzleInput.value = '';
+      } else {
+        // Track possible perfect score to compare with thresholds
+        if (step.type === 'scenario') perfectScorePossible += 3;
+        if (step.type === 'emergency') perfectScorePossible += 3;
+
+        currentChoices = shuffleArray([...step.choices]);
+        currentChoices.forEach((c, idx) => {
+          let btn = document.createElement('button');
+          btn.className = 'choice-btn';
+          btn.innerText = c.text;
+          btn.onclick = () => selectChoice(idx);
+          els.choices.appendChild(btn);
+        });
+      }
+    }
+
+    function selectChoice(idx) {
+      let choice = currentChoices[idx];
+      let step = steps[currentStepIdx];
+
+      // Update State
+      if (choice.pts > 0 || step.type === 'bonus') {
+         score += choice.pts;
+      }
+      resources.time += choice.res.t;
+      resources.budget += choice.res.b;
+      resources.patience += choice.res.p;
+      
+      updateUI();
+
+      els.choices.style.display = 'none';
+      els.feedback.className = `feedback-box ${choice.type}`;
+      
+      let resText = `(Time: ${choice.res.t}, Budget: ${choice.res.b}, Patience: ${choice.res.p})`;
+      els.feedback.innerHTML = `<strong>Feedback:</strong> ${choice.fb} <br><small>${resText}</small>`;
+      els.feedback.style.display = 'block';
+
+      els.actionRow.style.display = 'flex';
+
+      if (choice.pts === -1 && step.type !== 'bonus') {
+        els.nextBtn.innerText = "Try Again ↺";
+        els.nextBtn.onclick = () => {
+           // Cost of retry is already deducted
+           els.feedback.style.display = 'none';
+           els.actionRow.style.display = 'none';
+           els.reviewContainer.style.display = 'none';
+           els.choices.style.display = 'flex';
+        };
+        els.reviewBtn.style.display = 'none'; 
+      } else {
+        els.nextBtn.innerText = "Continue →";
+        els.nextBtn.onclick = advanceStep;
+        els.reviewBtn.style.display = 'block';
+        els.reviewBtn.disabled = false;
+      }
+    }
+
+    function showReview() {
+      els.reviewBtn.disabled = true;
+      els.reviewContainer.innerHTML = '<h4>All Options Review:</h4>';
+      currentChoices.forEach(c => {
+        let div = document.createElement('div');
+        div.className = 'review-item';
+        div.innerHTML = `<strong>Choice:</strong> ${c.text}<br>
+                         <strong>Points:</strong> ${c.pts} <br>
+                         <strong>Feedback:</strong> ${c.fb}`;
+        els.reviewContainer.appendChild(div);
+      });
+      els.reviewContainer.style.display = 'block';
+    }
+
+    function submitPuzzle() {
+      let step = steps[currentStepIdx];
+      let ans = els.puzzleInput.value.trim().toLowerCase();
+      
+      els.puzzleUI.style.display = 'none';
+      els.feedback.style.display = 'block';
+      els.actionRow.style.display = 'flex';
+      els.reviewBtn.style.display = 'none'; // No review for puzzles
+
+      if (ans === step.answer) {
+        clues.push(step.clue);
+        els.feedback.className = 'feedback-box excellent';
+        els.feedback.innerHTML = `<strong>Correct!</strong> You found a clue letter: <strong>${step.clue}</strong>`;
+      } else {
+        resources.time -= 5;
+        resources.patience -= 5;
+        updateUI();
+        els.feedback.className = 'feedback-box bad';
+        els.feedback.innerHTML = `<strong>Incorrect.</strong> The answer was "${step.answer}". You lost Time and Patience, but gained the clue: <strong>${step.clue}</strong> anyway.`;
+      }
+      
+      els.nextBtn.innerText = "Continue →";
+      els.nextBtn.onclick = advanceStep;
+    }
+
+    function advanceStep() {
+      currentStepIdx++;
+      renderStep();
+    }
+
+    function showEndPage() {
+      els.gameplay.style.display = 'none';
+      els.end.style.display = 'block';
+      
+      let summary = "";
+      if (score > 35) summary = "Incredible work! You are a master communicator.";
+      else if (score > 25) summary = "Great job! You navigated a tough week with solid skills.";
+      else summary = "You survived, but there is room for improving your clinical English.";
+      
+      document.getElementById('end-summary').innerText = `Final Score: ${score}. ${summary} \nRemaining Resources: Time ${resources.time}, Budget ${resources.budget}, Patience ${resources.patience}.`;
+      
+      // Shuffle clues visually
+      let displayClues = [...clues].sort(() => Math.random() - 0.5).join(" - ");
+      document.getElementById('clue-display').innerText = displayClues;
+    }
+
+    function checkFinalReward() {
+      let val = document.getElementById('final-reward-input').value.trim().toUpperCase();
+      let fb = document.getElementById('reward-feedback');
+      if (val === 'HEAL') {
+        fb.style.color = 'var(--color-excellent)';
+        fb.innerText = "ACCESS GRANTED! You have unlocked the Golden Stethoscope Certificate!";
+      } else {
+        fb.style.color = 'var(--color-bad)';
+        fb.innerText = "Incorrect. Try rearranging your clues.";
+      }
+    }
+
+    // Init
+    updateUI();
+  </script>
+</body>
+</html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Refinery Security & Training Chief — B1 Interactive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F3F4F6;--surface:#FFFFFF;--surface2:#F9FAFB;--surface3:#E5E7EB;
+  --ink:#111827;--ink2:#374151;--ink3:#6B7280;
+  --rule:rgba(17,24,39,0.08);
+  --green-bg:#F0FDF4;--green-bd:#22C55E;--green-tx:#166534;
+  --amber-bg:#FFFBEB;--amber-bd:#F59E0B;--amber-tx:#92400E;
+  --red-bg:#FEF2F2;--red-bd:#EF4444;--red-tx:#991B1B;
+  --blue-bg:#EFF6FF;--blue-bd:#3B82F6;--blue-tx:#1E40AF;
+  --purple-bg:#FAF5FF;--purple-bd:#A855F7;--purple-tx:#6B21A8;
+  --rxl:16px;--rs:8px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+.shell{max-width:750px;margin:2rem auto;padding:0 1rem}
+.card{background:var(--surface);border-radius:var(--rxl);box-shadow:0 10px 25px -5px rgba(0,0,0,0.05);overflow:hidden;border:1px solid var(--rule)}
+.card-bar{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.5rem;background:#fff;border-bottom:1px solid var(--rule)}
+.progress-track{display:flex;gap:4px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--surface3)}
+.dot.done{background:var(--green-bd)}
+.dot.active{background:var(--blue-bd)}
+.dot.emg{background:var(--red-bd);animation:pulse 1.2s infinite}
+@keyframes pulse{0%{opacity:1}50%{opacity:0.4}100%{opacity:1}}
+.score-chip{font-family:'DM Mono',monospace;font-size:13px;background:var(--blue-bg);color:var(--blue-tx);padding:4px 12px;border-radius:20px;border:1px solid var(--blue-bd)}
+.card-body{padding:1.5rem;animation:slideUp 0.35s ease-out}
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.time-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.5rem}
+.vocab-row{margin-bottom:1rem;display:flex;flex-wrap:wrap;gap:4px}
+.vpill{font-family:'DM Mono',monospace;font-size:10px;background:var(--surface2);color:var(--ink2);padding:2px 8px;border-radius:12px;border:1px solid var(--rule)}
+.scenario{font-size:16px;margin-bottom:1.5rem;color:var(--ink);font-weight:400}
+.opt{width:100%;text-align:left;padding:14px;background:var(--surface);border:1px solid var(--rule);border-radius:var(--rs);cursor:pointer;margin-bottom:10px;font-size:14px;transition:0.15s;display:flex;justify-content:space-between;align-items:center;color:var(--ink)}
+.opt:hover{background:var(--surface2);border-color:var(--ink3)}
+.opt:disabled{opacity:0.6;cursor:not-allowed;background:var(--surface3)}
+.fbox{margin-top:1rem;padding:1rem;border-radius:var(--rs);font-size:14px;display:none;border-left:4px solid}
+.fbox.show{display:block}
+.disc-box{margin-top:0.75rem;padding:0.85rem 1rem;border-radius:var(--rs);font-size:13px;font-style:italic;background:var(--purple-bg);border-left:4px solid var(--purple-bd);color:var(--purple-tx);display:none}
+.disc-box.show{display:block}
+.nxt{margin-top:1.5rem;padding:12px 24px;background:var(--ink);color:#fff;border:none;border-radius:var(--rs);cursor:pointer;display:none;float:right;font-weight:600}
+.nxt.show{display:block}
+.final-screen{padding:2.5rem}
+.band-box{margin:1.5rem 0;padding:1.5rem;border-radius:var(--rs);text-align:left}
+.band-1{background:var(--green-bg);border:1px solid var(--green-bd);color:var(--green-tx)}
+.band-2{background:var(--blue-bg);border:1px solid var(--blue-bd);color:var(--blue-tx)}
+.band-3{background:var(--amber-bg);border:1px solid var(--amber-bd);color:var(--amber-tx)}
+.band-4{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-tx)}
+
+.glossary-section {margin-top:2.5rem; border-top:2px solid var(--surface3); padding-top:1.5rem;}
+.glossary-title {font-family:Lora; font-size:22px; margin-bottom:1.2rem;}
+.glossary-grid {display:grid; grid-template-columns:1fr; gap:15px;}
+.g-item {background:var(--surface2); padding:12px; border-radius:var(--rs); border:1px solid var(--rule);}
+.g-term {font-family:'DM Mono',monospace; font-weight:600; color:var(--blue-tx); display:block; margin-bottom:4px; font-size:14px;}
+.g-def {font-size:13px; color:var(--ink2); display:block;}
+.g-note {font-size:11px; color:var(--ink3); font-style:italic; margin-top:4px; display:block;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <div class="card" id="main-card">
+    <div class="card-bar" id="card-bar" style="display:none">
+      <div style="font-family:Lora;font-weight:600">Refinery Security Simulation</div>
+      <div style="display:flex;align-items:center;gap:15px">
+        <div class="progress-track" id="dots"></div>
+        <div class="score-chip" id="score">0 pts</div>
+      </div>
+    </div>
+    <div id="content"></div>
+  </div>
+</div>
+
+<script>
+const S = { score: 0, answered: false };
+
+const GLOSSARY = [
+  { term: "Muster Point", def: "A safe place outside where workers meet during an emergency.", note: "Used to count all workers quickly." },
+  { term: "Hot Work Permit", def: "An official paper that allows workers to use fire or tools that make sparks.", note: "Without this paper, welding can start a big fire." },
+  { term: "SOP (Standard Operating Procedure)", def: "Clear written steps that explain how to do a job safely.", note: "Workers must follow these rules every time." },
+  { term: "Contractor Induction", def: "A basic safety talk for new or external workers before they enter the site.", note: "Helps new workers understand site dangers." },
+  { term: "Tailgating", def: "When an unauthorized person follows a worker through a door or gate without scanning an ID.", note: "A common security mistake at gate turnstiles." },
+  { term: "Phishing", def: "A dangerous fake email sent by criminals to steal passwords or software control.", note: "Opening bad links can give hackers access to machines." },
+  { term: "SCADA System", def: "The computer system that controls valves, pumps, and machines in the plant.", note: "If hackers control this system, they can stop production." },
+  { term: "PPE (Personal Protective Equipment)", def: "Special safety clothing and gear that protect workers from injury.", note: "Includes hard hats, safety boots, and fire-resistant clothes." }
+];
+
+const DATA = {
+  // --- DAY 1 ---
+  d1: {
+    label: "DAY 1: 06:15 — Main Gate Congestion",
+    scene: "A large group of contractors is waiting at the main gate. People are tailgating through the turnstiles. Plant managers ask you to turn off finger scanners to speed up entry.",
+    vocab: ["tailgating", "contractor", "scanner"],
+    opts: [
+      { t: "Turn off finger scanners and look at ID cards quickly with your eyes.", pts: 1, fb: "Suboptimal. Security guards can make mistakes when checking IDs quickly by hand.", disc: "How would you explain to a manager that security is more important than starting work on time?" },
+      { t: "Keep scanning. Add two extra security officers to manage the line and check IDs correctly.", pts: 3, fb: "Excellent. You must follow security rules even when the line is long.", disc: "What can security teams do to move big crowds through gates safely?" },
+      { t: "Open the big truck gate and let everyone walk through without checking.", pts: -1, fb: "Poor Choice. Unchecked strangers can walk into dangerous plant areas. Lose 1 point and choose again.", disc: "What dangers happen when people enter a factory without showing an ID?" }
+    ],
+    next: "d2"
+  },
+  d2: {
+    label: "DAY 1: 09:30 — Induction Shortcut",
+    scene: "A team of outside workers arrives to repair a pipe. They have not completed the required 2-hour Safety Induction class. The team leader asks you to sign their papers anyway.",
+    vocab: ["induction", "rules", "repair"],
+    opts: [
+      { t: "Refuse. Tell them they must finish the full safety class before starting work.", pts: 3, fb: "Correct. Workers who skip safety training might cause serious accidents.", disc: "How can safety trainers make induction classes simple and easy to understand?" },
+      { t: "Give them a short safety paper to read quickly while driving into the site.", pts: 1, fb: "Risky. A quick paper does not replace a proper safety class.", disc: "Why do workers often forget safety rules if they only read a short paper?" },
+      { t: "Sign their training papers immediately so they can start the repair job without delay.", pts: -1, fb: "Poor Choice. You will be responsible if an untrained worker gets hurt. Lose 1 point and choose again.", disc: "What problems happen when staff sign official papers without checking the facts?" }
+    ],
+    next: "d3"
+  },
+  d3: {
+    label: "DAY 1: 11:45 — The Perimeter Breach",
+    scene: "A security guard finds a hole cut in the fence near the oil storage tanks. Fresh footprints lead inside the factory area.",
+    vocab: ["fence", "danger", "intruder"],
+    opts: [
+      { t: "Walk over alone with a torch to check the hole in the fence yourself.", pts: 1, fb: "Unsafe. It is dangerous to investigate an intruder alone without support.", disc: "Why should security guards work in pairs when checking dangerous areas?" },
+      { t: "Lock down the local area, send a security patrol team, and check security cameras.", pts: 3, fb: "Excellent response. You treated the broken fence as a real security threat.", disc: "How can team leaders keep workers calm when closing an area for security?" },
+      { t: "Write a message for the repair team to fix the fence tomorrow morning.", pts: -1, fb: "Poor Choice. An intruder could be inside the site right now. Lose 1 point and choose again.", disc: "What can happen if security teams ignore broken fences or doors?" }
+    ],
+    next: "d4"
+  },
+  d4: {
+    label: "DAY 1: 14:00 — Hot Work Friction",
+    scene: "An experienced engineer refuses to wait for a Hot Work Permit. He says that his small welding job is far from the main oil units and completely safe.",
+    vocab: ["permit", "welding", "safety"],
+    opts: [
+      { t: "Warn him verbally, but let him start welding to avoid an argument.", pts: 1, fb: "Risky. Invisible gas clouds can travel far and catch fire easily.", disc: "Why do experienced workers sometimes ignore basic safety rules?" },
+      { t: "Stop the welding job immediately until gas tests are done and the permit is signed.", pts: 3, fb: "Perfect. Following permit rules stops gas clouds from exploding.", disc: "How can you speak politely to angry workers while enforcing firm safety rules?" },
+      { t: "Tell him to weld quickly before other managers see that he has no permit.", pts: -1, fb: "Poor Choice. Helping workers break safety rules can cause a fire. Lose 1 point and choose again.", disc: "What message does it send to new staff when senior workers skip safety steps?" }
+    ],
+    next: "emergency1"
+  },
+
+  // --- EMERGENCY 1 ---
+  emergency1: {
+    label: "DAY 1: 16:30 — EMERGENCY: Suspicious Drone",
+    scene: "An unknown drone is flying directly over the main oil refining unit and taking photos.",
+    vocab: ["drone", "camera", "emergency"],
+    opts: [
+      { t: "Sound the main loud emergency sirens and order everyone to run out of the site.", isGameOver: true, fb: "<strong>GAME OVER.</strong> Bad choice. Workers panicked and ran, causing accidents and injuries near heavy machines.", disc: "Why must managers avoid causing sudden panic during minor incidents?" },
+      { t: "Call local police, track the drone, and move sensitive work inside buildings.", isSafe: true, fb: "Correct. You protected site information and called police without causing panic.", disc: "How can modern factories protect their sites from unknown drones?" }
+    ],
+    next: "d5"
+  },
+
+  // --- DAY 2 ---
+  d5: {
+    label: "DAY 2: 08:00 — Cyber Alert",
+    scene: "IT security reports that a supervisor clicked a bad link in a fake email. Two office computers are now running strangely.",
+    vocab: ["fake email", "virus", "computer"],
+    opts: [
+      { t: "Disconnect the training computers immediately from the main network and plant controls.", pts: 3, fb: "Outstanding action. Disconnecting stops computer viruses from spreading to machines.", disc: "Why is it important to separate office computers from factory control systems?" },
+      { t: "Wait for the normal Friday IT scan to clean any computer viruses.", pts: 1, fb: "Dangerous. Computer viruses can spread to important factory systems in minutes.", disc: "What problems happen when companies delay fixing computer security alerts?" },
+      { t: "Ignore the alert because office computers do not control oil valves directly.", pts: -1, fb: "Poor Choice. Hackers often use office computers to reach factory machines. Lose 1 point and choose again.", disc: "How do simple fake emails give hackers access to big factory networks?" }
+    ],
+    next: "d6"
+  },
+  d6: {
+    label: "DAY 2: 10:30 — Contractor PPE Slack",
+    scene: "You see outside workers near hot pipes without fire-resistant clothes. They say their boss did not give them safety gear.",
+    vocab: ["safety gear", "clothes", "check"],
+    opts: [
+      { t: "Tell them to stay a few meters away from hot pipes while working.", pts: 1, fb: "Inadequate. Gas leaks can happen anywhere near processing pipes without warning.", disc: "Why is distance not a safe protection against sudden gas or oil leaks?" },
+      { t: "Stop their work immediately until their boss provides proper fire-resistant clothes for everyone.", pts: 3, fb: "Excellent leadership. Outside companies must follow your site safety rules.", disc: "How can factory owners make sure outside companies bring correct safety gear?" },
+      { t: "Give them simple thin coats from the visitor cupboard that are not fire-rated.", pts: -1, fb: "Poor Choice. Normal coats do not protect against fire and break safety rules. Lose 1 point and choose again.", disc: "Why is bad safety gear just as dangerous as wearing no safety gear at all?" }
+    ],
+    next: "d7"
+  },
+  d7: {
+    label: "DAY 2: 13:15 — The Audit Discrepancy",
+    scene: "You discover that a junior trainer wrote fake high scores on fire drill reports to make his team look good to company managers.",
+    vocab: ["fake scores", "fire drill", "report"],
+    opts: [
+      { t: "Speak to the trainer privately and ask him to write true reports next time.", pts: 1, fb: "Weak action. Writing fake safety reports is a serious problem that needs official action.", disc: "Why is private advice not enough when staff write fake safety records?" },
+      { t: "Report the fake results, plan a new fire drill, and start official disciplinary steps.", pts: 3, fb: "Superb integrity. Honest safety records save lives during real fires.", disc: "How can companies encourage staff to report true safety numbers without fear?" },
+      { t: "Delete the audit paper so the factory does not lose its end-of-year safety bonus.", pts: -1, fb: "Poor Choice. Changing official records puts lives in danger during real emergencies. Lose 1 point and choose again.", disc: "What happens when managers care more about money bonuses than real safety?" }
+    ],
+    next: "d8"
+  },
+  d8: {
+    label: "DAY 2: 15:45 — Media Pressure",
+    scene: "A minor steam leak makes black smoke above the plant. A newspaper reporter calls your direct phone and asks about 'the chemical explosion'.",
+    vocab: ["reporter", "news", "steam"],
+    opts: [
+      { t: "Answer his questions quietly off-the-record so he does not write false stories.", pts: 1, fb: "Risky. Reporters often print off-the-record comments and make mistakes.", disc: "Why is speaking off-the-record to reporters risky during a news event?" },
+      { t: "Refuse to comment and transfer the call immediately to the official Press Officer.", pts: 3, fb: "Correct protocol. Only trained media officers should speak to journalists.", disc: "Why should only trained press officers talk to reporters during accidents?" },
+      { t: "Tell him the plant is going to explode just to make him hang up the phone.", pts: -1, fb: "Poor Choice. Making bad jokes causes public panic and damages company trust. Lose 1 point and choose again.", disc: "How should workers speak on the phone when answering unexpected public calls?" }
+    ],
+    next: "emergency2"
+  },
+
+  // --- EMERGENCY 2 ---
+  emergency2: {
+    label: "DAY 2: 17:00 — EMERGENCY: Vapor Cloud Trigger",
+    scene: "An automatic sensor detects a large gas cloud near an oil tank. A single spark could cause a massive explosion.",
+    vocab: ["gas cloud", "spark", "emergency"],
+    opts: [
+      { t: "Stop factory machines, cut electric power to the area, and turn on water spray systems.", isSafe: true, fb: "Perfect response. You removed electrical sparks and cooled the gas cloud fast.", disc: "How do automated water spray systems help stop gas clouds from catching fire?" },
+      { t: "Send a security guard in a normal car to check if the gas sensor is broken.", isGameOver: true, fb: "<strong>GAME OVER.</strong> Disastrous action. The car engine made a small spark that exploded the gas cloud.", disc: "Why are normal petrol and diesel cars banned near gas leak areas?" }
+    ],
+    next: "d9"
+  },
+
+  // --- DAY 3 ---
+  d9: {
+    label: "DAY 3: 08:30 — VIP Interruption",
+    scene: "A group of important company bosses arrives for a visit. The local director asks you to skip their security gate check to save time.",
+    vocab: ["visitors", "bosses", "gate check"],
+    opts: [
+      { t: "Politely insist that all visitors, including top bosses, must do the security check.", pts: 3, fb: "Outstanding. Safety rules must apply to everyone equally, no matter their job level.", disc: "How can security staff stay polite and firm when talking to top company bosses?" },
+      { t: "Give them a very short 10-second verbal summary while walking into the building.", pts: 1, fb: "Compromised safety. Important visitors can get hurt in factory areas just like anyone else.", disc: "What can happen if important visitors enter factory floors without full safety gear?" },
+      { t: "Let them walk through without any checks and tell gate staff to look away.", pts: -1, fb: "Poor Choice. Skipping rules for bosses destroys your team's respect for safety. Lose 1 point and choose again.", disc: "How does giving special favors to bosses ruin safety discipline among regular workers?" }
+    ],
+    next: "d10"
+  },
+  d10: {
+    label: "DAY 3: 11:00 — Fatigued Officers",
+    scene: "Your security guards are very tired after working long shifts for 14 days in a row. They are making simple mistakes on duty.",
+    vocab: ["tired", "shift", "mistakes"],
+    opts: [
+      { t: "Give guards energy drinks and extra money to help them finish the week.", pts: 1, fb: "Inadequate. Energy drinks do not cure deep physical tiredness or prevent mistakes.", disc: "Why are energy drinks not a good solution for tired workers?" },
+      { t: "Bring extra trained guards from another site and give your team required rest days.", pts: 3, fb: "Excellent management. Tired workers make dangerous mistakes during emergencies.", disc: "What signs show that shift workers are too tired to work safely?" },
+      { t: "Make their daily shifts longer—16 hours—so you need fewer guards on site.", pts: -1, fb: "Poor Choice. Working 16-hour shifts causes severe tiredness and big safety errors. Lose 1 point and choose again.", disc: "How do long work hours increase the chance of workplace accidents?" }
+    ],
+    next: "d11"
+  },
+  d11: {
+    label: "DAY 3: 14:00 — Obsolete Hardware",
+    scene: "Security cameras near the train loading area are breaking down often. The money team wants to wait until next year to buy new cameras.",
+    vocab: ["cameras", "broken", "money"],
+    opts: [
+      { t: "Accept the money delay and ask guards to walk around the train area when free.", pts: 1, fb: "Weak coverage. Guards cannot watch dangerous fuel loading areas 24 hours a day.", disc: "Why are walking patrols less effective than continuous camera monitoring?" },
+      { t: "Write an official Risk Report explaining the danger to get emergency money for cameras.", pts: 3, fb: "Great work. Showing clear safety risks helps managers approve repair money quickly.", disc: "How can safety reports convince company managers to spend money on equipment?" },
+      { t: "Turn off the broken cameras completely so system screens do not show red errors.", pts: -1, fb: "Poor Choice. Hiding broken equipment leaves danger areas unmonitored. Lose 1 point and choose again.", disc: "Why is it dangerous to turn off error warnings on security screens?" }
+    ],
+    next: "d12"
+  },
+  d12: {
+    label: "DAY 3: 16:15 — The Final Choice",
+    scene: "A peaceful group of local protesters is standing outside the gate, blocking fuel trucks. The Operations Manager asks you to use force to push them away.",
+    vocab: ["protest", "police", "gate"],
+    opts: [
+      { t: "Work with local police to guide trucks safely while keeping the protest peaceful.", pts: 3, fb: "Superb decision. Calm actions protect people and maintain good public trust.", disc: "Why is working with local police better than using private security force?" },
+      { t: "Order security guards to push protesters away from the road using batons.", pts: 1, fb: "Highly volatile. Using force causes fights, injuries, and bad news stories.", disc: "What problems happen when private guards use physical force against peaceful crowds?" },
+      { t: "Lock all gates and let fuel trucks block the main public road indefinitely.", pts: -1, fb: "Poor Choice. Blocking public roads causes traffic chaos and stops deliveries completely. Lose 1 point and choose again.", disc: "How does blocking public roads harm local neighbors and company deliveries?" }
+    ],
+    next: "final"
+  }
+};
+
+function fisherYatesShuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function buildDots(id) {
+  const stages = ["d1", "d2", "d3", "d4", "emergency1", "d5", "d6", "d7", "d8", "emergency2", "d9", "d10", "d11", "d12"];
+  const curIdx = stages.indexOf(id);
+  const el = document.getElementById('dots');
+  if (!el) return;
+  el.innerHTML = '';
+  stages.forEach((stageId, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i < curIdx ? ' done' : i === curIdx ? ' active' : '');
+    if (stageId.includes('emergency') && i === curIdx) d.className += ' emg';
+    el.appendChild(d);
+  });
+}
+
+function show(id) {
+  if (!DATA[id]) {
+    finish(false);
+    return;
+  }
+  const node = DATA[id];
+  S.answered = false;
+  
+  const bar = document.getElementById('card-bar');
+  if (bar) bar.style.display = 'flex';
+  buildDots(id);
+  
+  let h = `<div class="card-body"><div class="time-label">${node.label}</div>`;
+  if(node.vocab) h += `<div class="vocab-row">${node.vocab.map(v=>`<span class="vpill">${v}</span>`).join('')}</div>`;
+  h += `<div class="scenario">${node.scene}</div><div class="options" id="opt-container">`;
+  
+  let displayOpts = fisherYatesShuffle(node.opts);
+  
+  displayOpts.forEach((o, idx) => {
+    const safeOptionStr = JSON.stringify(o).replace(/'/g, "&#39;").replace(/"/g, '&quot;');
+    h += `<button class="opt" id="opt-${idx}" onclick='pick("${id}", ${idx}, ${safeOptionStr})'>
+            <span>${o.t}</span>
+          </button>`;
+  });
+  h += `</div>
+        <div class="fbox" id="fb"></div>
+        <div class="disc-box" id="disc"></div>
+        <button class="nxt" id="nxt">Continue →</button>
+        </div>`;
+  document.getElementById('content').innerHTML = h;
+}
+
+function pick(id, idx, opt) {
+  if (S.answered && opt.pts !== -1) return;
+  
+  const fb = document.getElementById('fb');
+  const disc = document.getElementById('disc');
+  const nxt = document.getElementById('nxt');
+  
+  fb.innerHTML = opt.fb;
+  fb.className = 'fbox show';
+  
+  if (opt.disc) {
+    disc.innerHTML = `<strong>Discussion Question:</strong> ${opt.disc}`;
+    disc.className = 'disc-box show';
+  } else {
+    disc.className = 'disc-box';
+  }
+  
+  if (opt.pts === -1) {
+    S.score += opt.pts;
+    const scoreEl = document.getElementById('score');
+    if (scoreEl) scoreEl.textContent = S.score + ' pts';
+    const optBtn = document.getElementById(`opt-${idx}`);
+    if (optBtn) optBtn.disabled = true;
+    fb.style.backgroundColor = 'var(--red-bg)';
+    fb.style.borderColor = 'var(--red-bd)';
+    fb.style.color = 'var(--red-tx)';
+    return;
+  }
+  
+  S.answered = true;
+  
+  const optContainer = document.getElementById('opt-container');
+  if (optContainer) {
+    const allButtons = optContainer.getElementsByTagName('button');
+    for (let b of allButtons) {
+      b.disabled = true;
+    }
+  }
+  
+  if (opt.pts !== undefined) S.score += opt.pts;
+  const scoreEl = document.getElementById('score');
+  if (scoreEl) scoreEl.textContent = S.score + ' pts';
+  
+  const isExcellent = opt.pts === 3 || opt.isSafe;
+  fb.style.backgroundColor = isExcellent ? 'var(--green-bg)' : 'var(--amber-bg)';
+  fb.style.borderColor = isExcellent ? 'var(--green-bd)' : 'var(--amber-bd)';
+  fb.style.color = isExcellent ? 'var(--green-tx)' : 'var(--amber-tx)';
+  
+  if (opt.isGameOver) {
+    fb.style.backgroundColor = 'var(--red-bg)';
+    fb.style.borderColor = 'var(--red-bd)';
+    fb.style.color = 'var(--red-tx)';
+    nxt.textContent = "Final Incident Review";
+    nxt.onclick = () => finish(true);
+  } else {
+    nxt.textContent = "Continue →";
+    nxt.onclick = () => {
+      const nextId = DATA[id] ? DATA[id].next : 'final';
+      if (nextId === 'final') {
+        finish(false);
+      } else {
+        show(nextId);
+      }
+    };
+  }
+  nxt.classList.add('show');
+}
+
+function finish(gameOver) {
+  const bar = document.getElementById('card-bar');
+  if (bar) bar.style.display = 'none';
+  
+  let band, title, text, bClass;
+  
+  if (gameOver) {
+    bClass = "band-4"; 
+    title = "Band 4: HSE Regulatory Shutdown (Game Over)"; 
+    text = "A serious safety error happened during your shift. In oil refineries, breaking safety rules causes shutdowns, equipment damage, and legal trouble.";
+  } else if (S.score >= 32) {
+    bClass = "band-1"; 
+    title = "Band 1: Chief HSSE Director (32–36 pts)"; 
+    text = "Excellent work! You kept the plant safe under high work pressure, protected workers, and followed all safety rules correctly.";
+  } else if (S.score >= 24) {
+    bClass = "band-2"; 
+    title = "Band 2: Plant Security Superintendent (24–31 pts)"; 
+    text = "Good job! You protected factory equipment and completed shift safety checks well. You made a few minor mistakes under pressure, but overall safety remained good.";
+  } else if (S.score >= 12) {
+    bClass = "band-3"; 
+    title = "Band 3: Junior Safety Supervisor (12–23 pts)"; 
+    text = "You finished the shift, but some of your choices chose speed over safety. Review safety rules and hazard steps to improve next time.";
+  } else {
+    bClass = "band-4"; 
+    title = "Band 4: Operational Risk (Under 12 pts)"; 
+    text = "Many safety errors occurred during your shift. Skipping rules created dangerous conditions for workers. Read the safety guide again and try the challenge once more.";
+  }
+
+  let glossHtml = `
+    <div class="glossary-section">
+      <h3 class="glossary-title">Refinery Vocabulary & Core Concepts</h3>
+      <div class="glossary-grid">
+        ${GLOSSARY.map(g => `
+          <div class="g-item">
+            <span class="g-term">${g.term}</span>
+            <span class="g-def">${g.def}</span>
+            <span class="g-note">${g.note}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+
+  document.getElementById('content').innerHTML = `
+    <div class="final-screen">
+      <h2 style="font-family:Lora; font-size:26px">Simulation Complete</h2>
+      <div style="font-size:16px; margin:10px 0; font-family:'DM Mono'">Final Score: ${S.score} / 36 pts</div>
+      <div class="band-box ${bClass}">
+        <h3 style="margin-bottom:6px; font-weight:600">${title}</h3>
+        <p style="font-size:14px; opacity:0.95">${text}</p>
+      </div>
+      ${glossHtml}
+      <button class="opt" style="justify-content:center; margin-top:24px; font-weight:600; background:var(--ink); color:#fff" onclick="restartGame()">Restart Challenge</button>
+    </div>`;
+}
+
+function restartGame() {
+  S.score = 0;
+  S.answered = false;
+  start();
+}
+
+function start() {
+  const bar = document.getElementById('card-bar');
+  if (bar) bar.style.display = 'none';
+  
+  document.getElementById('content').innerHTML = `
+    <div class="final-screen" style="text-align:center">
+      <h2 style="font-family:Lora; font-size:30px; margin-bottom:0.5rem">PetroShield Global</h2>
+      <p style="font-size:15px; margin:1rem 0 1.5rem 0; color:var(--ink2)">
+        Work as Head of Security & Safety Training at a big oil refinery. 
+        Balance safety rules against busy daily work across three challenging days.
+      </p>
+      <div style="text-align:left; background:var(--surface2); padding:1rem; border-radius:var(--rs); border:1px solid var(--rule); margin-bottom:1.5rem; font-size:13px; color:var(--ink2)">
+        <strong style="display:block; margin-bottom:0.5rem; color:var(--ink)">Game Rules:</strong>
+        <ul style="margin-left:1.2rem; line-height:1.5">
+          <li><strong>12 Daily Situations:</strong> Choose the best answer (+3 Excellent, +1 Average, -1 Poor with retry).</li>
+          <li><strong>2 Emergencies:</strong> Choose the safe answer to survive. Bad choices cause an immediate <strong>Game Over</strong>.</li>
+          <li><strong>4 Final Results:</strong> Try to get up to 36 points for the top score band.</li>
+        </ul>
+      </div>
+      <button class="opt" style="justify-content:center; background:var(--ink); color:#fff; padding:16px; font-weight:600" onclick="show('d1')">Start Shift →</button>
+    </div>`;
+}
+
+start();
+</script>
+</body>
+</html>

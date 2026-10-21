@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Qualities - English Lesson</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-5px); } 100% { transform: translateX(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen overflow-x-hidden">
+
+    <div id="app" class="max-w-6xl mx-auto px-4 py-8 min-h-screen flex flex-col">
+        <header class="mb-8 border-b pb-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-indigo-700">Business English: Professional Qualities</h1>
+            <div id="retained-counter" class="hidden font-semibold bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full shadow-sm">
+                Retained: <span id="retained-number">0</span>/4
+            </div>
+        </header>
+
+        <main id="main-content" class="flex-grow flex flex-col w-full"></main>
+    </div>
+
+    <script>
+        const vocabulary = [
+            { word: "Adaptable", def: "Able to change or be changed in order to deal successfully with new situations." },
+            { word: "Ambitious", def: "Having a strong desire to be successful, rich, or powerful." },
+            { word: "Analytical", def: "Using a logical method of thinking about something in order to understand it." },
+            { word: "Charismatic", def: "Having a strong personal quality that makes other people like you and be attracted to you." },
+            { word: "Collaborative", def: "Involving two or more people working together for a special purpose." },
+            { word: "Conscientious", def: "Putting a lot of effort into your work and doing it well and carefully." },
+            { word: "Creative", def: "Producing or using original and unusual ideas." },
+            { word: "Decisive", def: "Able to make decisions quickly and confidently." },
+            { word: "Detail-oriented", def: "Paying close attention to all of the small particulars when working on a task." },
+            { word: "Diligent", def: "Careful and using a lot of effort." },
+            { word: "Diplomatic", def: "Acting in a way that does not cause offence; skilled in dealing with people." },
+            { word: "Dynamic", def: "Having a lot of ideas and enthusiasm; energetic and forceful." },
+            { word: "Efficient", def: "Working or operating quickly and effectively in an organized way." },
+            { word: "Empathetic", def: "Having the ability to imagine how someone else feels." },
+            { word: "Flexible", def: "Able to change or be changed easily according to the situation." },
+            { word: "Innovative", def: "Using new methods or ideas." },
+            { word: "Methodical", def: "Doing things in a very ordered, careful way." },
+            { word: "Motivated", def: "Very enthusiastic or driven to achieve something." },
+            { word: "Observant", def: "Good or quick at noticing things." },
+            { word: "Organized", def: "Able to plan things carefully and keep things tidy." },
+            { word: "Patient", def: "Able to wait for a long time or accept annoying behavior or difficulties without becoming angry." },
+            { word: "Persuasive", def: "Making you want to do or believe a particular thing." },
+            { word: "Proactive", def: "Taking action by causing change and not only reacting to change when it happens." },
+            { word: "Punctual", def: "Arriving, doing something, or happening at the expected, correct time." },
+            { word: "Reliable", def: "Someone or something that can be trusted or believed." },
+            { word: "Resilient", def: "Able to quickly return to a previous good condition after problems." },
+            { word: "Resourceful", def: "Skilled at solving problems and making decisions on your own." },
+            { word: "Tactful", def: "Careful not to say or do anything that could upset someone." },
+            { word: "Tenacious", def: "Holding tightly onto a good idea or goal; not giving up easily." },
+            { word: "Versatile", def: "Able to change easily from one activity to another or able to be used for many different purposes." }
+        ];
+
+        // Ensure exactly 12 candidates with 150-200 words, 4 interests, 2 experiences, and adjectives.
+        const candidates = [
+            { id: 1, name: "Alice Chen", status: null, text: "Dear Hiring Manager,\n\nI am writing to apply for the Assistant position. Throughout my career, I have prided myself on being highly adaptable and organized. In my previous role as an Administrative Coordinator at TechFlow Inc., I successfully managed complex daily schedules for five executives and implemented a new digital filing system that improved retrieval time by 30%. Before that, as a Customer Support Lead at Global Goods, I resolved escalated client issues, demonstrating that I am both empathetic and persuasive when dealing with difficult situations.\n\nI believe an assistant must be proactive and resourceful to anticipate the team's needs before they even arise. I am detail-oriented and diligent in my approach to all administrative tasks.\n\nOutside of my professional life, I have a variety of hobbies that keep me balanced. I am passionate about hiking in the mountains, reading historical biographies, practicing yoga every morning, and experimenting with vegetarian cooking. These interests help me remain patient and motivated in my daily life.\n\nI am very excited about the possibility of bringing my versatile skill set to your team. I look forward to discussing my application with you.\n\nBest regards,\nAlice Chen" },
+            { id: 2, name: "Marcus Johnson", status: null, text: "Dear Hiring Manager,\n\nI am eager to submit my application for the Learner's Assistant role. As a highly motivated and methodical professional, I thrive in environments that require careful planning and execution. For the past three years, I worked as a Project Assistant at BuildRight Construction, where I coordinated supply deliveries and drafted weekly progress reports for stakeholders. Prior to that, I served as a Data Entry Clerk at FinServe, ensuring 100% accuracy in our financial databases, proving I am highly reliable and conscientious.\n\nI always strive to be punctual and efficient, understanding that time management is critical for any successful team. When faced with sudden changes, I remain resilient and flexible, quickly adjusting my priorities to meet urgent deadlines.\n\nIn my free time, I love staying active and creative. My main interests include playing the acoustic guitar, participating in local amateur theater productions, playing competitive chess, and volunteering at the local animal shelter. Engaging in these activities makes me more dynamic and charismatic in my interactions with others.\n\nThank you for considering my application. I am confident my background makes me a strong fit for your organization.\n\nSincerely,\nMarcus Johnson" },
+            { id: 3, name: "Elena Rodriguez", status: null, text: "Dear Hiring Manager,\n\nPlease accept this email as my formal application for the Assistant position. I am a very dynamic and diplomatic individual who understands the importance of clear communication in the workplace. Over the last two years, I gained valuable experience working as a Front Desk Receptionist at a busy medical clinic, where I handled patient intake and scheduling while remaining tactful and patient under pressure. Additionally, I worked as an Event Planning Assistant for Cityscape Events, where I helped organize corporate retreats for up to 200 attendees.\n\nMy colleagues often describe me as collaborative and charismatic, as I enjoy building strong relationships across different departments. I am completely dedicated to being a proactive team member who finds innovative solutions to administrative bottlenecks.\n\nWhen I am not working, I dedicate my time to four main hobbies. I enjoy landscape photography, participating in marathon running, restoring vintage furniture, and learning foreign languages (I am currently studying Japanese). These pursuits require me to be observant and tenacious, qualities I bring to my professional endeavors as well.\n\nI would welcome the opportunity to discuss how my skills align with your needs.\n\nBest wishes,\nElena Rodriguez" },
+            { id: 4, name: "David Kim", status: null, text: "Dear Hiring Manager,\n\nI am writing to express my strong interest in the Assistant vacancy. I consider myself a highly analytical and decisive professional, capable of managing multiple priorities seamlessly. My professional background includes a tenure as a Logistics Coordinator at FastFreight, where I optimized delivery routes and reduced overhead costs by 15%. Before that, I spent a year as a Research Assistant at the State University, organizing vast amounts of data and preparing literature reviews. Both roles required me to be incredibly detail-oriented and diligent.\n\nI believe a great assistant must be resourceful and ambitious, constantly looking for ways to improve office workflows. I am versatile in my technical skills and can adapt to new software quickly.\n\nTo maintain a healthy work-life balance, I engage in several personal interests. I am an avid rock climber, I collect rare vinyl records, I enjoy writing short science fiction stories, and I actively participate in a local community gardening project. These activities help me stay resilient and creative when facing complex challenges.\n\nI am enthusiastic about the prospect of contributing to your team and ensuring your daily operations run smoothly.\n\nKind regards,\nDavid Kim" },
+            { id: 5, name: "Sarah O'Connor", status: null, text: "Dear Hiring Manager,\n\nI am thrilled to apply for the Assistant position at your esteemed company. Throughout my career, I have proven to be a highly empathetic and perceptive team member. My relevant experience includes working as an HR Assistant at PeopleFirst Inc., where I facilitated the onboarding process for over 50 new hires and managed confidential employee records. Prior to that, I was a Retail Store Supervisor at FashionForward, where I trained junior staff and handled customer complaints, demonstrating that I am both patient and persuasive.\n\nI pride myself on being organized and punctual. I understand that an assistant is the backbone of the team, and I am highly motivated to provide conscientious support to all staff members.\n\nOutside of the office, I have a diverse range of hobbies. I love baking artisanal breads, practicing modern dance, attending independent film festivals, and knitting winter garments for charity. These interests allow me to express my creative side while remaining disciplined and methodical.\n\nI am confident that my mix of administrative skills and personal dedication would make me a valuable asset to your organization.\n\nSincerely,\nSarah O'Connor" },
+            { id: 6, name: "Omar Hassan", status: null, text: "Dear Hiring Manager,\n\nIt is with great enthusiasm that I submit my application for the Assistant role. I am an innovative and observant professional with a passion for streamlining operations. Most recently, I worked as an Office Administrator at GreenTech Solutions, where I managed the procurement of office supplies and coordinated all business travel arrangements. Previously, I served as a Marketing Assistant at BrandBoost, where I helped design promotional materials and monitored social media engagement, proving my ability to be creative and adaptable.\n\nI am known for being a collaborative team player who is always ready to step in and help. I approach problems in a logical, analytical manner, and I am very decisive when urgent issues arise.\n\nIn my personal time, I engage in four primary activities. I am passionate about astronomy and stargazing, I play the piano, I participate in a local debate club, and I enjoy kayaking on the weekends. These hobbies keep me intellectually stimulated, dynamic, and tenacious in all my pursuits.\n\nThank you for taking the time to review my application. I look forward to the possibility of an interview.\n\nBest regards,\nOmar Hassan" },
+            { id: 7, name: "Chloe Dupont", status: null, text: "Dear Hiring Manager,\n\nI am writing to apply for the Learner's Assistant position. I am a versatile and diplomatic individual who excels in fast-paced environments. My professional journey includes working as a Legal Assistant at Smith & Associates, where I drafted correspondence, filed court documents, and maintained strict confidentiality. Before entering the legal field, I worked as a Travel Consultant at WorldViews Travel, creating customized itineraries for clients, which required me to be highly detail-oriented and empathetic to their needs.\n\nI am deeply conscientious about my work quality and consider myself to be highly reliable. My colleagues appreciate that I am always punctual and proactive in anticipating the needs of the executives I support.\n\nWhen I am not working, I dedicate time to my personal interests. I enjoy painting with watercolors, practicing mixed martial arts, exploring urban architecture, and writing a personal blog about sustainable living. These hobbies teach me to be resilient, resourceful, and focused.\n\nI am very excited about the opportunity to bring my strong organizational skills and positive attitude to your team.\n\nThank you for your consideration.\n\nSincerely,\nChloe Dupont" },
+            { id: 8, name: "James Wilson", status: null, text: "Dear Hiring Manager,\n\nPlease accept this email as my application for the Assistant vacancy. I am a highly motivated and efficient professional who takes pride in delivering excellent administrative support. In my last role as a Facilities Assistant at MegaCorp, I managed building maintenance requests and coordinated with external vendors to ensure a safe working environment. Prior to that, I worked as an Inventory Clerk at a regional warehouse, tracking stock levels and conducting weekly audits, which required me to be incredibly methodical and diligent.\n\nI am naturally persuasive and charismatic, making it easy for me to collaborate with various departments and external partners. I am also extremely flexible and willing to adapt to shifting priorities.\n\nOutside of work, my life is filled with engaging hobbies. I am an enthusiastic mountain biker, I spend time brewing my own craft beer, I volunteer as a youth soccer coach, and I love reading classic literature. These activities help me stay energetic, decisive, and ambitious.\n\nI am confident that my diverse professional background and strong work ethic make me an excellent candidate for this position.\n\nBest regards,\nJames Wilson" },
+            { id: 9, name: "Aisha Patel", status: null, text: "Dear Hiring Manager,\n\nI am eager to submit my resume for the Assistant position. I am a highly organized and proactive professional dedicated to facilitating smooth office operations. For the past two years, I worked as an Academic Assistant at City University, where I organized examination schedules, managed student records, and assisted professors with research material preparation. Previously, I was a Call Center Agent at Telecom Connect, where I handled over 80 customer inquiries daily, demonstrating that I am patient, tactful, and resilient in stressful situations.\n\nI always strive to be punctual and conscientious in everything I do. I am a collaborative worker who believes that teamwork is the key to achieving any company's goals.\n\nIn my spare time, I maintain a healthy work-life balance through my hobbies. I enjoy designing digital artwork, participating in a local choir, playing badminton, and collecting vintage stamps. These interests require me to be detail-oriented and creative, qualities I seamlessly transfer to my professional life.\n\nI am very interested in joining your team and contributing to your ongoing success.\n\nThank you for reviewing my application.\n\nWarm regards,\nAisha Patel" },
+            { id: 10, name: "Liam Thompson", status: null, text: "Dear Hiring Manager,\n\nI am writing to express my interest in the Assistant role at your organization. I am a tenacious and resourceful individual who enjoys solving complex administrative puzzles. My professional experience includes working as an Operations Assistant at TechLogix, where I streamlined the employee onboarding workflow and managed the company’s internal communication platform. Before that, I worked as a Bank Teller at First National, processing financial transactions with absolute accuracy, proving my methodical and diligent nature.\n\nI am highly adaptable to new technologies and consider myself to be an analytical thinker. I am always diplomatic when interacting with clients and colleagues alike.\n\nOutside of my professional endeavors, I have four main passions. I am an avid surfer, I enjoy building complex Lego architecture sets, I participate in competitive trivia nights, and I foster rescue dogs. These hobbies keep me dynamic, observant, and empathetic to the world around me.\n\nI am excited about the prospect of bringing my dedication and versatile skill set to your team. I would appreciate the opportunity to discuss my qualifications further.\n\nSincerely,\nLiam Thompson" },
+            { id: 11, name: "Maria Garcia", status: null, text: "Dear Hiring Manager,\n\nI am thrilled to apply for the Learner's Assistant position. I am a highly charismatic and innovative professional who loves bringing positive energy to the workplace. In my previous role as an Event Coordinator Assistant at Star Events, I managed vendor contracts, coordinated catering services, and ensured that all events ran seamlessly. Prior to that role, I was a Medical Records Clerk at a local hospital, where I maintained sensitive patient files, demonstrating that I am conscientious and highly reliable.\n\nI am deeply detail-oriented and proactive. I do not wait for problems to occur; I try to find efficient solutions beforehand. I am also extremely flexible when dealing with sudden itinerary changes.\n\nIn my free time, I love to stay active and engaged with my community. My hobbies include performing in a local salsa dancing troupe, hiking in national parks, baking complex pastries, and practicing calligraphy. These activities allow me to be creative, precise, and motivated.\n\nI am confident that my diverse background and strong communication skills make me an ideal fit for this role.\n\nThank you for your time and consideration.\n\nBest wishes,\nMaria Garcia" },
+            { id: 12, name: "Benjamin Wright", status: null, text: "Dear Hiring Manager,\n\nPlease accept this application for the Assistant position. I am an ambitious and decisive professional with a strong track record of providing high-level support. My relevant background includes serving as a Purchasing Assistant at Global Retail, where I negotiated with suppliers to secure better rates, and tracked international shipments. Before this, I worked as a Library Assistant at the central city library, cataloging new arrivals and assisting patrons, which required me to be patient, organized, and observant.\n\nI am a highly collaborative team member who values clear communication. I pride myself on being punctual and completely dedicated to producing high-quality, reliable work.\n\nOutside of the office, I maintain a busy and fulfilling personal life. I am a passionate amateur astronomer, I enjoy restoring classic cars, I play the drums in a jazz band, and I love exploring complex board games with friends. These interests help me remain versatile, analytical, and resilient in all aspects of my life.\n\nI would be honored to contribute to your team and look forward to the possibility of an interview.\n\nBest regards,\nBenjamin Wright" }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        const state = {
+            phase: 'landing', // 'landing', 'matching', 'evaluating', 'final'
+            shuffledDefinitions: [],
+            currentDefIndex: 0,
+            matchedAdjectives: [],
+            currentCandidateIndex: 0,
+            decisions: {}, // { candidateId: 'yes'|'maybe'|'no' }
+        };
+
+        const MAX_RETAINED = 4;
+
+        // --- DOM ELEMENTS ---
+        const appContainer = document.getElementById('main-content');
+        const retainedCounter = document.getElementById('retained-counter');
+        const retainedNumber = document.getElementById('retained-number');
+
+        function initApp() {
+            renderLanding();
+        }
+
+        function renderLanding() {
+            retainedCounter.classList.add('hidden');
+            let html = `
+                <div class="fade-in flex flex-col items-center justify-center text-center space-y-8 mt-10">
+                    <h2 class="text-4xl md:text-6xl font-extrabold text-slate-800 max-w-4xl leading-tight">
+                        What personal qualities do you need to do your job well?
+                    </h2>
+                    <p class="text-lg text-slate-600 max-w-2xl">
+                        In the professional world, the right vocabulary is essential. Review these 30 key adjectives used to describe professional qualities.
+                    </p>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-6 gap-3 w-full mt-8">
+                        ${vocabulary.map(v => `<div class="bg-white border border-slate-200 rounded-lg py-2 px-3 text-sm font-medium text-slate-700 shadow-sm hover:border-indigo-400 hover:text-indigo-600 transition-colors">${v.word}</div>`).join('')}
+                    </div>
+
+                    <button onclick="startMatching()" class="mt-12 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition-transform transform hover:scale-105 text-lg">
+                        Start Exercise
+                    </button>
+                </div>
+            `;
+            appContainer.innerHTML = html;
+        }
+
+        function startMatching() {
+            state.phase = 'matching';
+            // Shuffle definitions for the game
+            state.shuffledDefinitions = [...vocabulary].sort(() => Math.random() - 0.5);
+            state.currentDefIndex = 0;
+            state.matchedAdjectives = [];
+            renderMatching();
+        }
+
+        function renderMatching() {
+            if (state.currentDefIndex >= state.shuffledDefinitions.length) {
+                startEvaluating();
+                return;
+            }
+
+            const currentItem = state.shuffledDefinitions[state.currentDefIndex];
+            const progress = ((state.currentDefIndex) / vocabulary.length) * 100;
+
+            let html = `
+                <div class="fade-in flex flex-col max-w-5xl mx-auto w-full">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-slate-800">Part 1: Match the Definition</h2>
+                        <button onclick="startEvaluating()" class="text-slate-500 hover:text-indigo-600 underline text-sm font-medium">Skip/Finish Matching</button>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="w-full bg-slate-200 rounded-full h-2.5 mb-8">
+                        <div class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                    </div>
+
+                    <div class="bg-indigo-50 border-2 border-indigo-100 rounded-xl p-8 mb-8 text-center min-h-[160px] flex flex-col justify-center items-center">
+                        <span class="text-sm uppercase tracking-wider text-indigo-500 font-bold mb-2">Definition ${state.currentDefIndex + 1} of 30</span>
+                        <p class="text-xl md:text-2xl font-medium text-slate-800">"${currentItem.def}"</p>
+                    </div>
+
+                    <div id="feedback-msg" class="h-8 text-center font-bold text-lg mb-4 opacity-0 transition-opacity"></div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="adjective-grid">
+                        ${vocabulary.map(v => {
+                            const isMatched = state.matchedAdjectives.includes(v.word);
+                            return `
+                                <button 
+                                    onclick="checkMatch('${v.word}', '${currentItem.word}', this)"
+                                    class="${isMatched ? 'bg-green-100 border-green-300 text-green-700 opacity-50 cursor-not-allowed' : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50 hover:border-indigo-400'} border rounded-lg py-3 px-2 text-sm font-semibold shadow-sm transition-all"
+                                    ${isMatched ? 'disabled' : ''}
+                                >
+                                    ${v.word}
+                                </button>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            `;
+            appContainer.innerHTML = html;
+        }
+
+        window.checkMatch = function(selectedWord, correctWord, buttonElement) {
+            const feedback = document.getElementById('feedback-msg');
+            if (selectedWord === correctWord) {
+                feedback.textContent = "Correct!";
+                feedback.className = "h-8 text-center font-bold text-lg mb-4 text-green-600 opacity-100 transition-opacity";
+                buttonElement.classList.remove('bg-white', 'border-slate-300', 'text-slate-700');
+                buttonElement.classList.add('bg-green-500', 'border-green-600', 'text-white');
+                
+                state.matchedAdjectives.push(selectedWord);
+                
+                setTimeout(() => {
+                    state.currentDefIndex++;
+                    renderMatching();
+                }, 800);
+            } else {
+                feedback.textContent = "Incorrect, try again.";
+                feedback.className = "h-8 text-center font-bold text-lg mb-4 text-red-500 opacity-100 transition-opacity shake";
+                buttonElement.classList.add('bg-red-100', 'border-red-400', 'text-red-700');
+                setTimeout(() => {
+                    feedback.classList.replace('opacity-100', 'opacity-0');
+                    buttonElement.classList.remove('bg-red-100', 'border-red-400', 'text-red-700');
+                }, 1000);
+            }
+        };
+
+        function startEvaluating() {
+            state.phase = 'evaluating';
+            state.currentCandidateIndex = 0;
+            retainedCounter.classList.remove('hidden');
+            updateRetainedCount();
+            renderEvaluating();
+        }
+
+        function getRetainedCount() {
+            return Object.values(state.decisions).filter(val => val === 'yes' || val === 'maybe').length;
+        }
+
+        function updateRetainedCount() {
+            const count = getRetainedCount();
+            retainedNumber.textContent = count;
+            if(count === MAX_RETAINED) {
+                retainedCounter.classList.replace('bg-indigo-100', 'bg-green-100');
+                retainedCounter.classList.replace('text-indigo-800', 'text-green-800');
+            } else {
+                retainedCounter.classList.replace('bg-green-100', 'bg-indigo-100');
+                retainedCounter.classList.replace('text-green-800', 'text-indigo-800');
+            }
+        }
+
+        function renderEvaluating() {
+            const candidate = candidates[state.currentCandidateIndex];
+            const currentDecision = state.decisions[candidate.id];
+            const retainedCount = getRetainedCount();
+            const canRetainMore = retainedCount < MAX_RETAINED || currentDecision === 'yes' || currentDecision === 'maybe';
+
+            let html = `
+                <div class="fade-in flex flex-col lg:flex-row gap-8 w-full max-w-6xl mx-auto h-full">
+                    
+                    <!-- Left Column: Email & Controls -->
+                    <div class="flex-grow flex flex-col space-y-6 w-full lg:w-2/3">
+                        <div class="flex justify-between items-center">
+                            <h2 class="text-2xl font-bold text-slate-800">Part 2: Candidate Evaluation</h2>
+                            <span class="text-sm font-semibold bg-slate-200 px-3 py-1 rounded-full text-slate-700">Candidate ${state.currentCandidateIndex + 1} of 12</span>
+                        </div>
+                        
+                        <p class="text-slate-600 text-sm">Read the covering letter. Pay attention to the adjectives used. Make a decision below.</p>
+
+                        <!-- Email Container -->
+                        <div class="bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden flex flex-col flex-grow">
+                            <div class="bg-slate-100 border-b border-slate-200 p-4 space-y-2 text-sm">
+                                <div class="flex"><span class="w-16 font-semibold text-slate-500">To:</span> <span class="text-slate-800">Hiring Manager</span></div>
+                                <div class="flex"><span class="w-16 font-semibold text-slate-500">From:</span> <span class="text-slate-800">${candidate.name.toLowerCase().replace(' ', '.')}@email.com</span></div>
+                                <div class="flex"><span class="w-16 font-semibold text-slate-500">Subject:</span> <span class="font-bold text-slate-800">Assistant Application - ${candidate.name}</span></div>
+                            </div>
+                            <div class="p-6 text-slate-700 leading-relaxed whitespace-pre-wrap flex-grow overflow-y-auto" style="max-height: 50vh;">${candidate.text}</div>
+                        </div>
+
+                        <!-- Decision Buttons -->
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="font-semibold text-slate-700 w-full sm:w-auto text-center sm:text-left">Decision:</div>
+                            <div class="flex gap-2 w-full sm:w-auto justify-center">
+                                <button onclick="makeDecision(${candidate.id}, 'no')" class="flex-1 sm:flex-none px-6 py-2 rounded-lg font-bold border transition-colors ${currentDecision === 'no' ? 'bg-red-600 text-white border-red-600' : 'bg-white text-red-600 border-red-200 hover:bg-red-50'}">
+                                    No (Reject)
+                                </button>
+                                <button onclick="makeDecision(${candidate.id}, 'maybe')" ${!canRetainMore && currentDecision !== 'maybe' ? 'disabled' : ''} class="flex-1 sm:flex-none px-6 py-2 rounded-lg font-bold border transition-colors ${currentDecision === 'maybe' ? 'bg-amber-500 text-white border-amber-500' : (!canRetainMore ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-amber-600 border-amber-200 hover:bg-amber-50')}">
+                                    Maybe (Retain)
+                                </button>
+                                <button onclick="makeDecision(${candidate.id}, 'yes')" ${!canRetainMore && currentDecision !== 'yes' ? 'disabled' : ''} class="flex-1 sm:flex-none px-6 py-2 rounded-lg font-bold border transition-colors ${currentDecision === 'yes' ? 'bg-green-600 text-white border-green-600' : (!canRetainMore ? 'bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed' : 'bg-white text-green-600 border-green-200 hover:bg-green-50')}">
+                                    Yes (Hire)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Navigation -->
+                        <div class="flex justify-between items-center pt-2">
+                            <button onclick="navigateCandidate(-1)" ${state.currentCandidateIndex === 0 ? 'disabled' : ''} class="px-5 py-2 rounded-lg font-medium ${state.currentCandidateIndex === 0 ? 'text-slate-400 bg-slate-100 cursor-not-allowed' : 'text-slate-700 bg-white border border-slate-300 hover:bg-slate-50'}">
+                                &larr; Previous
+                            </button>
+                            
+                            ${state.currentCandidateIndex === candidates.length - 1 ? 
+                                `<button onclick="startFinalPhase()" class="px-6 py-2 rounded-lg font-bold bg-indigo-600 text-white hover:bg-indigo-700 shadow-md">Go to Final Discussion &rarr;</button>` 
+                                : 
+                                `<button onclick="navigateCandidate(1)" class="px-5 py-2 rounded-lg font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50">
+                                    Next Candidate &rarr;
+                                </button>`
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Adjective Reference -->
+                    <div class="w-full lg:w-1/3 bg-white border border-slate-200 rounded-xl shadow-sm p-4 flex flex-col h-full max-h-[80vh]">
+                        <h3 class="text-lg font-bold text-slate-800 mb-3 border-b pb-2">Vocabulary Reference</h3>
+                        <div class="overflow-y-auto flex-grow pr-2 space-y-2">
+                            ${vocabulary.map(v => `
+                                <div class="text-sm">
+                                    <span class="font-bold text-indigo-700">${v.word}:</span> 
+                                    <span class="text-slate-600">${v.def}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                </div>
+            `;
+            appContainer.innerHTML = html;
+        }
+
+        window.navigateCandidate = function(direction) {
+            const newIndex = state.currentCandidateIndex + direction;
+            if (newIndex >= 0 && newIndex < candidates.length) {
+                state.currentCandidateIndex = newIndex;
+                renderEvaluating();
+            }
+        };
+
+        window.makeDecision = function(candidateId, decision) {
+            state.decisions[candidateId] = decision;
+            updateRetainedCount();
+            renderEvaluating();
+        };
+
+        window.startFinalPhase = function() {
+            state.phase = 'final';
+            renderFinal();
+        };
+
+        function renderFinal() {
+            retainedCounter.classList.add('hidden');
+            const retainedCandidates = candidates.filter(c => state.decisions[c.id] === 'yes' || state.decisions[c.id] === 'maybe');
+            
+            let contentHtml = '';
+            if (retainedCandidates.length === 0) {
+                contentHtml = `
+                    <div class="text-center py-20 bg-white rounded-xl border border-slate-200 shadow-sm w-full">
+                        <h3 class="text-2xl font-bold text-slate-700 mb-4">No candidates retained.</h3>
+                        <p class="text-slate-500 mb-6">You rejected all candidates. Are you sure your standards aren't too high?</p>
+                        <button onclick="startEvaluating()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700">Go Back and Review</button>
+                    </div>
+                `;
+            } else {
+                contentHtml = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 w-full">
+                        ${retainedCandidates.map(c => `
+                            <div class="bg-white border ${state.decisions[c.id] === 'yes' ? 'border-green-400' : 'border-amber-400'} rounded-xl shadow-md overflow-hidden flex flex-col h-[500px]">
+                                <div class="${state.decisions[c.id] === 'yes' ? 'bg-green-50' : 'bg-amber-50'} px-6 py-4 border-b flex justify-between items-center">
+                                    <h3 class="text-xl font-bold text-slate-800">${c.name}</h3>
+                                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase ${state.decisions[c.id] === 'yes' ? 'bg-green-200 text-green-800' : 'bg-amber-200 text-amber-800'}">
+                                        ${state.decisions[c.id]}
+                                    </span>
+                                </div>
+                                <div class="p-6 text-sm text-slate-700 overflow-y-auto whitespace-pre-wrap flex-grow">${c.text}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="fade-in flex flex-col items-center max-w-6xl mx-auto w-full">
+                    <h2 class="text-3xl font-extrabold text-slate-800 mb-2 text-center">Part 3: Final Discussion</h2>
+                    <p class="text-slate-600 mb-8 text-center max-w-2xl">Review your shortlisted candidates. Discuss with your partner or class who is the absolute best fit for the Learner's Assistant position and justify your choice using the vocabulary adjectives.</p>
+                    
+                    ${contentHtml}
+
+                    <div class="mt-12">
+                        <button onclick="location.reload()" class="bg-slate-800 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-slate-900 transition-transform transform hover:scale-105">
+                            Restart Exercise
+                        </button>
+                    </div>
+                </div>
+            `;
+            appContainer.innerHTML = html;
+        }
+
+        // Start app
+        initApp();
+    </script>
+</body>
+</html>

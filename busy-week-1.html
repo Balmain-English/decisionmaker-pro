@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>A Busy Week - English for Accountants (B1)</title>
+<style>
+body{font-family:Arial,Helvetica,sans-serif;max-width:900px;margin:auto;padding:20px;background:#f4f6f8}
+.card{background:#fff;padding:20px;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+h1,h2{color:#1f3b5b}
+button{display:block;width:100%;margin:10px 0;padding:12px;border:none;border-radius:6px;background:#e7ecf3;cursor:pointer;text-align:left}
+button:hover{background:#d8e2ef}
+#feedback{margin-top:15px;padding:12px;border-radius:6px;display:none}
+.good{background:#e8f5e9}
+.bad{background:#ffebee}
+.info{background:#eef4ff}
+.score{font-size:1.1em;font-weight:bold}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<div class="card">
+<h1>A Busy Week</h1>
+<p><strong>Role:</strong> Junior Accountant at Northgate Manufacturing</p>
+<p class="score">Score: <span id="score">0</span></p>
+
+<div id="game"></div>
+
+<div id="feedback"></div>
+</div>
+
+<script>
+
+let score = 0;
+let current = 0;
+
+const scenarios = [
+
+{
+day:"Monday 08:40",
+title:"Supplier Payment Question",
+keywords:"supplier, payment, invoice, update, communication",
+text:"A supplier emails about an invoice that appears to be overdue. They ask for an update before noon.",
+choices:[
+{t:"Reply that you will review the invoice today and provide an update before noon.",p:3,fb:"You acknowledged the issue promptly, set a realistic expectation, and kept communication professional."},
+{t:"Forward the email to your manager and ask for advice.",p:2,fb:"Seeking guidance is reasonable, although the supplier still needs a direct response."},
+{t:"Check company records first, then reply later in the afternoon.",p:1,fb:"You gathered information, but the supplier received no immediate reassurance."},
+{t:"Ignore the email until the supplier contacts you again.",p:-1,fb:"The lack of communication increases risk and damages professional relationships."}
+]
+},
+
+{
+day:"Monday 15:00",
+title:"Missing Receipt",
+keywords:"expense, receipt, records, compliance, employee",
+text:"An employee requests reimbursement but cannot find a receipt for a business lunch.",
+choices:[
+{t:"Ask whether alternative documentation is available and explain company policy.",p:3,fb:"You balanced compliance requirements with a practical solution."},
+{t:"Send the request to HR for review.",p:2,fb:"The issue may be resolved, though you could have handled the first step yourself."},
+{t:"Approve the claim immediately.",p:1,fb:"You helped the employee, but documentation standards may not be met."},
+{t:"Reject the claim without discussion.",p:-1,fb:"A rigid response can create unnecessary frustration and does not explore options."}
+]
+},
+
+{
+day:"Tuesday 09:15",
+title:"Budget Meeting Preparation",
+keywords:"budget, forecast, meeting, finance, preparation",
+text:"You have a budget meeting at 10:00. A department manager asks for updated figures.",
+choices:[
+{t:"Prepare a concise summary with the latest available figures.",p:3,fb:"You supported decision-making with relevant financial information."},
+{t:"Share last month's report and mention that updates will follow.",p:2,fb:"A useful interim response, though not fully current."},
+{t:"Send only raw spreadsheet data.",p:1,fb:"The information may be accurate but difficult to interpret quickly."},
+{t:"Tell the manager to wait until after the meeting.",p:-1,fb:"Delaying support reduces the value accounting can provide."}
+]
+},
+
+{
+day:"Tuesday 16:20",
+title:"Client Billing Query",
+keywords:"client, billing, clarification, service, invoice",
+text:"A client questions a charge on their invoice and wants a quick explanation.",
+choices:[
+{t:"Review the details and provide a clear explanation with supporting information.",p:3,fb:"You combined accuracy, responsiveness, and customer service."},
+{t:"Acknowledge the query and promise a reply tomorrow.",p:2,fb:"The client receives an answer pathway, though not an immediate solution."},
+{t:"Resend the invoice without explanation.",p:1,fb:"The client receives information but not true clarification."},
+{t:"Tell the client the invoice is correct and end the discussion.",p:-1,fb:"This approach risks damaging trust."}
+]
+},
+
+{
+day:"Wednesday 08:50",
+title:"Data Entry Issue",
+keywords:"accuracy, records, transaction, correction, controls",
+text:"While checking transactions, you notice one entry appears twice.",
+choices:[
+{t:"Investigate the source of the duplicate and correct it if necessary.",p:3,fb:"You protected the accuracy of financial records."},
+{t:"Flag the issue for review later this week.",p:2,fb:"The issue is identified but remains unresolved."},
+{t:"Delete one entry immediately.",p:1,fb:"The duplicate may disappear, but the underlying cause is unexplored."},
+{t:"Assume someone else will notice it.",p:-1,fb:"Unresolved errors can create larger problems later."}
+]
+},
+
+{
+day:"Wednesday 14:30",
+title:"Vendor Information Request",
+keywords:"vendor, records, information, verification, process",
+text:"A vendor asks you to confirm company payment details.",
+choices:[
+{t:"Verify the request through approved channels before sharing information.",p:3,fb:"You followed a careful and secure process."},
+{t:"Ask your manager whether the request looks legitimate.",p:2,fb:"Consultation adds protection but slows the response."},
+{t:"Send the information because the vendor seems familiar.",p:1,fb:"Familiarity alone is not reliable verification."},
+{t:"Share all requested information immediately.",p:-1,fb:"Sensitive information should never be shared without verification."}
+]
+},
+
+{
+emergency:true,
+title:"EMERGENCY: Suspicious Payment Request",
+text:"An urgent email claims to be from a senior executive and requests an immediate transfer.",
+choices:[
+{t:"Verify the request through official channels before taking action.",p:2,fb:"Good judgement prevented a potentially serious problem."},
+{t:"Ask a colleague whether the email looks genuine.",p:1,fb:"You sought help, but verification should be direct and formal."},
+{t:"Process the transfer immediately.",gameover:true,fb:"The payment was unauthorized. Employment terminated."}
+]
+},
+
+{
+day:"Thursday 10:00",
+title:"Late Timesheet",
+keywords:"timesheet, payroll, deadline, communication, employee",
+text:"Payroll processing starts tomorrow. An employee has not submitted a timesheet.",
+choices:[
+{t:"Contact the employee promptly and explain the deadline.",p:3,fb:"You addressed the issue early and professionally."},
+{t:"Inform the supervisor and ask for assistance.",p:2,fb:"A reasonable escalation path."},
+{t:"Estimate the hours based on previous weeks.",p:1,fb:"This may create payroll inaccuracies."},
+{t:"Ignore the problem and continue.",p:-1,fb:"Payroll issues rarely solve themselves."}
+]
+},
+
+{
+day:"Thursday 16:45",
+title:"Quarterly Report Review",
+keywords:"report, review, figures, accuracy, management",
+text:"You finish a quarterly report shortly before the deadline.",
+choices:[
+{t:"Review key figures and calculations before submission.",p:3,fb:"Quality checks reduce the risk of avoidable errors."},
+{t:"Ask a colleague to glance through the report.",p:2,fb:"A second opinion may add value."},
+{t:"Submit immediately to save time.",p:1,fb:"The report is on time but may contain unnoticed mistakes."},
+{t:"Leave the report unfinished.",p:-1,fb:"Deadlines are important professional commitments."}
+]
+},
+
+{
+day:"Friday 09:30",
+title:"Cash Flow Discussion",
+keywords:"cash flow, forecast, management, priorities, planning",
+text:"Management requests a short cash flow update for the next month.",
+choices:[
+{t:"Prepare a simple forecast highlighting major expected movements.",p:3,fb:"You provided practical information for decision-making."},
+{t:"Share available balances and explain limitations.",p:2,fb:"Useful information, though less forward-looking."},
+{t:"Provide only historical figures.",p:1,fb:"Past data helps, but forecasts were requested."},
+{t:"Say there is not enough time to help.",p:-1,fb:"Missed opportunities reduce finance's contribution."}
+]
+},
+
+{
+day:"Friday 14:15",
+title:"Training Invitation",
+keywords:"training, development, learning, skills, planning",
+text:"You receive an invitation to a workshop on financial software improvements.",
+choices:[
+{t:"Review the agenda and register if the content is relevant.",p:3,fb:"Continuous learning supports long-term performance."},
+{t:"Ask colleagues whether they recommend it.",p:2,fb:"Gathering opinions is useful."},
+{t:"Ignore the email for now.",p:1,fb:"You may miss a valuable opportunity."},
+{t:"Delete the invitation immediately.",p:-1,fb:"Professional development deserves consideration."}
+]
+},
+
+{
+day:"Friday 17:00",
+title:"End-of-Week Priorities",
+keywords:"planning, workload, organisation, priorities, deadlines",
+text:"Before leaving, you review next week's tasks and deadlines.",
+choices:[
+{t:"Create a priority list and note key deadlines.",p:3,fb:"Good planning improves efficiency and reduces stress."},
+{t:"Leave brief notes for Monday morning.",p:2,fb:"Some preparation is better than none."},
+{t:"Rely on memory.",p:1,fb:"Important details can easily be forgotten."},
+{t:"Leave everything unplanned.",p:-1,fb:"A lack of organisation increases future workload pressure."}
+]
+}
+
+];
+
+function fisherYates(arr){
+for(let i=arr.length-1;i>0;i--){
+const j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
+return arr;
+}
+
+scenarios.forEach(s=>{
+s.choices=fisherYates([...s.choices]);
+});
+
+const emergencyAfter=[6,12];
+
+function renderScenario(){
+
+if(current===6){
+renderEmergency(0);
+return;
+}
+if(current===13){
+renderEmergency(1);
+return;
+}
+if(current>=14){
+endGame();
+return;
+}
+
+const s=scenarios[current];
+const game=document.getElementById("game");
+const fb=document.getElementById("feedback");
+fb.style.display="none";
+
+game.innerHTML=`
+<h2>${s.day} - ${s.title}</h2>
+<p><strong>Key words:</strong> ${s.keywords}</p>
+<p>${s.text}</p>
+`;
+
+s.choices.forEach(c=>{
+const b=document.createElement("button");
+b.textContent=c.t;
+b.onclick=()=>{
+if(c.p===-1){
+fb.className="bad";
+fb.innerHTML=c.fb+"<br><strong>Choose again.</strong>";
+fb.style.display="block";
+return;
+}
+score+=c.p;
+document.getElementById("score").textContent=score;
+fb.className="info";
+fb.innerHTML=c.fb;
+fb.style.display="block";
+setTimeout(()=>{current++;renderScenario();},1800);
+};
+game.appendChild(b);
+});
+}
+
+function renderEmergency(which){
+
+const emergency=which===0 ?
+{
+title:"Emergency Situation",
+text:"A senior executive supposedly requests an urgent transfer.",
+choices:[
+{t:"Verify through official channels.",p:2},
+{t:"Seek informal advice first.",p:1},
+{t:"Transfer the funds immediately.",g:true}
+]
+}
+:
+{
+title:"Emergency Situation",
+text:"You discover confidential payroll data attached to an external email draft.",
+choices:[
+{t:"Stop the email and report the issue immediately.",p:2},
+{t:"Remove the document but tell nobody.",p:1},
+{t:"Send the email anyway.",g:true}
+]
+};
+
+const game=document.getElementById("game");
+const fb=document.getElementById("feedback");
+fb.style.display="none";
+
+game.innerHTML=`<h2>${emergency.title}</h2><p>${emergency.text}</p>`;
+
+fisherYates([...emergency.choices]).forEach(c=>{
+const b=document.createElement("button");
+b.textContent=c.t;
+b.onclick=()=>{
+if(c.g){
+game.innerHTML="<h2>Game Over</h2><p>You were dismissed because of a critical professional error.</p>";
+fb.style.display="none";
+return;
+}
+score+=c.p;
+document.getElementById("score").textContent=score;
+current++;
+renderScenario();
+};
+game.appendChild(b);
+});
+}
+
+function endGame(){
+
+let band="";
+let msg="";
+
+if(score>=30){
+band="Excellent";
+msg="You demonstrated strong judgement, communication, prioritisation, and awareness of financial controls throughout the week. Your decisions consistently supported business needs while protecting accuracy, compliance, and professional relationships.";
+}
+else if(score>=22){
+band="Good";
+msg="You generally made effective decisions and showed sound professional judgement. A few opportunities for stronger communication or planning were missed, but overall your performance supported successful business operations.";
+}
+else if(score>=14){
+band="Developing";
+msg="You completed the week successfully but several decisions reduced efficiency or effectiveness. Greater attention to planning, communication, and risk awareness would improve future performance.";
+}
+else{
+band="Needs Improvement";
+msg="The week revealed significant gaps in professional judgement and workplace decision-making. Focus on communication, organisation, verification procedures, and financial controls to build stronger workplace performance.";
+}
+
+document.getElementById("game").innerHTML=`
+<h2>Debriefing</h2>
+<p><strong>Final Score:</strong> ${score}</p>
+<p><strong>Performance Band:</strong> ${band}</p>
+<p>${msg}</p>
+`;
+}
+
+renderScenario();
+
+</script>
+</body>
+</html>

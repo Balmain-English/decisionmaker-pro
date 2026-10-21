@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Food Factory Project Engineer - Decision Game</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent-blue: #38bdf8;
+            --accent-green: #22c55e;
+            --accent-yellow: #eab308;
+            --accent-red: #ef4444;
+            --font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-family);
+            line-height: 1.5;
+            padding: 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .game-container {
+            max-width: 920px;
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Bar */
+        .header {
+            background-color: #0b1120;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .badge-cefr {
+            background-color: #0369a1;
+            color: #e0f2fe;
+        }
+
+        .badge-dept {
+            background-color: #334155;
+            color: #f1f5f9;
+        }
+
+        .badge-emergency {
+            background-color: var(--accent-red);
+            color: #ffffff;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Dashboard Stat Bars */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            background-color: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .stat-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .progress-bar-bg {
+            height: 10px;
+            background-color: #334155;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 100%;
+            transition: width 0.4s ease, background-color 0.4s ease;
+        }
+
+        /* Status Bar Colors */
+        .status-green { background-color: var(--accent-green); }
+        .status-yellow { background-color: var(--accent-yellow); }
+        .status-red { background-color: var(--accent-red); }
+
+        .text-green { color: var(--accent-green); }
+        .text-yellow { color: var(--accent-yellow); }
+        .text-red { color: var(--accent-red); }
+
+        /* Main Game Content */
+        .main-content {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        /* Landing Screen Layout */
+        .landing-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+
+        .landing-hero {
+            background-color: #0f172a;
+            border: 1px solid var(--card-border);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 5px solid var(--accent-blue);
+        }
+
+        .landing-hero h2 {
+            font-size: 1.4rem;
+            color: var(--accent-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .landing-hero p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .landing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-card {
+            background-color: #0f172a;
+            border: 1px solid var(--card-border);
+            padding: 1.1rem;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .info-card h3 {
+            font-size: 1rem;
+            color: var(--accent-green);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .info-card p, .info-card ul {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .info-card ul {
+            padding-left: 1.2rem;
+        }
+
+        .start-btn {
+            background-color: var(--accent-green);
+            color: #0f172a;
+            font-weight: 800;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            width: 100%;
+            text-align: center;
+            margin-top: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .start-btn:hover {
+            background-color: #4ade80;
+            transform: translateY(-2px);
+        }
+
+        .scenario-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .step-indicator {
+            font-size: 0.85rem;
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .scenario-text {
+            font-size: 1.05rem;
+            color: var(--text-main);
+            background-color: #0f172a;
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        .emergency-text {
+            border-left-color: var(--accent-red);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        /* Options */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-btn {
+            background-color: #334155;
+            border: 1px solid #475569;
+            color: var(--text-main);
+            padding: 0.95rem 1.15rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #475569;
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+        }
+
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Feedback Box & Delta Display */
+        .feedback-box {
+            padding: 1.1rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .feedback-box.show {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .stat-deltas {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .delta-pill {
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background-color: rgba(15, 23, 42, 0.6);
+        }
+
+        .feedback-success {
+            background-color: rgba(34, 197, 94, 0.15);
+            border: 1px solid var(--accent-green);
+            color: #86efac;
+        }
+
+        .feedback-warning {
+            background-color: rgba(234, 179, 8, 0.15);
+            border: 1px solid var(--accent-yellow);
+            color: #fde047;
+        }
+
+        .feedback-error {
+            background-color: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-red);
+            color: #fca5a5;
+        }
+
+        /* Footer & Navigation */
+        .action-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.5rem;
+        }
+
+        .next-btn {
+            background-color: var(--accent-blue);
+            color: #0f172a;
+            font-weight: 700;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            display: none;
+        }
+
+        .next-btn:hover {
+            background-color: #7dd3fc;
+        }
+
+        /* Early Win Banner */
+        .early-win-banner {
+            background-color: rgba(34, 197, 94, 0.2);
+            border: 1px solid var(--accent-green);
+            color: #86efac;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .early-win-btn {
+            background-color: var(--accent-green);
+            color: #0f172a;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Debrief View */
+        .debrief-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .debrief-header {
+            text-align: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .debrief-band {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-top: 0.5rem;
+        }
+
+        .debrief-body {
+            background-color: #0f172a;
+            padding: 1.25rem;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            background-color: #1e293b;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .summary-val {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .restart-btn {
+            background-color: var(--accent-blue);
+            color: #0f172a;
+            border: none;
+            padding: 0.9rem;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .restart-btn:hover {
+            background-color: #7dd3fc;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <!-- Header -->
+    <header class="header">
+        <h1>
+            <span> Apex Pet Nutrition</span>
+            <span class="badge badge-cefr">CEFR B1-B2</span>
+        </h1>
+        <div id="dept-badge-container">
+            <span id="dept-badge" class="badge badge-dept">Engineering Orientation</span>
+        </div>
+    </header>
+
+    <!-- Dashboard Stat Bars (Hidden on Landing Screen) -->
+    <section id="dashboard" class="dashboard hidden">
+        <!-- Score Bar -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span>Score Progress</span>
+                <span id="score-val">0 / 40</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="score-bar" class="progress-bar-fill status-green" style="width: 0%;"></div>
+            </div>
+            <div id="score-status" class="stat-status text-green">Band 4: Initializing</div>
+        </div>
+
+        <!-- Budget Bar -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span>Budget Level</span>
+                <span id="budget-val">100%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="budget-bar" class="progress-bar-fill status-green" style="width: 100%;"></div>
+            </div>
+            <div id="budget-status" class="stat-status text-green">Optimal Budget</div>
+        </div>
+
+        <!-- Equipment Reliability Bar -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span>Equipment Reliability</span>
+                <span id="reliability-val">100%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="reliability-bar" class="progress-bar-fill status-green" style="width: 100%;"></div>
+            </div>
+            <div id="reliability-status" class="stat-status text-green">Optimal Machinery</div>
+        </div>
+
+        <!-- Safety & Morale Bar -->
+        <div class="stat-card">
+            <div class="stat-header">
+                <span>Safety & Morale</span>
+                <span id="morale-val">100%</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="morale-bar" class="progress-bar-fill status-green" style="width: 100%;"></div>
+            </div>
+            <div id="morale-status" class="stat-status text-green">Optimal Culture</div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+
+        <!-- 1. Introductory Landing Screen -->
+        <div id="landing-view" class="landing-screen">
+            <div class="landing-hero">
+                <h2> Welcome to Apex Pet Nutrition Manufacturing Plant</h2>
+                <p>
+                    You are stepping into the role of <strong>Lead Project Engineer</strong> at our high-capacity pet food manufacturing facility. Your job is to resolve complex technical challenges, maintain plant efficiency, and communicate professionally across internal departments (HR, Maintenance, Purchasing, Quality Control, EHS, R&D, and Finance).
+                </p>
+            </div>
+
+            <div class="landing-grid">
+                <div class="info-card">
+                    <h3> Target English Skills (CEFR B1-B2)</h3>
+                    <p>Practice professional workplace registers, formal request structures, technical manufacturing vocabulary, and cross-departmental negotiation in realistic industrial scenarios.</p>
+                </div>
+
+                <div class="info-card">
+                    <h3> Scenario Structure & Rules</h3>
+                    <ul>
+                        <li><strong>14 Steps:</strong> 12 standard operational challenges + 2 surprise emergency alerts.</li>
+                        <li><strong>4 Decision Options:</strong>
+                            <ul>
+                                <li><strong style="color:var(--accent-green)">Excellent (+3 Pts):</strong> Optimal strategy & language.</li>
+                                <li><strong style="color:var(--accent-blue)">Good (+2 Pts):</strong> Viable choice, minor stat cost.</li>
+                                <li><strong style="color:var(--accent-yellow)">Average (+1 Pt):</strong> Mediocre result.</li>
+                                <li><strong style="color:var(--accent-red)">Poor (-1 Pt):</strong> Flawed choice; requires mandatory retry.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="info-card">
+                    <h3> Emergency Hazards</h3>
+                    <p>During critical safety alarms, select safe containment procedures. Avoid choosing the fatal option, which triggers an immediate <strong>Instant Game Over</strong>!</p>
+                </div>
+
+                <div class="info-card">
+                    <h3> Evaluation & Early Victory</h3>
+                    <p>Achieve <strong>9 Excellent choices</strong> before Step 14 to unlock an Early Victory. Your final score (out of 40) will evaluate your skill across 4 Performance Bands.</p>
+                </div>
+            </div>
+
+            <button class="start-btn" onclick="startGame()">Start Industrial Simulation &rarr;</button>
+        </div>
+
+        <!-- Early Victory Banner -->
+        <div id="early-win-banner" class="early-win-banner hidden">
+            <span>🏆 <strong>Early Victory Unlocked!</strong> You earned 9 Excellent decisions. You can claim victory now or keep playing for maximum score!</span>
+            <button class="early-win-btn" onclick="triggerDebrief(true)">Claim Early Victory</button>
+        </div>
+
+        <!-- 2. Interactive Scenario View -->
+        <div id="scenario-view" class="hidden">
+            <div class="scenario-header">
+                <span id="step-indicator" class="step-indicator">Step 1 of 14</span>
+            </div>
+            
+            <p id="scenario-text" class="scenario-text" style="margin-top: 0.75rem;">
+                Loading scenario...
+            </p>
+
+            <div id="options-container" class="options-container" style="margin-top: 1rem;">
+                <!-- Options rendered dynamically -->
+            </div>
+
+            <div id="feedback-box" class="feedback-box">
+                <div id="stat-deltas" class="stat-deltas"></div>
+                <div id="feedback-text"></div>
+            </div>
+
+            <div class="action-footer">
+                <button id="next-btn" class="next-btn" onclick="nextStep()">Continue to Next Step &rarr;</button>
+            </div>
+        </div>
+
+        <!-- 3. Final Debrief Screen -->
+        <div id="debrief-view" class="debrief-screen hidden">
+            <div class="debrief-header">
+                <h2>Project Final Debrief & Evaluation</h2>
+                <div id="debrief-band-title" class="debrief-band text-green">Band 1: Master Engineer</div>
+            </div>
+
+            <div class="stats-summary">
+                <div>
+                    <div>Final Score</div>
+                    <div id="final-score" class="summary-val">0 / 40</div>
+                </div>
+                <div>
+                    <div>Excellent Choices</div>
+                    <div id="final-excellent" class="summary-val">0</div>
+                </div>
+                <div>
+                    <div>Budget Remaining</div>
+                    <div id="final-budget" class="summary-val">100%</div>
+                </div>
+                <div>
+                    <div>Plant Safety/Morale</div>
+                    <div id="final-morale" class="summary-val">100%</div>
+                </div>
+            </div>
+
+            <div id="debrief-feedback-text" class="debrief-body">
+                Feedback evaluation...
+            </div>
+
+            <button class="restart-btn" onclick="resetGame()">Restart Simulation</button>
+        </div>
+    </main>
+</div>
+
+<script>
+    /* Global Game State Variables */
+    let currentStepIndex = 0;
+    let score = 0;
+    let budget = 100;
+    let reliability = 100;
+    let morale = 100;
+    let excellentCount = 0;
+    let isStepResolved = false;
+    let earlyWinUnlocked = false;
+
+    /* Fisher-Yates Shuffle Algorithm */
+    function shuffleArray(array) {
+        let currentIndex = array.length, randomIndex;
+        while (currentIndex !== 0) {
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex--;
+            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+        }
+        return array;
+    }
+
+    /* 14 Scenarios Data */
+    const scenarios = [
+        {
+            id: 1,
+            isEmergency: false,
+            department: "Maintenance & Engineering",
+            text: "<strong>Extruder Drive Temperature Spike:</strong> During high-protein dog kibble production, the twin-screw extruder drive motor temperature is rising rapidly toward critical limits.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I request an immediate thermal inspection of the drive motor and a controlled reduction in feed rate.",
+                    points: 3, budgetDelta: 0, relDelta: 5, moraleDelta: 0,
+                    feedback: "Requesting thermal inspection uses professional register. Controlled feed reduction avoids motor strain and prevents costly equipment breakdown."
+                },
+                {
+                    type: "good",
+                    text: "Please send a maintenance technician to check the extruder bearings as soon as possible.",
+                    points: 2, budgetDelta: -5, relDelta: 0, moraleDelta: 0,
+                    feedback: "Direct communication resolves immediate safety concerns well, though reducing motor load immediately would prevent additional thermal stress."
+                },
+                {
+                    type: "average",
+                    text: "We should wait until shift change to inspect the motor temperature.",
+                    points: 1, budgetDelta: -10, relDelta: -15, moraleDelta: -5,
+                    feedback: "Delaying action risks severe motor damage and unplanned downtime. Prompt technical communication is essential during equipment overheating."
+                },
+                {
+                    type: "poor",
+                    text: "Override the high-temperature alarm and run at maximum speed to complete the batch quickly.",
+                    points: -1, budgetDelta: -15, relDelta: -25, moraleDelta: -10,
+                    feedback: "Overriding safety alarms leads to catastrophic motor failure and fires. Never bypass automated critical safety interlocks."
+                }
+            ]
+        },
+        {
+            id: 2,
+            isEmergency: false,
+            department: "Purchasing & Quality Control",
+            text: "<strong>Defective Packaging Seals:</strong> 15% of premium cat food pouches fail hermetic seal integrity tests due to film thickness variations from vendor 'PolyPack'.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "We must formally notify Purchasing to issue a Non-Conformance Report (NCR) and reject this batch.",
+                    points: 3, budgetDelta: 0, relDelta: 5, moraleDelta: 5,
+                    feedback: "Issuing a Non-Conformance Report applies correct QA terminology, ensuring vendor accountability and protecting batch seal integrity."
+                },
+                {
+                    type: "good",
+                    text: "Let's ask Purchasing to negotiate a discount while QA tests higher sealing temperatures.",
+                    points: 2, budgetDelta: -5, relDelta: -5, moraleDelta: 0,
+                    feedback: "Negotiating discounts helps budget management, but running defective film under higher temperatures risks burning the packaging material."
+                },
+                {
+                    type: "average",
+                    text: "I will call the supplier sales representative informally to ask for better quality next month.",
+                    points: 1, budgetDelta: -10, relDelta: -10, moraleDelta: -5,
+                    feedback: "Informal phone calls lack official quality documentation. Use formal reporting procedures to address persistent material non-compliance."
+                },
+                {
+                    type: "poor",
+                    text: "Ship the pouches anyway because minor seal flaws will go unnoticed by consumers.",
+                    points: -1, budgetDelta: -20, relDelta: -20, moraleDelta: -15,
+                    feedback: "Shipping defective seals leads to oxidation, food spoilage, and brand recalls. Always uphold strict quality assurance standards."
+                }
+            ]
+        },
+        {
+            id: 3,
+            isEmergency: false,
+            department: "R&D / Recipe Processing",
+            text: "<strong>Raw Meat Slurry Viscosity Issue:</strong> High viscosity in fresh chicken slurry is causing severe pump cavitation and misshapen kibble geometry.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I advise consulting R&D to adjust slurry moisture ratios within certified recipe specifications.",
+                    points: 3, budgetDelta: 0, relDelta: 5, moraleDelta: 0,
+                    feedback: "Consulting R&D uses proper collaborative phrasing while maintaining strict compliance with official nutritional recipe specifications."
+                },
+                {
+                    type: "good",
+                    text: "Let's call the formulation lab supervisor to inquire if adding process water is permitted.",
+                    points: 2, budgetDelta: -5, relDelta: 0, moraleDelta: 0,
+                    feedback: "Checking with lab supervisors is good practice, though initiating a formal formulation query provides better project documentation."
+                },
+                {
+                    type: "average",
+                    text: "Increase pump drive pressure manually to force the heavy slurry through the pipeline.",
+                    points: 1, budgetDelta: -10, relDelta: -15, moraleDelta: -5,
+                    feedback: "Increasing pump pressure mechanically stresses seal components without solving slurry viscosity. Identify root causes before applying pressure."
+                },
+                {
+                    type: "poor",
+                    text: "Add unmeasured buckets of tap water directly into the slurry tank to thin it out.",
+                    points: -1, budgetDelta: -10, relDelta: -20, moraleDelta: -10,
+                    feedback: "Adding unmeasured tap water violates guaranteed nutrient regulations and risks contamination. Never alter certified batch formulations."
+                }
+            ]
+        },
+        {
+            id: 4,
+            isEmergency: true,
+            department: "EMERGENCY SAFETY ALERT",
+            text: "<strong>CRITICAL EVENT: Ammonia Refrigeration Leak!</strong> High-concentration ammonia vapors detected near the raw ingredient blast freezer! Alarm sirens activated.",
+            options: [
+                {
+                    type: "viable_high",
+                    text: "Trigger full plant evacuation, actuate external emergency shutoff valves, and contact Hazmat.",
+                    points: 2, budgetDelta: 0, relDelta: 5, moraleDelta: 10,
+                    feedback: "Initiating evacuation and remote shutoff demonstrates decisive emergency command, safeguarding personnel lives and securing plant infrastructure."
+                },
+                {
+                    type: "viable_low",
+                    text: "Evacuate personnel immediately and alert the Safety Officer to lead containment protocols.",
+                    points: 1, budgetDelta: -5, relDelta: 0, moraleDelta: 5,
+                    feedback: "Evacuating personnel immediately prioritizes human safety. Prompt notification allows certified emergency responders to contain toxic leaks."
+                },
+                {
+                    type: "critical",
+                    text: "Enter the freezer compressor room without breathing apparatus to locate and repair the leak valve.",
+                    points: 0, budgetDelta: 0, relDelta: 0, moraleDelta: 0,
+                    feedback: "Entering concentrated ammonia without SCBA equipment causes fatal respiratory failure. Never enter hazardous zones without proper protection."
+                }
+            ]
+        },
+        {
+            id: 5,
+            isEmergency: false,
+            department: "HR & Shift Management",
+            text: "<strong>Continuous Dryer Operator Turnover:</strong> Kibble dryer operators complain of heat stress, confusing control interfaces, and high burnout rates.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I propose installing ergonomic thermal shields and delivering structured Standard Operating Procedure (SOP) training.",
+                    points: 3, budgetDelta: -5, relDelta: 10, moraleDelta: 15,
+                    feedback: "Combining ergonomic hardware retrofits with structured SOP training improves working conditions, operational safety, and long-term team retention."
+                },
+                {
+                    type: "good",
+                    text: "We should organize refresher training sessions and install additional ventilation units.",
+                    points: 2, budgetDelta: -5, relDelta: 5, moraleDelta: 10,
+                    feedback: "Refresher training and extra ventilation boost workplace morale, though full ergonomic adjustments are required for lasting safety."
+                },
+                {
+                    type: "average",
+                    text: "I will write a longer user manual and email it to operators to review during breaks.",
+                    points: 1, budgetDelta: 0, relDelta: 0, moraleDelta: -10,
+                    feedback: "Distributing long PDF manuals passively fails to address physical fatigue or control panel interface confusion effectively."
+                },
+                {
+                    type: "poor",
+                    text: "Request HR to replace complaining workers with temporary contract laborers immediately.",
+                    points: -1, budgetDelta: -15, relDelta: -10, moraleDelta: -25,
+                    feedback: "Replacing skilled staff with contractors damages team culture and increases technical error rates. Value experienced machine operators."
+                }
+            ]
+        },
+        {
+            id: 6,
+            isEmergency: false,
+            department: "EHS / Site Safety",
+            text: "<strong>Unsafe Contractor Scaffolding:</strong> Third-party contractors installing overhead grain pipework are working at 10 meters height without safety harnesses.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I am issuing an immediate Stop Work Notice until the contractor submits audited safety compliance.",
+                    points: 3, budgetDelta: -5, relDelta: 5, moraleDelta: 10,
+                    feedback: "Issuing a Stop Work Notice employs appropriate authority to halt life-threatening safety violations and enforce compliance."
+                },
+                {
+                    type: "good",
+                    text: "I must inform the EHS Manager immediately to perform a formal safety audit.",
+                    points: 2, budgetDelta: 0, relDelta: 0, moraleDelta: 5,
+                    feedback: "Escalating to the EHS Manager ensures official safety enforcement, though halting immediate unsafe high-altitude work is preferred."
+                },
+                {
+                    type: "average",
+                    text: "Verbally remind contractor workers to attach harnesses when supervisors are nearby.",
+                    points: 1, budgetDelta: 0, relDelta: -10, moraleDelta: -10,
+                    feedback: "Informal verbal reminders lack contractual authority. Enforce formal site safety rules strictly to prevent fatal fall hazards."
+                },
+                {
+                    type: "poor",
+                    text: "Ignore the violation so contractors complete the installation before the weekend deadline.",
+                    points: -1, budgetDelta: -10, relDelta: -20, moraleDelta: -20,
+                    feedback: "Ignoring fall hazards creates severe legal liability and endangers worker lives. Safety rules must never be sacrificed."
+                }
+            ]
+        },
+        {
+            id: 7,
+            isEmergency: false,
+            department: "Finance & Operations",
+            text: "<strong>Robotic Palletizer Cost Overrun:</strong> Unexpected electrical panel upgrades will push the automated palletizer project 15% over budget.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I will submit a formal budget variance report detailing necessary safety upgrades and long-term ROI.",
+                    points: 3, budgetDelta: -10, relDelta: 10, moraleDelta: 5,
+                    feedback: "Submitting a formal budget variance report clearly justifies emergency expenditure using professional financial language and ROI metrics."
+                },
+                {
+                    type: "good",
+                    text: "I need to request additional contingency funding from Plant Management with supplier quotes.",
+                    points: 2, budgetDelta: -15, relDelta: 5, moraleDelta: 0,
+                    feedback: "Requesting contingency funds with itemized supplier quotes shows fiscal accountability, maintaining transparent capital project management."
+                },
+                {
+                    type: "average",
+                    text: "Ask the supplier to remove safety light curtains to bring project costs back under budget.",
+                    points: 1, budgetDelta: 0, relDelta: -15, moraleDelta: -15,
+                    feedback: "Removing safety light curtains introduces severe workplace injury hazards. Never compromise safety hardware to balance capital budgets."
+                },
+                {
+                    type: "poor",
+                    text: "Conceal the extra charges by billing them into general factory routine maintenance accounts.",
+                    points: -1, budgetDelta: -20, relDelta: -10, moraleDelta: -10,
+                    feedback: "Misallocating capital expenses into maintenance accounts violates corporate financial ethics and accounting regulations. Maintain budget integrity."
+                }
+            ]
+        },
+        {
+            id: 8,
+            isEmergency: true,
+            department: "EMERGENCY SAFETY ALERT",
+            text: "<strong>CRITICAL EVENT: Explosive Grain Dust Hazard!</strong> Dust collectors failed in the corn silo tower; airborne dust concentrations have reached explosive thresholds (ATEX Zone 20)!",
+            options: [
+                {
+                    type: "viable_high",
+                    text: "Halt grain intake, execute Lockout/Tagout (LOTO), and activate explosion-proof ATEX exhaust systems.",
+                    points: 2, budgetDelta: -5, relDelta: 5, moraleDelta: 10,
+                    feedback: "Executing Lockout/Tagout and activating ATEX ventilation eliminates ignition sources and safely dilutes explosive dust concentrations."
+                },
+                {
+                    type: "viable_low",
+                    text: "Shut down all intake machinery and dispatch grounded industrial cleaning crews.",
+                    points: 1, budgetDelta: -10, relDelta: 0, moraleDelta: 5,
+                    feedback: "Shutting down intake equipment eliminates mechanical spark hazards effectively. Grounded cleaning equipment prevents electrostatic ignition during cleanup."
+                },
+                {
+                    type: "critical",
+                    text: "Use an electric angle grinder near the open silo hatch to clear the jammed dust duct.",
+                    points: 0, budgetDelta: 0, relDelta: 0, moraleDelta: 0,
+                    feedback: "Using electrical angle grinders near explosive grain dust triggers a catastrophic dust explosion. Never introduce open spark sources."
+                }
+            ]
+        },
+        {
+            id: 9,
+            isEmergency: false,
+            department: "Quality Assurance",
+            text: "<strong>Kibble Friability & Breakage:</strong> Cooked kibble is crumbling during pneumatic transport, generating 8% excess fines and blocking filling hoppers.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I recommend reducing transport air velocity and conducting a durability index (PDI) test with QA.",
+                    points: 3, budgetDelta: 0, relDelta: 10, moraleDelta: 5,
+                    feedback: "Reducing pneumatic velocity lowers impact stress, while conducting a durability index test pinpoints root causes with precision."
+                },
+                {
+                    type: "good",
+                    text: "We should inspect transfer duct elbows and ask QA to check raw binder consistency.",
+                    points: 2, budgetDelta: -5, relDelta: 5, moraleDelta: 0,
+                    feedback: "Checking mechanical elbows and binder quality is good troubleshooting, though verifying air velocity parameters yields faster results."
+                },
+                {
+                    type: "average",
+                    text: "Slow down overall factory line output by 50% without investigating transport mechanics.",
+                    points: 1, budgetDelta: -15, relDelta: -5, moraleDelta: -5,
+                    feedback: "Halving line production speed severely penalizes plant productivity without addressing underlying kibble durability and friability problems."
+                },
+                {
+                    type: "poor",
+                    text: "Spray unapproved synthetic liquid glues on finished kibble to stop crumble.",
+                    points: -1, budgetDelta: -10, relDelta: -15, moraleDelta: -15,
+                    feedback: "Applying unapproved chemical glues violates pet food safety legislation and consumer trust. Adhere strictly to approved formulations."
+                }
+            ]
+        },
+        {
+            id: 10,
+            isEmergency: false,
+            department: "Supply Chain & Logistics",
+            text: "<strong>Delayed Specialty Vitamin Premix:</strong> Custom micro-nutrient premix for veterinary formulations is held in customs for 5 days.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I advise rescheduling the master plan to standard diets while tracking customs release with Logistics.",
+                    points: 3, budgetDelta: 0, relDelta: 5, moraleDelta: 5,
+                    feedback: "Rescheduling production using clear operational language maintains plant output while managing supply chain delays with logistics partners."
+                },
+                {
+                    type: "good",
+                    text: "We should contact secondary approved suppliers to request emergency certified stock.",
+                    points: 2, budgetDelta: -10, relDelta: 5, moraleDelta: 0,
+                    feedback: "Sourcing stock from pre-approved secondary suppliers ensures production continuity without compromising product formulation standards."
+                },
+                {
+                    type: "average",
+                    text: "Leave the specialized production line idle until customs clears the shipment next week.",
+                    points: 1, budgetDelta: -20, relDelta: -10, moraleDelta: -10,
+                    feedback: "Leaving production lines idle causes heavy financial losses. Adjust operational schedules proactively during ingredient supply delays."
+                },
+                {
+                    type: "poor",
+                    text: "Manufacture the veterinary diet without vitamins and ship it to customers as complete nutrition.",
+                    points: -1, budgetDelta: -25, relDelta: -20, moraleDelta: -20,
+                    feedback: "Omitting essential vitamins causes animal health deficiencies and regulatory bans. Never ship incomplete nutritional products to market."
+                }
+            ]
+        },
+        {
+            id: 11,
+            isEmergency: false,
+            department: "Utilities & Environmental",
+            text: "<strong>Wastewater Effluent COD Spikes:</strong> Factory discharge sensors report Chemical Oxygen Demand (COD) approaching municipal violation thresholds.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I propose installing inline grease separators and optimizing Clean-In-Place (CIP) rinse cycles.",
+                    points: 3, budgetDelta: -5, relDelta: 10, moraleDelta: 5,
+                    feedback: "Optimizing CIP cycles and installing grease separators reduces wastewater pollution at source using professional environmental engineering principles."
+                },
+                {
+                    type: "good",
+                    text: "We must adjust shift washdown procedures and consult environmental engineering specialists.",
+                    points: 2, budgetDelta: -5, relDelta: 5, moraleDelta: 0,
+                    feedback: "Updating washdown procedures controls organic waste loading, though automated physical separation provides reliable long-term compliance."
+                },
+                {
+                    type: "average",
+                    text: "Dilute effluent holding tanks with fresh municipal tap water before official sampling.",
+                    points: 1, budgetDelta: -10, relDelta: -10, moraleDelta: -10,
+                    feedback: "Diluting wastewater before inspection violates environmental legislation and wastes clean water. Address pollutant sources directly."
+                },
+                {
+                    type: "poor",
+                    text: "Bypass discharge monitoring sensors and release high-COD effluent into the river at night.",
+                    points: -1, budgetDelta: -30, relDelta: -30, moraleDelta: -30,
+                    feedback: "Bypassing discharge sensors to release untreated effluent constitutes a severe environmental crime. Enforce legal compliance strictly."
+                }
+            ]
+        },
+        {
+            id: 12,
+            isEmergency: false,
+            department: "Utilities & Energy",
+            text: "<strong>Boiler Energy Loss:</strong> Fuel consumption for process cooking steam has jumped 22%, indicating significant condensate and thermal losses.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I suggest conducting a steam trap audit and retrofitting condensate heat recovery exchangers.",
+                    points: 3, budgetDelta: 5, relDelta: 10, moraleDelta: 5,
+                    feedback: "Conducting steam trap audits and recovering condensate heat recovers lost thermal energy and dramatically lowers utility costs."
+                },
+                {
+                    type: "good",
+                    text: "We should inspect boiler thermal insulation and schedule burner tuning with technicians.",
+                    points: 2, budgetDelta: 0, relDelta: 5, moraleDelta: 0,
+                    feedback: "Insulating steam pipes and calibrating burners reduces energy waste, though recovering condensate heat delivers greater long-term efficiency."
+                },
+                {
+                    type: "average",
+                    text: "Increase boiler firing rates to overcome heat distribution losses in process lines.",
+                    points: 1, budgetDelta: -10, relDelta: -10, moraleDelta: -5,
+                    feedback: "Increasing boiler pressure wastes fuel and strains pressure vessels without repairing steam line leaks. Fix leaks first."
+                },
+                {
+                    type: "poor",
+                    text: "Disable steam pressure relief safety valves to force higher steam temperature output.",
+                    points: -1, budgetDelta: -20, relDelta: -30, moraleDelta: -20,
+                    feedback: "Disabling pressure safety valves creates severe risk of catastrophic boiler explosions. Safety relief valves must never be altered."
+                }
+            ]
+        },
+        {
+            id: 13,
+            isEmergency: false,
+            department: "Automation & IT Systems",
+            text: "<strong>Batching Scale Data Desync:</strong> Micro-dosing ingredient scale weights are failing to sync with the Manufacturing Execution System (MES).",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I recommend enforcing physical verification logs while IT calibrates OPC communication tags.",
+                    points: 3, budgetDelta: 0, relDelta: 5, moraleDelta: 5,
+                    feedback: "Enforcing manual verification logs maintains product quality and traceability while IT recalibrates automation system communication tags."
+                },
+                {
+                    type: "good",
+                    text: "We should pause batching operations temporarily and escalate the issue to the automation team.",
+                    points: 2, budgetDelta: -5, relDelta: 5, moraleDelta: 0,
+                    feedback: "Pausing operations prevents unverified ingredient batching, though implementing manual logs allows safe, continued production."
+                },
+                {
+                    type: "average",
+                    text: "Instruct operators to estimate ingredient weights by eye and log numbers manually later.",
+                    points: 1, budgetDelta: -10, relDelta: -15, moraleDelta: -10,
+                    feedback: "Estimating ingredient weights manually introduces recipe errors and compromises quality control. Always use precise measurement protocols."
+                },
+                {
+                    type: "poor",
+                    text: "Bypass batching verification entirely and run unmeasured ingredients into mixing tanks.",
+                    points: -1, budgetDelta: -20, relDelta: -25, moraleDelta: -15,
+                    feedback: "Bypassing batching verification produces uncalibrated, unsafe product lots. Maintain strict ingredient weight verification at all times."
+                }
+            ]
+        },
+        {
+            id: 14,
+            isEmergency: false,
+            department: "Executive Leadership",
+            text: "<strong>Capital Project Wrap-Up:</strong> You are presenting the final engineering outcome and $2M expansion plan to the Plant Director and Board.",
+            options: [
+                {
+                    type: "excellent",
+                    text: "I will present a data-driven business case emphasizing OEE improvements, payback timelines, and risk mitigation.",
+                    points: 3, budgetDelta: 10, relDelta: 10, moraleDelta: 10,
+                    feedback: "Presenting a data-driven business case emphasizing OEE improvements and financial payback secures executive approval and project funding."
+                },
+                {
+                    type: "good",
+                    text: "I plan to highlight operational safety improvements, line capacity gains, and milestone schedules.",
+                    points: 2, budgetDelta: 5, relDelta: 5, moraleDelta: 5,
+                    feedback: "Highlighting capacity gains and safety achievements communicates project success effectively to executive leadership and stakeholders."
+                },
+                {
+                    type: "average",
+                    text: "I will present basic expenditure spreadsheets and summarize technical features verbally.",
+                    points: 1, budgetDelta: 0, relDelta: 0, moraleDelta: 0,
+                    feedback: "Presenting unformatted financial spreadsheets without strategic metrics weakens executive confidence. Always structure business presentations clearly."
+                },
+                {
+                    type: "poor",
+                    text: "Send an unformatted cost spreadsheet via email and cancel the executive presentation meeting.",
+                    points: -1, budgetDelta: -15, relDelta: -10, moraleDelta: -10,
+                    feedback: "Canceling executive briefings and emailing unformatted data shows poor professional leadership. Present project outcomes directly and confidently."
+                }
+            ]
+        }
+    ];
+
+    /* Start Game from Landing Page */
+    function startGame() {
+        document.getElementById("landing-view").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+        document.getElementById("scenario-view").classList.remove("hidden");
+        renderStep();
+    }
+
+    /* Render Current Step UI */
+    function renderStep() {
+        isStepResolved = false;
+        const currentScenario = scenarios[currentStepIndex];
+
+        const deptBadge = document.getElementById("dept-badge");
+        const stepIndicator = document.getElementById("step-indicator");
+        const scenarioText = document.getElementById("scenario-text");
+        const optionsContainer = document.getElementById("options-container");
+        const feedbackBox = document.getElementById("feedback-box");
+        const nextBtn = document.getElementById("next-btn");
+
+        // Reset elements
+        feedbackBox.className = "feedback-box";
+        nextBtn.style.display = "none";
+        optionsContainer.innerHTML = "";
+
+        // Updates
+        stepIndicator.innerText = `Step ${currentStepIndex + 1} of ${scenarios.length}`;
+        deptBadge.innerText = currentScenario.department;
+        
+        if (currentScenario.isEmergency) {
+            deptBadge.className = "badge badge-emergency";
+            scenarioText.className = "scenario-text emergency-text";
+        } else {
+            deptBadge.className = "badge badge-dept";
+            scenarioText.className = "scenario-text";
+        }
+
+        scenarioText.innerHTML = currentScenario.text;
+
+        // Shuffle Options using Fisher-Yates
+        const shuffledOptions = shuffleArray([...currentScenario.options]);
+
+        // Render Option Buttons
+        shuffledOptions.forEach((opt) => {
+            const btn = document.createElement("button");
+            btn.className = "option-btn";
+            btn.innerHTML = opt.text;
+            btn.onclick = () => handleOptionSelect(opt, btn);
+            optionsContainer.appendChild(btn);
+        });
+
+        // Early Victory Check (9 Excellent Choices before step 14)
+        if (excellentCount >= 9 && currentStepIndex < 13 && !earlyWinUnlocked) {
+            earlyWinUnlocked = true;
+            document.getElementById("early-win-banner").classList.remove("hidden");
+        }
+    }
+
+    /* Option Selection Logic & Dynamic Stat Feedback */
+    function handleOptionSelect(option, selectedBtn) {
+        if (isStepResolved) return;
+
+        const currentScenario = scenarios[currentStepIndex];
+        const feedbackBox = document.getElementById("feedback-box");
+        const feedbackText = document.getElementById("feedback-text");
+        const statDeltas = document.getElementById("stat-deltas");
+        const nextBtn = document.getElementById("next-btn");
+
+        // Emergency Instant Failure Check
+        if (currentScenario.isEmergency && option.type === "critical") {
+            feedbackBox.className = "feedback-box feedback-error show";
+            statDeltas.innerHTML = `<span class="delta-pill text-red">CRITICAL SAFETY FAILURE</span>`;
+            feedbackText.innerHTML = option.feedback;
+            disableAllOptions();
+            setTimeout(() => triggerGameOver(option.feedback), 2500);
+            return;
+        }
+
+        // Standard Poor Option (-1 Pt & Forced Retry Loop)
+        if (option.type === "poor") {
+            updateStats(option.budgetDelta, option.relDelta, option.moraleDelta, option.points);
+            feedbackBox.className = "feedback-box feedback-error show";
+            
+            statDeltas.innerHTML = `
+                <span class="delta-pill text-red">Score: ${option.points} Pt</span>
+                <span class="delta-pill text-red">Budget: ${option.budgetDelta}%</span>
+                <span class="delta-pill text-red">Reliability: ${option.relDelta}%</span>
+                <span class="delta-pill text-red">Morale: ${option.moraleDelta}%</span>
+            `;
+            feedbackText.innerHTML = `<strong>POOR CHOICE (-1 Pt & Retry Mandatory):</strong> ${option.feedback}`;
+            
+            selectedBtn.disabled = true;
+            return;
+        }
+
+        // Viable / Good / Excellent Choice
+        isStepResolved = true;
+        updateStats(option.budgetDelta, option.relDelta, option.moraleDelta, option.points);
+
+        if (option.type === "excellent") {
+            excellentCount++;
+            feedbackBox.className = "feedback-box feedback-success show";
+        } else {
+            feedbackBox.className = "feedback-box feedback-warning show";
+        }
+
+        // Format Stat Delta Badges for clear visual feedback
+        const pStr = option.points > 0 ? `+${option.points}` : `${option.points}`;
+        const bStr = option.budgetDelta > 0 ? `+${option.budgetDelta}%` : `${option.budgetDelta}%`;
+        const rStr = option.relDelta > 0 ? `+${option.relDelta}%` : `${option.relDelta}%`;
+        const mStr = option.moraleDelta > 0 ? `+${option.moraleDelta}%` : `${option.moraleDelta}%`;
+
+        statDeltas.innerHTML = `
+            <span class="delta-pill ${option.points > 0 ? 'text-green' : 'text-red'}">Score: ${pStr} Pts</span>
+            <span class="delta-pill ${option.budgetDelta >= 0 ? 'text-green' : 'text-yellow'}">Budget: ${bStr}</span>
+            <span class="delta-pill ${option.relDelta >= 0 ? 'text-green' : 'text-yellow'}">Reliability: ${rStr}</span>
+            <span class="delta-pill ${option.moraleDelta >= 0 ? 'text-green' : 'text-yellow'}">Morale: ${mStr}</span>
+        `;
+        feedbackText.innerHTML = option.feedback;
+
+        disableAllOptions();
+
+        if (currentStepIndex < scenarios.length - 1) {
+            nextBtn.style.display = "block";
+        } else {
+            nextBtn.innerText = "Complete Simulation & View Debrief →";
+            nextBtn.style.display = "block";
+        }
+    }
+
+    function disableAllOptions() {
+        const btns = document.querySelectorAll(".option-btn");
+        btns.forEach(btn => btn.disabled = true);
+    }
+
+    /* Update Dashboard Bars and Text Labels */
+    function updateStats(budgetD, relD, moraleD, pointsD) {
+        score = Math.max(0, Math.min(40, score + pointsD));
+        budget = Math.max(0, Math.min(100, budget + budgetD));
+        reliability = Math.max(0, Math.min(100, reliability + relD));
+        morale = Math.max(0, Math.min(100, morale + moraleD));
+
+        // Update Numbers
+        document.getElementById("score-val").innerText = `${score} / 40`;
+        document.getElementById("budget-val").innerText = `${budget}%`;
+        document.getElementById("reliability-val").innerText = `${reliability}%`;
+        document.getElementById("morale-val").innerText = `${morale}%`;
+
+        // Bar Fill Widths
+        updateBar("score-bar", (score / 40) * 100);
+        updateBar("budget-bar", budget);
+        updateBar("reliability-bar", reliability);
+        updateBar("morale-bar", morale);
+
+        // Bar Text Status Feedback
+        updateScoreStatusText(score);
+        updateResourceStatusText("budget-status", budget, "Budget");
+        updateResourceStatusText("reliability-status", reliability, "Machinery");
+        updateResourceStatusText("morale-status", morale, "Culture");
+    }
+
+    function updateBar(barId, percentage) {
+        const bar = document.getElementById(barId);
+        bar.style.width = `${percentage}%`;
+
+        bar.classList.remove("status-green", "status-yellow", "status-red");
+        if (percentage >= 70) {
+            bar.classList.add("status-green");
+        } else if (percentage >= 40) {
+            bar.classList.add("status-yellow");
+        } else {
+            bar.classList.add("status-red");
+        }
+    }
+
+    function updateScoreStatusText(scoreVal) {
+        const el = document.getElementById("score-status");
+        el.classList.remove("text-green", "text-yellow", "text-red");
+
+        if (scoreVal >= 35) {
+            el.innerText = "Band 1: Master Pace";
+            el.classList.add("text-green");
+        } else if (scoreVal >= 28) {
+            el.innerText = "Band 2: Competent Pace";
+            el.classList.add("text-green");
+        } else if (scoreVal >= 20) {
+            el.innerText = "Band 3: Survivor Pace";
+            el.classList.add("text-yellow");
+        } else {
+            el.innerText = "Band 4: At Risk";
+            el.classList.add("text-red");
+        }
+    }
+
+    function updateResourceStatusText(elementId, value, label) {
+        const el = document.getElementById(elementId);
+        el.classList.remove("text-green", "text-yellow", "text-red");
+
+        if (value >= 75) {
+            el.innerText = `Optimal ${label}`;
+            el.classList.add("text-green");
+        } else if (value >= 40) {
+            el.innerText = `Warning: ${label} Strain`;
+            el.classList.add("text-yellow");
+        } else {
+            el.innerText = `Critical ${label} Deficit`;
+            el.classList.add("text-red");
+        }
+    }
+
+    /* Navigation */
+    function nextStep() {
+        if (currentStepIndex < scenarios.length - 1) {
+            currentStepIndex++;
+            renderStep();
+        } else {
+            triggerDebrief(false);
+        }
+    }
+
+    /* Instant Game Over Screen */
+    function triggerGameOver(reason) {
+        document.getElementById("scenario-view").classList.add("hidden");
+        document.getElementById("dept-badge-container").classList.add("hidden");
+        document.getElementById("early-win-banner").classList.add("hidden");
+
+        const debriefView = document.getElementById("debrief-view");
+        debriefView.classList.remove("hidden");
+
+        const bandTitle = document.getElementById("debrief-band-title");
+        bandTitle.className = "debrief-band text-red";
+        bandTitle.innerText = "Band 4: Unsuccessful / Safety Termination";
+
+        document.getElementById("final-score").innerText = `${score} / 40`;
+        document.getElementById("final-excellent").innerText = excellentCount;
+        document.getElementById("final-budget").innerText = `${budget}%`;
+        document.getElementById("final-morale").innerText = `${morale}%`;
+
+        document.getElementById("debrief-feedback-text").innerHTML = `
+            <strong style="color: var(--accent-red);">CRITICAL SAFETY / ETHICAL BREACH TERMINATION:</strong><br>${reason}<br><br>
+            <em>Actionable Pedagogical Feedback (~50 words):</em> Unsuccessful outcome. Critical safety violations or ethical breaches compromise plant operations and endanger lives. Managing modern pet food manufacturing requires strict adherence to safety protocols, formal engineering vocabulary, and active risk escalation. Review core technical safety procedures and restart the simulation.
+        `;
+    }
+
+    /* Final Debriefing Screen */
+    function triggerDebrief(isEarlyWin) {
+        document.getElementById("scenario-view").classList.add("hidden");
+        document.getElementById("early-win-banner").classList.add("hidden");
+        document.getElementById("debrief-view").classList.remove("hidden");
+
+        const bandTitle = document.getElementById("debrief-band-title");
+        const feedbackText = document.getElementById("debrief-feedback-text");
+
+        document.getElementById("final-score").innerText = `${score} / 40`;
+        document.getElementById("final-excellent").innerText = excellentCount;
+        document.getElementById("final-budget").innerText = `${budget}%`;
+        document.getElementById("final-morale").innerText = `${morale}%`;
+
+        let bandName = "";
+        let bandClass = "";
+        let feedbackContent = "";
+
+        if (score >= 35 || isEarlyWin) {
+            bandName = "Band 1: Master Project Engineer";
+            bandClass = "debrief-band text-green";
+            feedbackContent = "Outstanding performance! You demonstrated exceptional technical expertise, precise business communication, and sound safety leadership across all factory departments. Your decisions optimized production efficiency while strictly adhering to quality and safety standards. You are ready to lead complex industrial engineering projects in international manufacturing environments.";
+        } else if (score >= 28) {
+            bandName = "Band 2: Competent Engineer";
+            bandClass = "debrief-band text-green";
+            feedbackContent = "Solid performance! You managed technical challenges effectively and communicated well with cross-functional teams. While a few decisions led to minor operational delays or budget friction, your general approach kept the plant safe and productive. Focus on refining proactive risk management to reach master level.";
+        } else if (score >= 20) {
+            bandName = "Band 3: Survivor Engineer";
+            bandClass = "debrief-band text-yellow";
+            feedbackContent = "You survived the assignment, but line operations faced noticeable friction. Frequent reliance on sub-optimal choices increased team stress and reduced equipment reliability. To advance, work on formal technical vocabulary, standard operating procedures, and clearer inter-departmental request strategies before managing critical factory projects.";
+        } else {
+            bandName = "Band 4: Unsuccessful Engineer";
+            bandClass = "debrief-band text-red";
+            feedbackContent = "Unsuccessful outcome. Critical delays, safety breaches, or severe miscommunications compromised factory operations and regulatory compliance. Managing modern pet food manufacturing requires strict adherence to safety protocols, precise technical vocabulary, and structured cross-departmental collaboration. Review core engineering concepts and workplace communication guidelines before retrying.";
+        }
+
+        bandTitle.className = bandClass;
+        bandTitle.innerText = bandName;
+        feedbackText.innerHTML = `<strong>Actionable Evaluation (~50 words):</strong><br>${feedbackContent}`;
+    }
+
+    /* Reset Game State */
+    function resetGame() {
+        currentStepIndex = 0;
+        score = 0;
+        budget = 100;
+        reliability = 100;
+        morale = 100;
+        excellentCount = 0;
+        isStepResolved = false;
+        earlyWinUnlocked = false;
+
+        updateStats(0, 0, 0, 0);
+
+        document.getElementById("landing-view").classList.remove("hidden");
+        document.getElementById("dept-badge-container").classList.remove("hidden");
+        document.getElementById("dept-badge").innerText = "Engineering Orientation";
+        document.getElementById("dashboard").classList.add("hidden");
+        document.getElementById("scenario-view").classList.add("hidden");
+        document.getElementById("debrief-view").classList.add("hidden");
+        document.getElementById("early-win-banner").classList.add("hidden");
+    }
+</script>
+</body>
+</html>

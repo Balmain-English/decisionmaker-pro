@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Strategy — Escape Game Development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8F7F4;--surface:#FFFFFF;--surface2:#F1EFE8;
+  --border:rgba(0,0,0,0.11);--border2:rgba(0,0,0,0.2);
+  --text:#1A1A18;--text2:#6B6B67;--text3:#9A9A96;
+  --green-bg:#EAF3DE;--green-bd:#97C459;--green-tx:#27500A;
+  --amber-bg:#FAEEDA;--amber-bd:#EF9F27;--amber-tx:#633806;
+  --red-bg:#FCEBEB;--red-bd:#F09595;--red-tx:#791F1F;
+  --fatal-bd:#E24B4A;--fatal-tx:#501313;
+  --blue-bg:#E6F1FB;--blue-bd:#85B7EB;--blue-tx:#0C447C;
+  /* rating palette: 3 = green, 2 = light green, 1 = ochre, worst = light red */
+  --r3-bg:#C5E4A0;--r3-bd:#4C9A1E;--r3-tx:#1B4407;
+  --r2-bg:#E6F3D6;--r2-bd:#A6CF74;--r2-tx:#2F5A12;
+  --r1-bg:#F1DFA6;--r1-bd:#BC8F1F;--r1-tx:#5A4006;
+  --r0-bg:#FBE4E2;--r0-bd:#EBA09C;--r0-tx:#7A1F1F;
+  --rf-bg:#F7CFCC;--rf-bd:#D63C3A;--rf-tx:#4A1010;
+  --r:10px;--rs:6px
+}
+body{font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 4rem}
+.page-header{width:100%;max-width:720px;margin-bottom:1.75rem;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.level-tag{font-size:11px;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;background:var(--blue-bg);color:var(--blue-tx);border:.5px solid var(--blue-bd);border-radius:20px;padding:3px 10px}
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1.75rem;width:100%;max-width:720px;box-shadow:0 1px 5px rgba(0,0,0,0.05)}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border);gap:1rem}
+.char-name{font-size:15px;font-weight:500;margin-bottom:2px}
+.char-role{font-size:12px;color:var(--text2)}
+.header-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.step-track{display:flex;gap:4px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
+.dot.done{background:#639922}.dot.active{background:#378ADD}.dot.emg{background:#E24B4A}
+.score-pill{font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:500;background:var(--green-bg);color:var(--green-tx);border:.5px solid var(--green-bd);border-radius:20px;padding:4px 12px;min-width:58px;text-align:center}
+.time-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);font-weight:500;margin-bottom:.5rem}
+.emg-alert{background:var(--red-bg);border:.5px solid var(--red-bd);border-radius:var(--rs);padding:10px 14px;font-size:13px;color:var(--red-tx);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.vocab-row{margin-bottom:1rem;font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.vpill{display:inline-block;font-size:11px;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;background:var(--blue-bg);color:var(--blue-tx);border-radius:var(--rs);padding:2px 8px}
+.scenario{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:1.5rem}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem}
+.opt-btn{text-align:left;padding:14px 16px;border:.5px solid var(--border);border-radius:var(--rs);background:var(--surface);cursor:pointer;font-family:inherit;font-size:14px;color:var(--text);line-height:1.55;transition:background .15s,border-color .15s;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;width:100%}
+.opt-btn:hover:not(:disabled){background:var(--surface2);border-color:var(--border2)}
+.opt-btn:disabled{cursor:default}
+.opt-btn:focus-visible,.nxt:focus-visible,.replay:focus-visible{outline:2px solid var(--blue-bd);outline-offset:2px}
+.opt-btn.r3{background:var(--r3-bg);border-color:var(--r3-bd);color:var(--r3-tx)}
+.opt-btn.r2{background:var(--r2-bg);border-color:var(--r2-bd);color:var(--r2-tx)}
+.opt-btn.r1{background:var(--r1-bg);border-color:var(--r1-bd);color:var(--r1-tx)}
+.opt-btn.r0{background:var(--r0-bg);border-color:var(--r0-bd);color:var(--r0-tx)}
+.opt-btn.rf{background:var(--rf-bg);border-color:var(--rf-bd);color:var(--rf-tx)}
+.opt-btn.picked{box-shadow:0 0 0 2px currentColor}
+.opt-btn.dim{opacity:.75}
+.ptag{flex-shrink:0;font-size:11px;font-weight:500;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;padding:2px 8px;border-radius:20px;white-space:nowrap;margin-top:2px;visibility:hidden;border:.5px solid transparent;background:rgba(255,255,255,.55)}
+.ptag.show{visibility:visible}
+.ptag.r3{border-color:var(--r3-bd)}.ptag.r2{border-color:var(--r2-bd)}.ptag.r1{border-color:var(--r1-bd)}.ptag.r0{border-color:var(--r0-bd)}.ptag.rf{border-color:var(--rf-bd)}
+.fbox{padding:14px 16px;border-radius:var(--rs);font-size:14px;line-height:1.65;margin-bottom:1.25rem;display:none}
+.fbox.show{display:block}
+.fb-rate{display:inline-block;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.fb-r3{background:var(--r3-bg);border:.5px solid var(--r3-bd);color:var(--r3-tx)}
+.fb-r2{background:var(--r2-bg);border:.5px solid var(--r2-bd);color:var(--r2-tx)}
+.fb-r1{background:var(--r1-bg);border:.5px solid var(--r1-bd);color:var(--r1-tx)}
+.fb-r0{background:var(--r0-bg);border:.5px solid var(--r0-bd);color:var(--r0-tx)}
+.fb-rf{background:var(--rf-bg);border:1px solid var(--rf-bd);color:var(--rf-tx)}
+.score-pill.neg{background:var(--r0-bg);color:var(--r0-tx);border-color:var(--r0-bd)}
+.tally{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:1.5rem}
+.tchip{font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding:3px 10px;border-radius:20px;border:.5px solid}
+.tchip.r3{background:var(--r3-bg);border-color:var(--r3-bd);color:var(--r3-tx)}
+.tchip.r2{background:var(--r2-bg);border-color:var(--r2-bd);color:var(--r2-tx)}
+.tchip.r1{background:var(--r1-bg);border-color:var(--r1-bd);color:var(--r1-tx)}
+.tchip.r0{background:var(--r0-bg);border-color:var(--r0-bd);color:var(--r0-tx)}
+.tchip.rf{background:var(--rf-bg);border-color:var(--rf-bd);color:var(--rf-tx)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.nxt{padding:10px 22px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rs);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s;display:none}
+.nxt:hover{background:var(--surface2)}
+.nxt.show{display:inline-block}
+/* final */
+.fin{text-align:center}
+.fin-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
+.fin-num{font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:60px;font-weight:500;line-height:1;margin-bottom:4px}
+.fin-max{font-size:14px;color:var(--text2);margin-bottom:1.25rem}
+.bar-bg{background:var(--surface2);border-radius:20px;height:10px;overflow:hidden;margin-bottom:1.5rem}
+.bar-fill{height:10px;border-radius:20px;background:#639922;width:0%;transition:width .9s cubic-bezier(.34,1.4,.64,1)}
+.fin-grade{font-size:17px;font-weight:500;margin-bottom:.75rem}
+.fin-text{font-size:15px;line-height:1.75;text-align:left}
+.vfooter{margin-top:1.5rem;padding-top:1rem;border-top:.5px solid var(--border);font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.replay{margin-top:1.5rem;padding:10px 24px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rs);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s}
+.replay:hover{background:var(--surface2)}
+[hidden]{display:none!important}
+.intro-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500;margin-bottom:.5rem}
+.intro-title{font-size:26px;font-weight:500;line-height:1.25;margin-bottom:.75rem}
+.intro-lead{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:1.5rem}
+.intro-sec{margin-bottom:1.5rem}
+.intro-h{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);font-weight:500;margin-bottom:.6rem}
+.intro-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fact{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;text-align:center}
+.fact b{display:block;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:20px;font-weight:500}
+.fact span{font-size:12px;color:var(--text2)}
+.intro-steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6}
+.intro-steps li{counter-increment:s;display:flex;gap:10px;align-items:flex-start}
+.intro-steps li::before{content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--blue-bg);color:var(--blue-tx);font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.legend{display:flex;flex-direction:column;gap:6px}
+.lg{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border:.5px solid;border-radius:var(--rs);font-size:13px}
+.lg .ptag{visibility:visible}
+.lg.r3{background:var(--r3-bg);border-color:var(--r3-bd);color:var(--r3-tx)}
+.lg.r2{background:var(--r2-bg);border-color:var(--r2-bd);color:var(--r2-tx)}
+.lg.r1{background:var(--r1-bg);border-color:var(--r1-bd);color:var(--r1-tx)}
+.lg.r0{background:var(--r0-bg);border-color:var(--r0-bd);color:var(--r0-tx)}
+.lg.rf{background:var(--rf-bg);border-color:var(--rf-bd);color:var(--rf-tx)}
+.intro-warn{font-size:13px;line-height:1.6;color:var(--red-tx);background:var(--red-bg);border:.5px solid var(--red-bd);border-radius:var(--rs);padding:10px 14px;margin-top:10px}
+.start{width:100%;padding:14px 24px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.start:hover{opacity:.88}
+.start:focus-visible{outline:2px solid var(--blue-bd);outline-offset:2px}
+@media(max-width:480px){.intro-title{font-size:22px}.intro-facts{grid-template-columns:1fr}}
+@media(max-width:480px){.card{padding:1.25rem}.fin-num{font-size:44px}}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <div class="page-title">English in the Workplace</div>
+  <div class="level-tag">B1 / B2</div>
+</div>
+<div class="card" id="intro">
+  <div class="intro-kicker">Business English &middot; Finance</div>
+  <h1 class="intro-title">A Busy Year in the Life of a Management Accountant</h1>
+  <p class="intro-lead">You are <strong>Alex Chen</strong>, Management Accountant at <strong>Enigma Forge Ltd.</strong>, a fast-growing escape room company. New rooms are being built, a rival is circling and the board wants answers. Every decision you make will affect the company&rsquo;s financial health &mdash; and its survival.</p>
+
+  <div class="intro-sec">
+    <div class="intro-facts">
+      <div class="fact"><b>12</b><span>financial decisions</span></div>
+      <div class="fact"><b>2</b><span>emergencies</span></div>
+      <div class="fact"><b>40</b><span>points available</span></div>
+    </div>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">What you will practise</div>
+    <p style="font-size:14px;line-height:1.7;color:var(--text2)">Financial vocabulary in context, reading business scenarios, and choosing &mdash; and justifying &mdash; the most professional course of action. Three discussion questions appear along the way: pause and talk them through with a partner. (About 20&ndash;25 minutes.)</p>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">How to play</div>
+    <ol class="intro-steps">
+      <li><span>Read each scenario and the key vocabulary above it.</span></li>
+      <li><span>Choose one of the options. The order changes every time.</span></li>
+      <li><span>Read the feedback to find out why the answer was strong or weak, and compare it with the other options.</span></li>
+    </ol>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">How you are scored</div>
+    <div class="legend">
+      <div class="lg r3"><span>Excellent &mdash; the best professional response</span><span class="ptag r3">+3</span></div>
+      <div class="lg r2"><span>Good &mdash; sensible, but not the strongest</span><span class="ptag r2">+2</span></div>
+      <div class="lg r1"><span>Weak &mdash; flawed reasoning</span><span class="ptag r1">+1</span></div>
+      <div class="lg r0"><span>Poor &mdash; you lose a point and must choose again</span><span class="ptag r0">&minus;1</span></div>
+    </div>
+    <div class="intro-warn"><strong>Emergencies:</strong> when a crisis hits, you get only three options and one of them ends the game. Choose carefully &mdash; the best response is worth +2.</div>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">Key vocabulary</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="vpill">variance analysis</span><span class="vpill">CAPEX</span><span class="vpill">ROI & NPV</span><span class="vpill">WIP valuation</span><span class="vpill">CAC & LTV</span><span class="vpill">cash flow forecast</span><span class="vpill">EBITDA</span><span class="vpill">operating margins</span><span class="vpill">depreciation</span><span class="vpill">price elasticity</span><span class="vpill">M&A due diligence</span><span class="vpill">margin compression</span></div>
+  </div>
+
+  <button class="start" id="start" type="button">Start the simulation &rarr;</button>
+</div>
+<div class="card" id="gc" hidden>
+  <div class="card-header">
+    <div><div class="char-name">Alex Chen</div><div class="char-role">Management Accountant — Enigma Forge Ltd.</div></div>
+    <div class="header-right">
+      <div class="step-track" id="dots" role="img" aria-label="Progress"></div>
+      <div class="score-pill" id="score">0 pts</div>
+    </div>
+  </div>
+  <div class="time-label" id="lbl"></div>
+  <div class="scenario" id="scene"></div>
+  <div class="options" id="opts" role="group" aria-label="Answer options"></div>
+  <div class="fbox" id="fb" role="status" aria-live="polite"></div>
+  <button class="nxt" id="nxt">Next →</button>
+</div>
+
+<script>
+/* ── STATE ── */
+const S = { score:0, answered:false, maxScore:40, tally:{r3:0,r2:0,r1:0,r0:0,rf:0} };
+const GAME_HTML = document.getElementById('gc').innerHTML; // pristine card, restored on restart
+let curId = null, curShuffled = [];
+
+/* ── TREE ── */
+const N = {
+d1:{
+  label:"Decision 1: Budget Variance",
+  scene:`Reviewing Q1 physical build costs for the new "Haunted Asylum" room, you notice that timber and electronics components are currently <strong>18% over budget</strong>. The project manager wants to proceed without alterations.`,
+  vocab:["variance analysis","cost drivers","capital expenditure","re-forecasting"],
+  opts:[
+    {t:"Isolate the variances by material type, compare against current market rates, and adjust Q2 forecasts accordingly.", pts:3, fb:"Excellent. Isolating variances clarifies the root cause, enabling accurate re-forecasting and much better management of future capital expenditure."},
+    {t:"Highlight the overall 18% variance to the project manager and demand they reduce spending on remaining rooms.", pts:2, fb:"Good, but simply demanding a reduction doesn't address underlying cost drivers. Detailed variance analysis is more effective for long-term planning."},
+    {t:"Absorb the variance into the general contingency fund without analyzing the specific cost drivers.", pts:1, fb:"Poor practice. Using the contingency fund hides the variance, preventing management from understanding true underlying procurement trends."},
+    {t:"Ignore the overspend entirely since the room is expected to generate massive revenue once it opens.", pts:-1, fb:"Dangerous logic. Revenue projections never justify ignoring unanalyzed cost overruns. This masks potential systemic procurement issues."}
+  ],
+  next:"d2"
+},
+d2:{
+  label:"Decision 2: Revenue Forecasts",
+  scene:`You are preparing Q3 revenue projections. Advance bookings for your sci-fi room, "Cyber Heist", show a clear <strong>downward trend</strong> compared to historical seasonal data. You must present this to stakeholders.`,
+  vocab:["revenue projections","seasonal trends","stakeholders","commercial awareness"],
+  opts:[
+    {t:"Present the data visually, correlating the drop with seasonal trends, and propose a revised, conservative Q3 revenue forecast.", pts:3, fb:"Perfect. Visual data interpretation combined with realistic adjustments demonstrates strong analytical skills and acute commercial awareness."},
+    {t:"Mention the downward trend in the report footnotes but maintain the original revenue forecast to avoid alarming the board.", pts:2, fb:"Risky. Footnotes are easily overlooked. Significant trends negatively impacting revenue forecasts must be highlighted transparently to stakeholders."},
+    {t:"Wait until the end of Q3 to see if actual walk-in bookings compensate for the drop in pre-bookings.", pts:1, fb:"Too passive. Waiting prevents proactive marketing or pricing adjustments. Forecasts must reflect the most current operational data immediately."},
+    {t:"Artificially inflate the projected walk-in rate to ensure the final presentation meets the initial budget targets.", pts:-1, fb:"Unethical and invalid. Manipulating forecast variables simply to match initial targets destroys the integrity of financial reporting."}
+  ],
+  next:"d3"
+},
+d3:{
+  label:"Decision 3: Evaluating CAPEX",
+  scene:`The R&D team requests £50,000 for a cutting-edge holographic projector system. You are required to evaluate the <strong>Return on Investment (ROI)</strong> before the CFO signs off on the capital expenditure.`,
+  vocab:["Return on Investment (ROI)","Net Present Value (NPV)","CAPEX","payback period"],
+  opts:[
+    {t:"Calculate the payback period and NPV, incorporating projected ongoing maintenance costs and expected ticket price premiums.", pts:3, fb:"Comprehensive analysis. Including ongoing maintenance and revenue premiums ensures the Net Present Value (NPV) calculation is highly accurate."},
+    {t:"Calculate the basic ROI by dividing expected additional annual revenue by the initial £50,000 capital expenditure.", pts:2, fb:"Adequate, but ignoring ongoing maintenance and the time value of money limits the usefulness of this basic calculation."},
+    {t:"Approve the CAPEX solely because the technology is innovative and competitors in the area do not have it yet.", pts:1, fb:"Flawed logic. Innovation is important, but it must still be justified by rigorous financial metrics and a clear path to profitability."},
+    {t:"Reject the proposal immediately because £50,000 exceeds the standard £30,000 limit for individual electronic asset purchases.", pts:-1, fb:"Rigid thinking. Capital expenditure limits exist as guidelines, but significant investments should be evaluated on projected ROI, not just initial cost."}
+  ],
+  next:"d4"
+},
+d4:{
+  label:"Decision 4: WIP Inventory Valuation",
+  scene:`It is month-end. Two new escape rooms are approximately 60% built. You must value this <strong>Work in Progress (WIP)</strong> for the upcoming balance sheet reporting.`,
+  vocab:["Work in Progress (WIP)","balance sheet","capitalizing costs","asset valuation"],
+  opts:[
+    {t:"Capitalize direct materials and apportioned labor costs incurred so far, recording them accurately as WIP assets.", pts:3, fb:"Correct application of accounting principles. Capitalizing these costs ensures the balance sheet accurately reflects current asset creation."},
+    {t:"Record the materials as WIP but expense the labor immediately to reduce this month's taxable profit.", pts:2, fb:"Inconsistent application. Direct labor utilized in asset creation should be capitalized alongside materials for accurate asset valuation."},
+    {t:"Estimate the WIP value based on a quick visual inspection of the rooms rather than consulting the ledger.", pts:1, fb:"Unprofessional approach. Asset valuation must be based on documented financial records, not subjective visual estimates by accounting staff."},
+    {t:"Expense all costs immediately to the profit and loss account since the rooms are not yet generating revenue.", pts:-1, fb:"Incorrect. Expensing capital build costs distorts the P&L immediately and severely undervalues the company's asset base."}
+  ],
+  next:"d5"
+},
+d5:{
+  label:"Decision 5: CAC vs. LTV",
+  scene:`<em>Discussion 1: How does inaccurate WIP valuation impact a company's perceived financial health during rapid expansion?</em><br><br>Moving on, marketing data shows corporate <strong>Customer Acquisition Cost (CAC)</strong> has risen 40%, but <strong>Lifetime Value (LTV)</strong> remains flat.`,
+  vocab:["Customer Acquisition Cost (CAC)","Lifetime Value (LTV)","marketing ROI","price elasticity"],
+  opts:[
+    {t:"Present a segmented profitability analysis, recommending a shift in marketing spend toward higher-yield customer demographics.", pts:3, fb:"Strategic and data-driven. Reallocating the budget based on segmented CAC/LTV ratios maximizes overall marketing ROI effectively."},
+    {t:"Suggest a general reduction in the corporate marketing budget to immediately bring the overall CAC back to baseline.", pts:2, fb:"A blunt instrument. Cutting the budget blindly might reduce acquisition costs, but it could also severely restrict growth potential."},
+    {t:"Increase corporate pricing by 40% to immediately offset the higher acquisition costs and protect gross profit margins.", pts:1, fb:"Unrealistic response. Drastic price increases without assessing price elasticity will likely cause a collapse in corporate bookings."},
+    {t:"Ignore the CAC increase, assuming corporate clients will eventually increase their booking frequency naturally over time.", pts:-1, fb:"Naive assumption. Hoping for an LTV increase without strategic intervention is not a valid or sound financial strategy."}
+  ],
+  next:"d6"
+},
+d6:{
+  label:"Decision 6: Cash Flow Forecast",
+  scene:`Forecasting Q4 cash flow, you note a major corporate partner owes £40,000. However, they have requested a <strong>60-day payment extension</strong> due to their own internal restructuring.`,
+  vocab:["cash flow forecast","liquidity","working capital","stress test"],
+  opts:[
+    {t:"Run a stress test on the cash flow model. Negotiate a partial payment now, extending the rest to 60 days.", pts:3, fb:"Excellent liquidity management. Stress testing reveals vulnerabilities, while negotiating partial payment secures immediate essential working capital."},
+    {t:"Grant the 60-day extension but freeze their ability to book new events until the £40,000 balance is cleared.", pts:2, fb:"Firm, but potentially damages a major relationship. It protects cash flow but sacrifices future revenue opportunities."},
+    {t:"Grant the extension immediately to maintain good relations, hoping standard operational cash reserves will cover the shortfall.", pts:1, fb:"Risky. Relying on hope rather than a modeled cash flow forecast jeopardizes the company's ability to pay its own suppliers."},
+    {t:"Threaten immediate legal action if they do not pay the full balance within the original 30-day terms.", pts:-1, fb:"Overly aggressive. Immediate litigation destroys business relationships, incurs heavy fees, and rarely results in faster cash recovery."}
+  ],
+  next:"e1"
+},
+e1:{
+  label:"EMERGENCY 1: Supplier Collapse",
+  isEmergency:true,
+  scene:`<strong>CRITICAL ALERT:</strong> The sole supplier for your proprietary electronic locking mechanisms has suddenly gone into administration. Three major room builds are instantly halted. You must act to protect company assets.`,
+  vocab:["administration","insolvent","creditors","crisis management"],
+  opts:[
+    {t:"Halt payments for undelivered goods immediately, assess the financial impact of project delays, and urgently source an alternative.", pts:2, fb:"Decisive crisis management. Protecting outgoing cash while accurately calculating the delay cost allows for informed recovery planning."},
+    {t:"Wait for the administrators to contact you regarding the delivery schedule of the already ordered and partially paid locks.", pts:1, fb:"Too passive. Administrators prioritize secured creditors, not your project timelines. Waiting guarantees costly and prolonged build delays."},
+    {t:"Pay the supplier's outstanding invoices in full immediately, hoping it encourages them to fulfill your order first.", pts:0, isGameOver:true, fb:"<strong>GAME OVER.</strong> Paying an insolvent supplier guarantees losing the cash. The administrator absorbs the funds, you receive nothing, and Enigma Forge faces a catastrophic cash crisis."}
+  ],
+  next:"d7"
+},
+d7:{
+  label:"Decision 7: Re-forecasting EBITDA",
+  scene:`Following the supplier crisis, you must present a revised <strong>EBITDA forecast</strong> for the year to the board of directors. The delays will severely impact Q4 revenues.`,
+  vocab:["EBITDA","cost mitigation","operational timelines","sandbagging"],
+  opts:[
+    {t:"Present a revised model showing the impact of the delays on revenue, alongside cost mitigation strategies to protect EBITDA.", pts:3, fb:"Strong executive communication. Acknowledging the negative impact while presenting actionable cost mitigation demonstrates excellent financial leadership."},
+    {t:"Lower the EBITDA forecast significantly to create a 'worst-case scenario' buffer, ensuring you don't miss targets again.", pts:2, fb:"Overly pessimistic. While caution is good, artificially sandbagging the forecast misleads the board about the company's true position."},
+    {t:"Maintain the original EBITDA target by proposing severe cuts to the ongoing maintenance budget of existing rooms.", pts:1, fb:"Short-sighted. Cutting essential maintenance degrades the core product, leading to customer dissatisfaction and revenue loss that outweighs short-term savings."},
+    {t:"Present the original forecast, arguing that the delayed rooms will make up the lost revenue once they finally open.", pts:-1, fb:"Misleading. Ignoring verified project delays invalidates the forecast. EBITDA metrics must consistently reflect actual, updated operational timelines."}
+  ],
+  next:"d8"
+},
+d8:{
+  label:"Decision 8: Profit Margins",
+  scene:`You analyze operating margins. The flagship "Medieval Dungeon" room generates the highest gross revenue, but its <strong>profit margin is 15% lower</strong> than the company average.`,
+  vocab:["operating margins","gross revenue","cost-driver analysis","profitability metrics"],
+  opts:[
+    {t:"Conduct a granular cost-driver analysis. Identify that excessive reset time and prop breakage are actively eroding the gross margin.", pts:3, fb:"Outstanding analysis. Identifying specific operational inefficiencies allows management to fix the root cause of the margin erosion."},
+    {t:"Recommend raising the ticket price for the 'Medieval Dungeon' to bring its profit margin in line with the company average.", pts:2, fb:"Partially effective. Raising prices might help revenue, but it completely ignores the underlying operational inefficiencies driving up costs."},
+    {t:"Suggest closing the room entirely, as it is dragging down the company's overall average profitability metrics.", pts:1, fb:"Drastic and premature. The room generates high revenue; optimizing its operating costs is vastly preferable to losing that income stream entirely."},
+    {t:"Do nothing. High absolute revenue is significantly more important than percentage margins in the competitive entertainment sector.", pts:-1, fb:"Fundamentally flawed. High revenue with poor margins destroys long-term profitability. Margin percentage is a critical corporate health metric."}
+  ],
+  next:"d9"
+},
+d9:{
+  label:"Decision 9: Depreciation Methods",
+  scene:`<em>Discussion 2: Why is granular cost-driver analysis superior to blanket price increases when addressing margin erosion?</em><br><br>You evaluate an £80,000 animatronic dragon asset. It draws crowds now but will likely look outdated in 3 years. You must select a <strong>depreciation method</strong>.`,
+  vocab:["depreciation","double-declining balance","straight-line","useful life"],
+  opts:[
+    {t:"Apply a double-declining balance depreciation method to match the higher expense with the asset's early revenue generation.", pts:3, fb:"Excellent financial matching. Accelerated depreciation accurately reflects the asset's rapid loss of novelty and economic value over time."},
+    {t:"Use standard straight-line depreciation over 5 years to keep annual expenses predictable for the internal management accounts.", pts:2, fb:"Acceptable, but it mismatches expenses with actual revenue generation. The asset generates far more value early on, which straight-line ignores."},
+    {t:"Expense the entire £80,000 in year one to aggressively minimize the company's current corporation tax liability.", pts:1, fb:"Non-compliant. A significant tangible asset with a multi-year useful life must be capitalized and systematically depreciated, not expensed immediately."},
+    {t:"Do not depreciate the asset at all, arguing that it is a unique 'art piece' that retains its value indefinitely.", pts:-1, fb:"Incorrect accounting treatment. Entertainment technology depreciates rapidly due to heavy wear and obsolescence. It is not an appreciating artwork."}
+  ],
+  next:"d10"
+},
+d10:{
+  label:"Decision 10: Dynamic Pricing",
+  scene:`The CEO proposes a <strong>dynamic pricing model</strong>: raising weekend prices by 30% and dropping Tuesday prices by 20% to maximize yield across the week.`,
+  vocab:["dynamic pricing","yield management","price elasticity model","break-even point"],
+  opts:[
+    {t:"Build a price elasticity model using historical booking data to forecast the exact revenue impact of these proposed changes.", pts:3, fb:"Highly professional approach. Modeling price elasticity using historical data removes guesswork and provides a solid quantitative basis for pricing decisions."},
+    {t:"Implement the changes as a pilot program in one location only, monitoring financial performance closely before a full rollout.", pts:2, fb:"A sensible operational approach. Piloting limits risk exposure, though it lacks the predictive power of a comprehensive financial data model."},
+    {t:"Advise against it, stating that customers prefer flat pricing and this complex strategy will damage the brand's reputation.", pts:1, fb:"Unsubstantiated opinion. Financial advice must be based on rigorous data analysis, not personal assumptions about customer sentiment."},
+    {t:"Approve the CEO's proposal immediately without analysis, as increasing weekend prices automatically guarantees higher overall revenue.", pts:-1, fb:"Dangerous assumption. If the 30% increase causes a massive drop in weekend demand (high elasticity), overall revenue will actually fall."}
+  ],
+  next:"e2"
+},
+e2:{
+  label:"EMERGENCY 2: Aggressive Competitor",
+  isEmergency:true,
+  scene:`<strong>CRITICAL ALERT:</strong> A well-funded corporate competitor suddenly opens nearby, offering 50% off all bookings. Your advance bookings instantly plummet by 40% in 48 hours.`,
+  vocab:["market share","liquidity","cash depletion","retention"],
+  opts:[
+    {t:"Immediately re-forecast cash flow for a low-revenue quarter, freeze non-essential CAPEX, and launch targeted retention offers.", pts:2, fb:"Excellent crisis response. Prioritizing liquidity through CAPEX freezes while targeting customer retention is the correct strategic survival maneuver."},
+    {t:"Match their 50% discount immediately across all your rooms to ensure you absolutely do not lose local market share.", pts:1, fb:"A risky race to the bottom. Slashing prices by 50% without analyzing your break-even point could easily cause severe operational losses."},
+    {t:"Ignore the competitor, assuming your superior room quality will naturally maintain your premium customer base without intervention.", pts:0, isGameOver:true, fb:"<strong>GAME OVER.</strong> Ignoring a massive structural market shift leads to rapid cash depletion. Within three months, revenue drops below operating costs, forcing the closure of your flagship location."}
+  ],
+  next:"d11"
+},
+d11:{
+  label:"Decision 11: M&A Balance Sheet Analysis",
+  scene:`Enigma Forge is considering acquiring a smaller rival. Reviewing their balance sheet, you spot a disproportionately large "Intangible Assets" entry and dangerously high short-term debt.`,
+  vocab:["M&A (Mergers and Acquisitions)","Intangible Assets","quick ratio","solvency"],
+  opts:[
+    {t:"Request a detailed breakdown of the intangibles and calculate the quick ratio to accurately assess their immediate liquidity risk.", pts:3, fb:"Astute analysis. Questioning opaque intangible assets while assessing immediate solvency via the quick ratio is absolutely crucial in M&A."},
+    {t:"Flag the high short-term debt to the CEO, recommending you negotiate a significantly lower purchase price based on this risk.", pts:2, fb:"Good commercial awareness. Leveraging debt for negotiation is smart, but failing to concurrently investigate the intangibles leaves a major blind spot."},
+    {t:"Focus only on their EBITDA margin, as operational profitability is vastly more important than balance sheet structure during acquisitions.", pts:1, fb:"A critical error. Strong EBITDA means nothing if high short-term debt and poor liquidity force the acquired company into sudden insolvency."},
+    {t:"Assume the 'Intangible Assets' logically represent their strong brand value and treat it as solid justification for the acquisition.", pts:-1, fb:"Highly naive. Intangibles often contain capitalized operational costs or goodwill that hold no actual market value. They must be aggressively scrutinized."}
+  ],
+  next:"d12"
+},
+d12:{
+  label:"Decision 12: Board Presentation",
+  scene:`Year-end board meeting. You must summarize the company's financial health. Revenue is up 12% overall, but the net profit margin has shrunk by 2% due to inflation.`,
+  vocab:["executive summary","top-line growth","margin compression","inflationary pressures"],
+  opts:[
+    {t:"Present a synthesized report showing that while top-line growth is strong, inflationary cost pressures require stricter operational controls next year.", pts:3, fb:"Exceptional executive summary. You accurately synthesize the data, expertly highlighting the vital tension between revenue growth and margin compression."},
+    {t:"Focus the presentation entirely on the impressive 12% revenue growth to ensure the board remains confident in the executive team.", pts:2, fb:"Unbalanced reporting. Highlighting top-line growth while actively ignoring margin compression prevents the board from fulfilling its fiduciary oversight role."},
+    {t:"Present a dense, 50-page spreadsheet of all financial transactions without providing a clear executive summary or strategic narrative.", pts:1, fb:"Poor communication. The board needs strategic insights derived from financial data, not uninterpreted raw transaction logs to dig through themselves."},
+    {t:"Argue that the 2% margin shrinkage is completely irrelevant because the company now commands a dominant share of the local market.", pts:-1, fb:"Fundamentally incorrect. Market share growth that heavily degrades profitability is unsustainable in the long run. Margins are never irrelevant."}
+  ],
+  next:"final"
+}
+};
+
+/* ── FISHER-YATES SHUFFLE ── */
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/* ── PROGRESS DOTS ── */
+function buildDots(id){
+  const stageMap={d1:0,d2:1,d3:2,d4:3,d5:4,d6:5,e1:6,d7:7,d8:8,d9:9,d10:10,e2:11,d11:12,d12:13};
+  const cur = stageMap[id] ?? 14;
+  const el = document.getElementById('dots');
+  el.innerHTML='';
+  el.setAttribute('aria-label','Step '+Math.min(cur+1,14)+' of 14');
+  for(let i=0;i<14;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i<cur?' done':i===cur?(N[id]?.isEmergency?' emg':' active'):'');
+    el.appendChild(d);
+  }
+}
+
+/* ── RATING SCHEME ── */
+function rate(opt,node){
+  if(opt.isGameOver) return {cls:'rf', label:'Game over', tag:'Fatal'};
+  if(opt.pts===3)  return {cls:'r3', label:'Excellent', tag:'+3'};
+  if(opt.pts===2)  return {cls:'r2', label:node.isEmergency?'Best response':'Good', tag:'+2'};
+  if(opt.pts===1)  return {cls:'r1', label:'Weak', tag:'+1'};
+  return {cls:'r0', label:'Poor', tag:'\u22121'};
+}
+function setScore(delta){
+  S.score+=delta;
+  const el=document.getElementById('score');
+  el.textContent=S.score+' pts';
+  el.classList.toggle('neg',S.score<0);
+}
+
+/* ── SHOW NODE ── */
+function show(id){
+  curId=id;
+  const node=N[id];
+  S.answered=false;
+  document.getElementById('fb').className='fbox';
+  const nb=document.getElementById('nxt');
+  nb.className='nxt'; nb.onclick=null;
+  buildDots(id);
+  document.getElementById('lbl').textContent=node.label;
+
+  let html='';
+  if(node.isEmergency) html+=`<div class="emg-alert"><span aria-hidden="true">&#9888;</span> Emergency \u2014 critical decision required.</div>`;
+  if(node.vocab) html+=`<div class="vocab-row">Key vocabulary: ${node.vocab.map(v=>`<span class="vpill">${v}</span>`).join('')}</div>`;
+  document.getElementById('scene').innerHTML=html+node.scene;
+
+  curShuffled = shuffle(node.opts.slice());   // copy: never mutate the source data
+
+  const el=document.getElementById('opts');
+  el.innerHTML='';
+  curShuffled.forEach((opt,i)=>{
+    const r=rate(opt,node);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='opt-btn';
+    btn.dataset.rating=r.cls;
+    const txt=document.createElement('span'); txt.textContent=opt.t;
+    const tag=document.createElement('span'); tag.className='ptag '+r.cls; tag.textContent=r.tag;
+    btn.append(txt,tag);
+    btn.addEventListener('click',()=>pick(i,btn));
+    el.appendChild(btn);
+  });
+}
+
+/* ── PICK ── */
+function pick(di, btn){
+  if(S.answered || btn.disabled) return;
+  const node=N[curId];
+  const opt=curShuffled[di];
+  const r=rate(opt,node);
+  const btns=[...document.querySelectorAll('.opt-btn')];
+  const fb=document.getElementById('fb');
+  const nb=document.getElementById('nxt');
+  const badge=`<span class="fb-rate">${r.label}${opt.isGameOver?'':' \u00b7 '+r.tag}</span><br>`;
+
+  /* Penalty option: score -1, lock that option, let the player try again */
+  if(!node.isEmergency && opt.pts===-1){
+    setScore(-1);
+    S.tally.r0++;
+    btn.disabled=true;
+    btn.classList.add(r.cls,'picked');
+    btn.querySelector('.ptag').classList.add('show');
+    fb.className='fbox fb-r0 show';
+    fb.innerHTML=badge+opt.fb+"<br><br><strong>Score \u22121 point. Please choose another option.</strong>";
+    return;
+  }
+
+  S.answered=true;
+  if(!opt.isGameOver) setScore(opt.pts);
+  S.tally[r.cls]++;
+
+  /* Reveal the colour ranking of every option so learners can compare */
+  btns.forEach(b=>{
+    b.disabled=true;
+    b.classList.add(b.dataset.rating);
+    b.querySelector('.ptag').classList.add('show');
+    if(b===btn || b.classList.contains('picked')) b.classList.add('picked');
+    else b.classList.add('dim');
+  });
+
+  fb.className='fbox fb-'+r.cls+' show';
+  fb.innerHTML=badge+opt.fb;
+  if(window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    fb.scrollIntoView({block:'nearest',behavior:'smooth'});
+
+  nb.className='nxt show';
+  if(opt.isGameOver){
+    nb.textContent='See Final Score'; nb.onclick=()=>showFinal(true);
+  } else if(node.next==='final'){
+    nb.textContent='See Final Score'; nb.onclick=()=>showFinal(false);
+  } else if(N[node.next] && N[node.next].isEmergency){
+    nb.textContent='Continue to Emergency \u2192'; nb.onclick=()=>show(node.next);
+  } else {
+    nb.textContent='Next \u2192'; nb.onclick=()=>show(node.next);
+  }
+  nb.focus({preventScroll:true});
+}
+
+/* ── FINAL ── */
+function showFinal(gameOver){
+  const s=S.score, max=S.maxScore, pct=Math.max(0, Math.min(100, Math.round(s/max*100)));
+  let grade;
+  if(gameOver)      grade="Analysis Terminated Early.";
+  else if(s>=36)    grade="CFO-Level Financial Acumen.";
+  else if(s>=28)    grade="Strong Management Accountant.";
+  else if(s>=20)    grade="Developing Financial Analyst.";
+  else              grade="Significant Financial Review Required.";
+
+  const barColor = gameOver ? 'var(--rf-bd)' : pct>=90 ? 'var(--r3-bd)' : pct>=70 ? '#84B64A' : pct>=50 ? 'var(--r1-bd)' : 'var(--rf-bd)';
+
+  const discussion = " Discussion Question 3: How can financial analysts balance rapid expansion with strict cost controls in entertainment?";
+  const summary = gameOver
+    ? "A critical decision during a crisis ended the simulation early. In a volatile entertainment market, one poor call under pressure can threaten a company's survival. Replay to see how the stronger responses protect liquidity and keep the business running." + discussion
+    : "You navigated complex financial data, balancing growth with operational constraints in a volatile entertainment market. Whether evaluating CAPEX, re-forecasting EBITDA, or assessing acquisition targets, your analytical rigor directly influenced corporate survival." + discussion;
+
+  const labels={r3:'Excellent',r2:'Good',r1:'Weak',r0:'Poor',rf:'Fatal'};
+  const tally=Object.keys(labels).filter(k=>S.tally[k]>0)
+    .map(k=>`<span class="tchip ${k}">${labels[k]} \u00d7 ${S.tally[k]}</span>`).join('');
+
+  document.getElementById('gc').innerHTML=`
+    <div class="fin">
+      <div class="fin-lbl">Performance Review \u2014 Enigma Forge Ltd.</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:4px">Your final score</div>
+      <div class="fin-num">${s}</div>
+      <div class="fin-max">out of ${max} points</div>
+      <div class="bar-bg"><div class="bar-fill" id="bfill" style="background:${barColor}"></div></div>
+      <div class="tally" aria-label="Answer breakdown">${tally}</div>
+      <div class="fin-grade">${grade}</div>
+      <div class="fin-text">${summary}</div>
+      <div class="vfooter">Key Concepts Conquered:
+        ${["CAPEX","EBITDA","price elasticity","WIP valuation","liquidity management","variance analysis","CAC & LTV","M&A due diligence"].map(v=>`<span class="vpill">${v}</span>`).join('')}
+      </div>
+      <button class="replay" type="button" onclick="restartGame()">Restart Simulation</button>
+    </div>`;
+  setTimeout(()=>{const b=document.getElementById('bfill');if(b)b.style.width=pct+'%';},120);
+}
+
+function restartGame(){
+  // showFinal() replaced the card contents, so rebuild the game card before rendering
+  document.getElementById('gc').innerHTML=GAME_HTML;
+  S.score=0; S.answered=false; S.tally={r3:0,r2:0,r1:0,r0:0,rf:0};
+  show('d1');
+  window.scrollTo({top:0});
+}
+
+document.getElementById('start').addEventListener('click',()=>{
+  document.getElementById('intro').hidden=true;
+  document.getElementById('gc').hidden=false;
+  window.scrollTo({top:0});
+  show('d1');
+});
+</script>
+</body>
+</html>

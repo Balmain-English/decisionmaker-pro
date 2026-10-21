@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Hypno-Nurse Chronicles: A B1/B2 English Decision Game</title>
+  <style>
+    :root {
+      --bg-color: #f0fdf4;
+      --card-bg: #ffffff;
+      --text-color: #0f172a;
+      --border-color: #cbd5e1;
+      --primary-color: #0d9488;
+      --primary-hover: #0f766e;
+      
+      /* Rating Colors */
+      --color-excellent: #15803d;
+      --bg-excellent: #f0fdf4;
+
+      --color-good: #1d4ed8;
+      --bg-good: #eff6ff;
+
+      --color-average: #b45309;
+      --bg-average: #fffbeb;
+
+      --color-bad: #b91c1c;
+      --bg-bad: #fef2f2;
+
+      --color-emergency: #991b1b;
+      --bg-emergency: #450a0a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+
+    .game-container {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      max-width: 800px;
+      width: 100%;
+      padding: 32px;
+      box-sizing: border-box;
+      border: 1px solid var(--border-color);
+    }
+
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+
+    .progress-title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .score-tracker {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      background-color: #ccfbf1;
+      padding: 6px 14px;
+      border-radius: 20px;
+    }
+
+    .day-badge {
+      display: inline-block;
+      background-color: #0284c7;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .emergency-badge {
+      background-color: #dc2626 !important;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.6; }
+      100% { opacity: 1; }
+    }
+
+    .story-text {
+      font-size: 1.05rem;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .prompt-text {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: #0f172a;
+    }
+
+    .choices-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .choice-btn {
+      background-color: #ffffff;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 14px 18px;
+      font-size: 0.98rem;
+      color: var(--text-color);
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      line-height: 1.45;
+    }
+
+    .choice-btn:hover {
+      border-color: var(--primary-color);
+      background-color: #f0fdf4;
+      transform: translateY(-1px);
+    }
+
+    .feedback-box {
+      padding: 16px;
+      border-radius: 8px;
+      font-size: 0.98rem;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      border-left: 6px solid;
+    }
+
+    .feedback-box.excellent {
+      background-color: var(--bg-excellent);
+      color: var(--color-excellent);
+      border-color: var(--color-excellent);
+    }
+
+    .feedback-box.good {
+      background-color: var(--bg-good);
+      color: var(--color-good);
+      border-color: var(--color-good);
+    }
+
+    .feedback-box.average {
+      background-color: var(--bg-average);
+      color: var(--color-average);
+      border-color: var(--color-average);
+    }
+
+    .feedback-box.bad {
+      background-color: var(--bg-bad);
+      color: var(--color-bad);
+      border-color: var(--color-bad);
+    }
+
+    .feedback-box.game-over {
+      background-color: #fef2f2;
+      color: #991b1b;
+      border-color: #dc2626;
+      font-weight: 600;
+    }
+
+    .discussion-box {
+      background-color: #f8fafc;
+      border: 1px solid var(--border-color);
+      padding: 14px 18px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .action-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      font-weight: 700;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+
+    .action-btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .action-btn.danger {
+      background-color: #dc2626;
+    }
+    .action-btn.danger:hover {
+      background-color: #b91c1c;
+    }
+
+    .intro-list {
+      background-color: #f8fafc;
+      border-left: 4px solid var(--primary-color);
+      padding: 16px 20px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .intro-list ul {
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+    }
+
+    .debrief-card {
+      background-color: #f8fafc;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .band-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    
+    <!-- LANDING PAGE -->
+    <div id="landing-page">
+      <h1 style="margin-top:0; color:#0f766e;">The Hypno-Nurse Chronicles 🌀</h1>
+      <h3 style="margin-top:-10px; color:#64748b; font-weight: normal;">A Professional Communication Simulation (B1/B2 English)</h3>
+      
+      <p class="story-text">
+        Welcome to St. Jude’s Medical Centre! You are <strong>Nurse Alex</strong>, a highly skilled specialized nurse in <strong>Hypno-analgesia & Surgical Hypnosis</strong>. Your job is to prepare patients for minor surgeries and painful procedures using hypnotic trance and suggestion instead of (or alongside) heavy chemical anaesthesia.
+      </p>
+      <p class="story-text">
+        Over the course of <strong>one busy week</strong>, you will face 12 routine and delicate professional scenarios, plus <strong>2 unexpected Emergency Situations</strong>. Read carefully! Every response seems plausible, but subtle differences will test your communication, empathy, and clinical judgment.
+      </p>
+
+      <div class="intro-list">
+        <strong>Game Rules & Scoring System:</strong>
+        <ul>
+          <li><strong>12 Standard Scenarios:</strong> Choose the most effective, professional response.</li>
+          <li>🟩 <strong>Excellent (+3 pts):</strong> Ideal combination of empathy, clarity, and patient safety.</li>
+          <li>🟦 <strong>Good (+2 pts):</strong> Professional and clear, though slightly rigid or missing therapeutic warmth.</li>
+          <li>🟧 <strong>Average (+1 pt):</strong> Technically safe, but passive or mildly dismissive.</li>
+          <li>🟥 <strong>Bad (-1 pt):</strong> Counterproductive, clumsy, or unprofessional. Costs 1 point and requires a retry!</li>
+          <li>🚨 <strong>2 Emergency Situations:</strong> High-risk clinical events! Excellent (+2 pts), Good (+1 pt), Average (0 pts), or a critical error leading to <strong>GAME OVER</strong>!</li>
+          <li><strong>Maximum Score:</strong> 40 Points (12 × 3 + 2 × 2).</li>
+        </ul>
+      </div>
+
+      <button class="action-btn" onclick="startGame()">Start Your Workweek →</button>
+    </div>
+
+    <!-- GAMEPLAY PAGE -->
+    <div id="gameplay-page" style="display: none;">
+      <div class="header-bar">
+        <div>
+          <span id="day-badge" class="day-badge">Monday Morning</span>
+          <div id="progress" class="progress-title">Scenario 1 of 14</div>
+        </div>
+        <div id="score" class="score-tracker">Score: 0 / 40</div>
+      </div>
+
+      <div id="story" class="story-text">Loading...</div>
+      <div id="feedback" class="feedback-box" style="display: none;"></div>
+      <div id="discussion" class="discussion-box" style="display: none;"></div>
+      <div id="prompt" class="prompt-text"></div>
+      <div id="choices" class="choices-grid"></div>
+      <button id="action-btn" class="action-btn" style="display: none;">Continue →</button>
+    </div>
+
+    <!-- DEBRIEFING PAGE -->
+    <div id="debrief-page" style="display: none;">
+      <h2 style="margin-top:0;">Weekly Performance Debriefing</h2>
+      <div id="debrief-content"></div>
+      <button class="action-btn" onclick="startGame()">Start a New Shift (Replay) ↺</button>
+    </div>
+
+  </div>
+
+  <script>
+    const scenarios = [
+      {
+        id: 1,
+        day: "Monday Morning",
+        title: "Scenario 1: The Skeptical Sceptic",
+        isEmergency: false,
+        text: "Your first patient on Monday is Mr. Harrison, scheduled for a mole excision. He sits stiffly in your hypnosis cabinet, crosses his arms, and snorts: 'Hypnosis? My doctor sent me here, but I think this is total pseudoscience! Are you going to make me cluck like a chicken?'",
+        prompt: "How do you respond to his skepticism?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Smile calmly and say: 'I completely understand your doubts, Mr. Harrison. Clinical hypnosis is simply a focused state of relaxation that helps block pain perception, and you stay in complete control the whole time.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Perfect balance! You validated his feelings while offering a simple, reassuring explanation of clinical hypnosis without over-complicating it.",
+            discussion: "Communication Note: Acknowledging skepticism directly builds trust faster than arguing or giving generic brochures."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Reassure him gently: 'Stage tricks give hypnosis a bad reputation, but in a hospital, we use standardized neurological focus techniques to modulate pain signals alongside local anaesthetics.'",
+            feedback: "🟦 GOOD (+2 pts): Accurate and professional, though using words like 'neurological focus techniques' can sound a bit distant to an anxious patient.",
+            discussion: "Language Refinement: Clinical terminology is accurate, but simpler conversational terms help lower patient anxiety."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Offer him an informational leaflet: 'It's normal to be skeptical. Why don't you read this short pamphlet on hypno-analgesia while I set up the equipment?'",
+            feedback: "🟧 AVERAGE (+1 pt): Safe and informative, but handing off a leaflet avoids direct verbal connection when the patient needs personal reassurance.",
+            discussion: "Patient Interaction: Printed material is useful, but direct conversation is key to establishing rapport."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Say firmly: 'I assure you this is evidence-based medicine. If you aren't willing to participate, we will have to reschedule your excision for another date.'",
+            feedback: "🟥 BAD (-1 pt): Too rigid and defensive! Giving an ultimatum damages patient trust and increases resistance.",
+            discussion: "De-escalation: Avoid presenting medical options as 'take it or leave it' choices when addressing patient anxiety."
+          }
+        ]
+      },
+      {
+        id: 2,
+        day: "Monday Afternoon",
+        title: "Scenario 2: Establishing the Safe Place",
+        isEmergency: false,
+        text: "You are guiding Mrs. Gable into a light hypnotic trance before her dental surgery. You ask her to imagine her 'safe, calming place.' She whispers nervously: 'I don't know... nature freaks me out, and beaches make me feel sunburnt!'",
+        prompt: "How do you guide her to choose an effective hypnotic safe place?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Say softly: 'That is perfectly fine. A safe place can be anywhere you feel relaxed—a quiet library, your favourite armchair, or sitting indoors listening to rain. What place feels cozy to you?'",
+            feedback: "🟩 EXCELLENT (+3 pts): Excellent flexibility! Offering relatable indoor alternatives gives her clear options while keeping her in control.",
+            discussion: "Hypnotic Technique: Permissive suggestions allow patients to tailor imagery to their comfort level."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Say calmly: 'No problem at all. We can utilize a sensory-neutral indoor environment, like a comfortable reading room or a quiet art gallery, to achieve deep physical relaxation.'",
+            feedback: "🟦 GOOD (+2 pts): Effective redirection, though phrasing it as a 'sensory-neutral indoor environment' sounds slightly clinical.",
+            discussion: "Tone Balance: Clinical terms work well, but warm imagery creates stronger relaxation."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Suggest an abstract idea: 'Let's keep it simple then—close your eyes and imagine resting in a warm, peaceful room with soft lighting and no clutter.'",
+            feedback: "🟧 AVERAGE (+1 pt): Functional, but generating a generic blank room can feel sterile rather than genuinely relaxing.",
+            discussion: "Visualization: Specific personal memories usually evoke stronger calm than abstract generic settings."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Encourage her to push through: 'Try to focus on a shaded beach under a big umbrella where you won't burn, as ocean sounds are scientifically optimal for hypnosis.'",
+            feedback: "🟥 BAD (-1 pt): Unhelpful! Pushing a setting she explicitly disliked forces her to dwell on her anxieties.",
+            discussion: "Active Listening: Never insist on a suggestion after the patient expresses discomfort with it."
+          }
+        ]
+      },
+      {
+        id: 3,
+        day: "Tuesday Morning",
+        title: "Scenario 3: The Pendulum Request",
+        isEmergency: false,
+        text: "A new patient, Mr. Vance, walks into your cabinet holding a brass pendulum on a chain. He places it on your desk and says: 'I saw on television that you need to swing this in front of my eyes to put me into a deep trance right now!'",
+        prompt: "How do you handle his pop-culture expectation?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Smile warmly and say: 'TV shows love pendulums! In real medical practice, though, we rely on calm breathing and vocal guidance because they work much better for procedural pain relief.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Friendly, clear, and educational! You validated his reference without making him feel silly.",
+            discussion: "Diplomacy: Reframing popular myths with warmth helps set clear clinical expectations."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Explain professionally: 'While visual fixation devices like pendulums were historically common, modern clinical protocols prioritize verbal hypnotic induction to establish pain control.'",
+            feedback: "🟦 GOOD (+2 pts): Accurate historical context, though slightly formal in tone.",
+            discussion: "Professional Tone: Balanced technical explanations work well for analytical patients."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Set the object aside: 'We won't need that today, Mr. Vance. Let's put it away and focus on getting you comfortable in the chair for our session.'",
+            feedback: "🟧 AVERAGE (+1 pt): Polite and direct, but misses an opportunity to explain how medical hypnosis actually functions.",
+            discussion: "Patient Education: Briefly explaining the method builds confidence in the procedure."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Offer a compromise: 'We can swing it for thirty seconds if it helps you focus, but then we must switch to proper clinical breathing methods.'",
+            feedback: "🟥 BAD (-1 pt): Ineffective! Indulging theatrical props reinforces misconceptions and distracts from proper clinical care.",
+            discussion: "Boundaries: Maintain professional standards rather than adopting theatrical tactics."
+          }
+        ]
+      },
+      {
+        id: 4,
+        day: "Tuesday Afternoon",
+        title: "EMERGENCY 1: The Sudden Respiratory Distress",
+        isEmergency: true,
+        text: "🚨 EMERGENCY SITUATION 🚨<br>During a pre-anaesthesia hypnosis session for a minor biopsy, your patient, Clara (who has severe asthma), suddenly begins wheezing heavily. Her lips turn pale, she clutches her chest, and she struggles to breathe while drifting deeper into a panicked state.",
+        prompt: "What is your immediate, critical action?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 2,
+            text: "Immediately pause hypnosis, speak in a firm, grounding voice to wake her, assist her with her emergency inhaler, call for support, and assess her oxygen saturation.",
+            feedback: "🟩 EXCELLENT (+2 pts): EMERGENCY RESOLVED! Immediate physical medical intervention restored her airway safely.",
+            discussion: "Emergency Protocol: Airway and physiological stability always take precedence over psychological states."
+          },
+          {
+            type: "good",
+            pts: 1,
+            text: "Stop the session, bring her out of trance, sit her upright to open her chest, hand her the inhaler, and summon medical help immediately.",
+            feedback: "🟦 GOOD (+1 pt): EMERGENCY RESOLVED! Safe, direct physical care that properly prioritized her physical distress.",
+            discussion: "Clinical Action: Positioning and immediate bronchodilator delivery are vital for acute asthma."
+          },
+          {
+            type: "average",
+            pts: 0,
+            text: "Attempt to guide her into a calm breathing pattern: 'Focus on my voice, slow down your breathing, and picture your airways expanding fully.'",
+            feedback: "🟧 AVERAGE (0 pts): HIGH RISK! While calm breathing helps anxiety, acute severe asthma requires immediate physical medication, not just vocal coaching.",
+            discussion: "Clinical Warning: Vocal guidance alone cannot relieve severe physical bronchospasm."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Deepen the hypnotic trance rapidly by suggesting: 'You are floating in clean, crisp air on a mountain peak where breathing is effortless.'",
+            feedback: "🚨 GAME OVER! Hypnosis cannot cure acute physical bronchospasm! Delaying medical intervention led to severe hypoxia.",
+            discussion: "Critical Failure: Never use hypnotic suggestion to manage acute, life-threatening airway emergencies."
+          }
+        ]
+      },
+      {
+        id: 5,
+        day: "Wednesday Morning",
+        title: "Scenario 4: Interrupted Trance",
+        isEmergency: false,
+        text: "You are mid-session with a sensitive patient, preparing her for an endoscopy. Suddenly, a noisy hospital technician bursts into your cabinet without knocking, shouting: 'Hey Alex! Did you take the extra blood pressure cuffs?' The patient jumps and snaps out of her hypnotic focus.",
+        prompt: "How do you manage this sudden disruption?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Address the colleague firmly but quietly: 'I am in a clinical session; please step outside.' Then turn softly to the patient: 'You are completely safe. Let's use that interruption to help you settle even deeper into relaxation.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Outstanding recovery! You set professional boundaries with your colleague while seamlessly re-anchoring the patient.",
+            discussion: "Hypnotic Reframing: Integrating unexpected noise into the trance prevents patient panic."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Tell the colleague calmly: 'Please wait outside, I am with a patient.' Then turn to the patient and state: 'Everything is fine. Take a deep breath and let's resume our focused breathing exercise.'",
+            feedback: "🟦 GOOD (+2 pts): Clear and professional, though guided re-induction could be smoother.",
+            discussion: "Boundary Setting: Professional firmness protects patient focus during clinical procedures."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Quickly point to the cabinet shelf to answer the technician so he leaves fast, then apologize to the patient and try restarting the relaxation script.",
+            feedback: "🟧 AVERAGE (+1 pt): Resolves the disruption quickly, but answering the technician breaks your focus on the patient.",
+            discussion: "Priority: Patient care should take immediate priority over administrative interruptions."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Apologize profusely to the patient: 'I am so sorry, that was incredibly unprofessional! Let's wait a few minutes until you stop shaking before we try again.'",
+            feedback: "🟥 BAD (-1 pt): Clumsy! Magnifying the mistake increases the patient's stress instead of restoring calm.",
+            discussion: "Communication: Downplay disruptions calmly rather than validating panic."
+          }
+        ]
+      },
+      {
+        id: 6,
+        day: "Wednesday Afternoon",
+        title: "Scenario 5: The Surly Surgeon",
+        isEmergency: false,
+        text: "Dr. Stone, an old-school surgeon, enters your cabinet before a joint procedure. He sneers: 'Nurse, stop talking magic words to this patient. We don't have time for this relaxation stuff today; I have three surgeries lined up!'",
+        prompt: "How do you maintain professional boundaries with the surgeon?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Maintain a calm posture and say: 'Dr. Stone, this short preparation lowers the patient's heart rate and reduces procedural anxiety, which makes the operation go smoother. We will be ready in two minutes.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Perfect assertive communication! Explaining the surgical benefits keeps the discussion professional.",
+            discussion: "Interprofessional Skills: Highlighting clinical value resolves friction better than arguing protocol."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Respond steady and clear: 'Dr. Stone, hypno-analgesia is part of the approved pre-operative care plan for this patient. We are wrapping up now and will stay on schedule.'",
+            feedback: "🟦 GOOD (+2 pts): Firm and professional, though mentioning specific patient benefits can be even more persuasive.",
+            discussion: "Workplace Dynamics: Citing care plans asserts your role effectively."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Speed up your process rapidly: 'Understood, Doctor. I'll finish up the trance induction right now so you can start immediately.'",
+            feedback: "🟧 AVERAGE (+1 pt): Keeps the schedule moving, but rushing care to appease a colleague compromises your service quality.",
+            discussion: "Professional Autonomy: Stand firm on patient care quality even under time pressure."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Inform him dryly: 'If you interrupt my session, I will report this delay to the Chief of Surgery as non-compliance with integrative care protocols.'",
+            feedback: "🟥 BAD (-1 pt): Threatening formal complaints creates immediate hostility in front of the patient.",
+            discussion: "Conflict Resolution: Avoid threatening escalations during active patient care."
+          }
+        ]
+      },
+      {
+        id: 7,
+        day: "Thursday Morning",
+        title: "Scenario 6: The Chatty Companion",
+        isEmergency: false,
+        text: "A 19-year-old anxious patient, Leo, comes in for pre-op hypnosis. His overprotective mother insists on sitting right next to his chair, interrupting your induction every 30 seconds by saying: 'Leo, honey, are you hypnotic yet? Are your eyes heavy?'",
+        prompt: "How do you manage the intrusive relative?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Address the mother warmly: 'Mrs. Davis, your support is wonderful, but Leo needs quiet to focus on my voice. Could I ask you to hold his hand silently, or wait in the comfortable seating area nearby?'",
+            feedback: "🟩 EXCELLENT (+3 pts): Tactful diplomacy! Redirecting her into a constructive, quiet role protects the session while respecting her care.",
+            discussion: "Family Management: Giving eager family members a passive task reduces unwanted interruptions."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Say politely: 'Mrs. Davis, for hypnotic suggestions to work effectively, we require a silent environment. Please hold all questions until the end of the induction.'",
+            feedback: "🟦 GOOD (+2 pts): Clear, professional boundary, though offering a gentle alternative option is warmer.",
+            discussion: "Communication: Direct requests for silence are effective when delivered politely."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Incorporate her into the script: 'As you hear your mother's voice, let it remind you of home, and sink deeper into relaxation...'",
+            feedback: "🟧 AVERAGE (+1 pt): Creative reframing, but it allows frequent interruptions to continue throughout the induction.",
+            discussion: "Session Control: Reframing works once, but clear structure is needed for repeated distractions."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Ask her to leave: 'Mrs. Davis, your constant questions are resetting his progress. Please step out to the waiting room until we finish.'",
+            feedback: "🟥 BAD (-1 pt): Blunt and critical! Framing her behavior as 'resetting progress' makes her defensive and anxious.",
+            discussion: "Tactful Phrasing: Request cooperation without blaming the family member."
+          }
+        ]
+      },
+      {
+        id: 8,
+        day: "Thursday Afternoon",
+        title: "Scenario 7: Spontaneous Abreaction",
+        isEmergency: false,
+        text: "While relaxing in a hypnotic trance, a patient suddenly starts crying intensely, trembling, and reliving a bad childhood memory unrelated to the surgery.",
+        prompt: "How do you handle this emotional abreaction professionally?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Use a calm grounding technique: 'You are completely safe here with Nurse Alex in the clinic today. Take a deep breath, let that distant memory fade, and feel the solid chair supporting you right now.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Excellent clinical care! Grounding the patient in the present safe space helps resolve abreactions smoothly.",
+            discussion: "Clinical Terminology: Grounding techniques re-orient distressed patients to present safety."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Gently count him out of the trance: 'I am going to count from 1 to 5, and you will wake up feeling alert, safe, and back in the room. 1... 2... 3...'",
+            feedback: "🟦 GOOD (+2 pts): Safe and structured exit, though grounding within trance can preserve calm prior to waking.",
+            discussion: "Patient Safety: Safely emerging a patient from a distress state is always an acceptable choice."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Offer immediate reassurance: 'It's alright, let it all out. Cry as much as you need to, and we will wait until you feel ready to continue the medical procedure.'",
+            feedback: "🟧 AVERAGE (+1 pt): Empathetic, but allowing uncontrolled emotional processing during a surgical pre-op can increase distress.",
+            discussion: "Role Scope: Support emotional safety without launching into unplanned therapy sessions."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Investigate the memory: 'Tell me what is happening in that memory so we can understand why your mind brought it up during our session.'",
+            feedback: "🟥 BAD (-1 pt): Beyond professional scope! Exploring psychological trauma requires specialized therapy, not pre-op care.",
+            discussion: "Scope of Practice: Avoid analyzing deep trauma outside appropriate clinical settings."
+          }
+        ]
+      },
+      {
+        id: 9,
+        day: "Thursday Evening",
+        title: "EMERGENCY 2: Local Anaesthetic Toxicity",
+        isEmergency: true,
+        text: "🚨 EMERGENCY SITUATION 🚨<br>During a combined local anaesthetic + hypno-analgesia procedure, your patient suddenly complains of a metallic taste in her mouth, ringing in her ears (tinnitus), and begins twitching rhythmically. Her blood pressure spikes dramatically.",
+        prompt: "What is your immediate clinical judgment?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 2,
+            text: "Recognize LAST (Local Anaesthetic Systemic Toxicity), stop local anaesthetic administration, call for emergency help/intralipid therapy, and prepare airway management.",
+            feedback: "🟩 EXCELLENT (+2 pts): EMERGENCY RESOLVED! Immediate identification of LAST saved the patient's life.",
+            discussion: "Clinical Knowledge: Tinnitus, metallic taste, and twitching are classic early signs of local toxicity."
+          },
+          {
+            type: "good",
+            pts: 1,
+            text: "Recognize acute drug toxicity, immediately summon the attending physician, stop the injection, and bring emergency resuscitation equipment to the bedside.",
+            feedback: "🟦 GOOD (+1 pt): EMERGENCY RESOLVED! Rapid recognition of a medical crisis and immediate call for help.",
+            discussion: "Emergency Response: Prompt emergency escalation prevents rapid clinical decline."
+          },
+          {
+            type: "average",
+            pts: 0,
+            text: "Pause the procedure, administer high-flow oxygen, place the patient in a recumbent position, and monitor vital signs closely to see if symptoms stabilize.",
+            feedback: "🟧 AVERAGE (0 pts): HIGH RISK! Supportive care helps, but delaying formal LAST treatment protocols can lead to seizures and cardiac arrest.",
+            discussion: "Clinical Caution: Suspected LAST requires immediate active intervention, not just observation."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Assume this is a hyperventilation reaction to hypnotic induction and instruct her to focus on deep, rhythmic breathing to settle her nervous system.",
+            feedback: "🚨 GAME OVER! Confusing systemic drug toxicity with anxiety led to severe grand mal seizures and cardiac arrest.",
+            discussion: "Critical Failure: Never attribute physical toxic symptoms to psychological factors."
+          }
+        ]
+      },
+      {
+        id: 10,
+        day: "Friday Morning",
+        title: "Scenario 8: Language Barrier & Metaphor",
+        isEmergency: false,
+        text: "Your patient, Mr. Rossi, speaks limited English (B1 level). You need to explain the concept of 'glove anaesthesia' (a hypnosis technique where the patient's hand becomes numb, as if wearing a heavy leather glove).",
+        prompt: "How do you explain this concept clearly to a non-native speaker?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Use clear language with simple gestures: 'Imagine dipping your hand into cold ice water. Your hand feels cold, heavy, and numb—like wearing a thick glove. Then we move that numb feeling to your arm.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Fantastic clarity! Universal physical metaphors like ice water transcend language barriers naturally.",
+            discussion: "Language Accessibility: Physical sensory examples are easy to understand across language levels."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Demonstrate visually: Hold up an actual thick glove, put it on, and explain simply: 'Your hand will feel covered and protected like this, so you don't feel the sharp pain.'",
+            feedback: "🟦 GOOD (+2 pts): Clear visual aid, though combining visuals with sensory suggestion builds deeper hypnotic response.",
+            discussion: "Visual Communication: Demonstration is a strong tool for non-native speakers."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Explain the mechanism carefully: 'We are using suggestion to create peripheral somatic analgesia, making your brain ignore nerve sensation in your hand.'",
+            feedback: "🟧 AVERAGE (+1 pt): Accurate description, but medical terms like 'somatic analgesia' can confuse B1 speakers.",
+            discussion: "Vocabulary Choice: Avoid jargon when communicating with language learners."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Speak slowly and loudly: 'YOU... WILL... FEEL... NO... PAIN... LIKE... YOUR... HAND... IS... IN... A... HEAVY... GLOVE!'",
+            feedback: "🟥 BAD (-1 pt): Ineffective! Raising your voice and speaking unnaturally does not improve comprehension.",
+            discussion: "Communication Etiquette: Speak at normal volume using simple, well-structured sentences."
+          }
+        ]
+      },
+      {
+        id: 11,
+        day: "Friday Midday",
+        title: "Scenario 9: The Confidentiality Dilemma",
+        isEmergency: false,
+        text: "After a successful session, a local journalist catches you in the clinic hallway. She asks: 'Is it true that famous local politician Senator Vance was treated for severe surgical anxiety in your hypnosis cabinet today?'",
+        prompt: "How do you handle the journalist's query?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "State professionally: 'Under patient privacy laws, I cannot confirm or deny information about any patient at our facility. Please contact our communications team for official statements.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Flawless compliance! Standard professional language protects patient privacy completely.",
+            discussion: "Legal Standards: 'Neither confirm nor deny' protects confidentiality while redirecting media appropriately."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Respond firmly: 'Patient records are strictly confidential. I cannot discuss any individuals treated here today. Have a good afternoon.'",
+            feedback: "🟦 GOOD (+2 pts): Solid boundary, though adding a referral to press relations provides extra protection.",
+            discussion: "Privacy Protocols: Direct refusal to discuss patient care is legally sound."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Deflect casually: 'We see many people every day, but I don't pay attention to who is famous and who isn't. You'd have to ask hospital administration.'",
+            feedback: "🟧 AVERAGE (+1 pt): Avoids leaking data, but conversational deflections can sound informal or uncertain.",
+            discussion: "Professional Style: Use formal compliance language when dealing with press inquiries."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Off-the-record comment: 'Look, I can't name names, but hypno-analgesia works wonders even for high-profile public figures with severe needle phobias!'",
+            feedback: "🟥 BAD (-1 pt): Ethical breach! Hinting at details still compromises patient confidentiality.",
+            discussion: "Ethics: 'Off the record' statements can easily leak and violate privacy regulations."
+          }
+        ]
+      },
+      {
+        id: 12,
+        day: "Friday Afternoon",
+        title: "Scenario 10: Pain Scale Evaluation",
+        isEmergency: false,
+        text: "A patient completes a minor dermatological procedure under hypno-analgesia. You need to assess her pain level for the post-op medical report using standard medical phrasing.",
+        prompt: "How do you conduct this evaluation effectively?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Ask precisely: 'On a scale from 0 to 10, where 0 is no pain at all and 10 is the worst pain imaginable, how would you rate your discomfort during the procedure?'",
+            feedback: "🟩 EXCELLENT (+3 pts): Standard clinical perfection! Clear numeric anchors ensure accurate medical documentation.",
+            discussion: "Clinical Tools: Standardized pain scales provide objective data for medical records."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Inquire clearly: 'How would you describe the pain you felt during the procedure—mild, moderate, or severe—and did you feel adequately comfortable?'",
+            feedback: "🟦 GOOD (+2 pts): Useful qualitative assessment, though numerical ratings offer better standard charting data.",
+            discussion: "Documentation: Qualitative descriptions add detail, but numbers standardize medical charts."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Ask leadingly: 'The hypnosis worked pretty well to keep you comfortable, right? Would you say the pain was negligible?'",
+            feedback: "🟧 AVERAGE (+1 pt): Leading questions can bias patient feedback and produce inaccurate charts.",
+            discussion: "Assessment Bias: Frame evaluation questions neutrally to gather accurate data."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Chart without asking: Record '0/10 Pain' on the chart because the patient remained still and quiet throughout the procedure.",
+            feedback: "🟥 BAD (-1 pt): Falsification! Visual calm does not guarantee absence of pain; direct self-reporting is required.",
+            discussion: "Medical Ethics: Never assume subjective symptoms without asking the patient directly."
+          }
+        ]
+      },
+      {
+        id: 13,
+        day: "Friday Late Afternoon",
+        title: "Scenario 11: Team Debriefing",
+        isEmergency: false,
+        text: "The weekly nursing debrief meeting takes place. The Chief Nurse asks you: 'Alex, how can we better integrate hypnotic pre-medication into the general hospital workflow next month?'",
+        prompt: "How do you present your recommendation professionally?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Propose constructively: 'I suggest offering a short 15-minute briefing for surgical nurses on basic relaxation cues, alongside a simple pre-op patient screening checklist.'",
+            feedback: "🟩 EXCELLENT (+3 pts): Actionable and structured proposal! You offered practical solutions that respect staff time.",
+            discussion: "Workplace Skills: Presenting concise, actionable steps demonstrates strong leadership."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Recommend clearly: 'We should distribute informative pamphlets to incoming surgical patients so they can request hypno-analgesia before their appointment.'",
+            feedback: "🟦 GOOD (+2 pts): Good patient-facing strategy, though internal staff training adds higher systemic value.",
+            discussion: "Process Improvement: Combining patient education with staff training achieves best outcomes."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Suggest casually: 'We could ask doctors to mention it to anxious patients during consultations, if they have extra time to discuss options.'",
+            feedback: "🟧 AVERAGE (+1 pt): Reasonable idea, but relying on busy doctors' 'extra time' rarely changes clinical habits.",
+            discussion: "Strategic Planning: Ground proposals in reliable, standardized workflows."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Complain openly: 'First, we need other staff to stop treating hypnosis like a hobby and take our department seriously.'",
+            feedback: "🟥 BAD (-1 pt): Unconstructive! Turning strategic meetings into personal grievances damages professional standing.",
+            discussion: "Meeting Etiquette: Focus on practical solutions rather than airing frustrations."
+          }
+        ]
+      },
+      {
+        id: 14,
+        day: "Friday Shift End",
+        title: "Scenario 12: End-of-Week Self-Care",
+        isEmergency: false,
+        text: "It is 6:00 PM on Friday. You have treated 15 patients this week using intense focus, active listening, and hypnotic vocal guidance. You feel mentally exhausted.",
+        prompt: "How do you manage professional fatigue and transition out of work?",
+        choices: [
+          {
+            type: "excellent",
+            pts: 3,
+            text: "Take 5 minutes for a quiet self-debrief and grounding exercise to reset your focus, turn off your work phone, and leave hospital duties behind for the weekend.",
+            feedback: "🟩 EXCELLENT (+3 pts): Essential self-care! Setting clear professional boundaries prevents long-term burnout.",
+            discussion: "Occupational Health: Mental decompression routines are key for sustainable healthcare careers."
+          },
+          {
+            type: "good",
+            pts: 2,
+            text: "Complete all charting neatly, organize your workspace for Monday morning, and head home to enjoy a relaxing, work-free weekend.",
+            feedback: "🟦 GOOD (+2 pts): Great organizational closure, setting up a clear transition out of the workweek.",
+            discussion: "Work-Life Balance: Structured sign-offs help clear your mind for rest."
+          },
+          {
+            type: "average",
+            pts: 1,
+            text: "Review challenging cases from the week on your commute home to figure out how to improve hypnotic induction scripts for next week.",
+            feedback: "🟧 AVERAGE (+1 pt): Well-intentioned reflection, but brooding on work during off-hours leads to exhaustion.",
+            discussion: "Stress Management: Separate constructive professional reflection from personal downtime."
+          },
+          {
+            type: "bad",
+            pts: -1,
+            text: "Send quick check-in texts from your personal phone to a few anxious patients you treated earlier to see how they are recovering.",
+            feedback: "🟥 BAD (-1 pt): Boundary violation! Contacting patients from personal devices compromises privacy and disrupts personal recovery time.",
+            discussion: "Professional Distance: Maintain communication within official hospital channels and hours."
+          }
+        ]
+      }
+    ];
+
+    let currentScenarioIdx = 0;
+    let score = 0;
+    let shuffledChoices = [];
+
+    // Fisher-Yates Array Shuffle
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startGame() {
+      document.getElementById('landing-page').style.display = 'none';
+      document.getElementById('debrief-page').style.display = 'none';
+      document.getElementById('gameplay-page').style.display = 'block';
+      currentScenarioIdx = 0;
+      score = 0;
+      updateScoreDisplay();
+      resetScenarioChoices();
+      renderCurrentScenario();
+    }
+
+    function selectOption(shuffledIdx) {
+      const scenario = scenarios[currentScenarioIdx];
+      const choice = shuffledChoices[shuffledIdx];
+
+      const feedbackEl = document.getElementById('feedback');
+      const discussionEl = document.getElementById('discussion');
+      const actionBtn = document.getElementById('action-btn');
+      const choicesEl = document.getElementById('choices');
+
+      // Emergency Game Over Check
+      if (scenario.isEmergency && choice.pts === -1) {
+        feedbackEl.className = 'feedback-box game-over';
+        feedbackEl.innerHTML = `<strong>🚨 CLINICAL GAME OVER!</strong><br>${choice.feedback}`;
+        feedbackEl.style.display = 'block';
+
+        discussionEl.innerHTML = `<strong>Emergency Analysis:</strong><br>${choice.discussion}`;
+        discussionEl.style.display = 'block';
+
+        choicesEl.style.display = 'none';
+
+        actionBtn.innerText = "Restart Shift (Try Game Again) ↺";
+        actionBtn.className = "action-btn danger";
+        actionBtn.onclick = () => startGame();
+        actionBtn.style.display = 'block';
+        return;
+      }
+
+      // Standard & Non-Fatal Emergency Choices
+      feedbackEl.className = `feedback-box ${choice.type}`;
+      feedbackEl.innerText = choice.feedback;
+      feedbackEl.style.display = 'block';
+
+      if (choice.type === 'bad') {
+        score = Math.max(0, score + choice.pts);
+        updateScoreDisplay();
+        
+        discussionEl.innerHTML = `<strong>Reflection Question:</strong><br>${choice.discussion}`;
+        discussionEl.style.display = 'block';
+
+        actionBtn.innerText = "Retry Scenario ↺";
+        actionBtn.className = "action-btn";
+        actionBtn.onclick = resetScenarioChoices;
+        actionBtn.style.display = 'block';
+
+        choicesEl.style.display = 'none';
+      } else {
+        score += choice.pts;
+        updateScoreDisplay();
+
+        discussionEl.innerHTML = `<strong>Reflection / Discussion Point:</strong><br>${choice.discussion}`;
+        discussionEl.style.display = 'block';
+
+        choicesEl.style.display = 'none';
+
+        if (currentScenarioIdx < scenarios.length - 1) {
+          actionBtn.innerText = "Advance to Next Scenario →";
+          actionBtn.className = "action-btn";
+          actionBtn.onclick = advanceScenario;
+        } else {
+          actionBtn.innerText = "View Weekly Performance Debriefing ★";
+          actionBtn.className = "action-btn";
+          actionBtn.onclick = renderDebriefing;
+        }
+        actionBtn.style.display = 'block';
+      }
+    }
+
+    function resetScenarioChoices() {
+      document.getElementById('feedback').style.display = 'none';
+      document.getElementById('discussion').style.display = 'none';
+      document.getElementById('action-btn').style.display = 'none';
+      document.getElementById('choices').style.display = 'flex';
+    }
+
+    function advanceScenario() {
+      currentScenarioIdx++;
+      resetScenarioChoices();
+      renderCurrentScenario();
+    }
+
+    function updateScoreDisplay() {
+      document.getElementById('score').innerText = `Score: ${score} / 40`;
+    }
+
+    function renderCurrentScenario() {
+      const scenario = scenarios[currentScenarioIdx];
+      
+      const dayBadge = document.getElementById('day-badge');
+      dayBadge.innerText = scenario.day;
+      if (scenario.isEmergency) {
+        dayBadge.classList.add('emergency-badge');
+      } else {
+        dayBadge.classList.remove('emergency-badge');
+      }
+
+      document.getElementById('progress').innerText = `Scenario ${scenario.id} of 14`;
+      document.getElementById('story').innerHTML = scenario.text;
+      document.getElementById('prompt').innerText = scenario.prompt;
+
+      const choicesEl = document.getElementById('choices');
+      choicesEl.innerHTML = '';
+
+      shuffledChoices = shuffleArray(scenario.choices);
+
+      shuffledChoices.forEach((choice, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerText = `${String.fromCharCode(65 + idx)}. ${choice.text}`;
+        btn.onclick = () => selectOption(idx);
+        choicesEl.appendChild(btn);
+      });
+    }
+
+    function renderDebriefing() {
+      document.getElementById('gameplay-page').style.display = 'none';
+      document.getElementById('debrief-page').style.display = 'block';
+
+      let bandTitle = "";
+      let bandColor = "";
+      let bandFeedback = "";
+
+      if (score >= 34) {
+        bandTitle = "Band 4: Master Hypno-Nurse Specialist (34–40 Points)";
+        bandColor = "var(--color-excellent)";
+        bandFeedback = "<strong>Outstanding Performance!</strong> You demonstrated exceptional B1/B2 English fluency, empathetic clinical rapport, swift emergency judgment, and master-level diplomatic boundaries. Patients and hospital staff trust you completely!";
+      } else if (score >= 24) {
+        bandTitle = "Band 3: Proficient Clinical Practitioner (24–33 Points)";
+        bandColor = "var(--color-good)";
+        bandFeedback = "<strong>Great Work!</strong> You navigated the week safely and professionally. You handled patient anxiety and team communication well. To reach Band 4, focus on subtle phrasing improvements and permissive suggestions.";
+      } else if (score >= 14) {
+        bandTitle = "Band 2: Developing Hypno-Nurse (14–23 Points)";
+        bandColor = "var(--color-average)";
+        bandFeedback = "<strong>Satisfactory Progress.</strong> You survived the week without major incidents, but several communication choices were overly casual or passive. Replay to practice high-impact professional English vocabulary!";
+      } else {
+        bandTitle = "Band 1: Needs Clinical & Language Refinement (0–13 Points)";
+        bandColor = "var(--color-bad)";
+        bandFeedback = "<strong>Further Study Recommended.</strong> You struggled with diplomatic phrasing, patient rapport, or clinical emergency decision-making. Review the scenario feedback and replay to improve your medical English skill set.";
+      }
+
+      const debriefContent = document.getElementById('debrief-content');
+      debriefContent.innerHTML = `
+        <div class="debrief-card" style="border-color: ${bandColor}">
+          <div class="progress-title" style="margin-bottom:8px;">Total Score: ${score} / 40 Points</div>
+          <div class="band-title" style="color: ${bandColor}">${bandTitle}</div>
+          <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 0;">${bandFeedback}</p>
+        </div>
+
+        <div class="discussion-box">
+          <strong style="font-size: 1.05rem;">Class Room & Self-Reflection Questions:</strong>
+          <ol style="margin-top: 10px; padding-left: 20px; line-height: 1.6;">
+            <li>Which scenario required the most delicate English phrasing? Why?</li>
+            <li>How does communicating with an anxious medical patient differ from everyday casual conversations?</li>
+            <li>Which new B1/B2 medical terms or diplomatic phrases will you use in your future career?</li>
+          </ol>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welding Workshop: Production Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --grey: #2f3542;
+        --orange: #ff9f43;
+        --blue: #0984e3;
+        --green: #2ecc71;
+        --red: #d63031;
+        --bg: #f1f2f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--bg);
+        color: #333;
+        line-height: 1.5;
+    }
+
+    header {
+        background: var(--grey);
+        color: white;
+        padding: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 5px solid var(--orange);
+    }
+
+    .container { max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
+
+    .card {
+        background: white;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        display: none;
+    }
+    .card.active { display: block; }
+
+    h1 { font-family: 'Roboto Mono', monospace; text-transform: uppercase; font-size: 1.5rem; }
+    h2 { margin-bottom: 1rem; color: var(--grey); }
+    p { margin-bottom: 1.5rem; color: #57606f; }
+
+    .choices-grid { display: grid; gap: 1rem; margin: 2rem 0; }
+    .choice-btn {
+        background: white;
+        border: 2px solid #ced4da;
+        padding: 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        text-align: left;
+        transition: all 0.2s;
+    }
+    .choice-btn:hover:not(:disabled) { border-color: var(--blue); background-color: #f8faff; }
+    .choice-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .feedback {
+        padding: 1.5rem;
+        border-radius: 6px;
+        margin-top: 1.5rem;
+        display: none;
+    }
+    .fb-good { background: #dff9fb; border-left: 5px solid var(--green); }
+    .fb-bad { background: #ffeaa7; border-left: 5px solid var(--orange); }
+
+    .next-btn {
+        background: var(--grey);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 800;
+        display: none;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .emergency-badge {
+        background: var(--red);
+        color: white;
+        padding: 0.2rem 0.6rem;
+        font-size: 0.8rem;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 0.5rem;
+    }
+
+    .vpill {
+        display: inline-block;
+        background: #ced4da;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        margin: 2px;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Welding Workshop v1.0</h1>
+    <div>Score: <span id="scoreDisplay">0</span> / 30</div>
+</header>
+
+<div class="container">
+    <div class="card active" id="screen-start">
+        <h2>Shift Start</h2>
+        <p>Welcome to the fabrication floor. You are the Welding Workshop Manager. Your job is to keep production running smoothly while managing weld quality, equipment failures, and strict safety protocols.</p>
+        <p>Make 10 major decisions. High-point choices build your reputation. Watch out for <strong>emergencies</strong> where a wrong move ends the game!</p>
+        <button class="choice-btn" style="width: 100%; text-align: center;" onclick="startGame()">Ignite Torch →</button>
+    </div>
+
+    <div class="card" id="screen-game">
+        <div id="step-header"></div>
+        <h2 id="step-title"></h2>
+        <p id="step-desc"></p>
+        <div class="choices-grid" id="choices-container"></div>
+        <div class="feedback" id="feedback-box">
+            <strong id="points-label"></strong>
+            <p id="feedback-text" style="margin: 0.5rem 0 0 0;"></p>
+        </div>
+        <button class="next-btn" id="btn-next">Next Task →</button>
+    </div>
+
+    <div class="card" id="screen-final">
+        <h2>Shift Report</h2>
+        <div id="final-stats" style="font-size: 1.5rem; font-weight: 800; margin: 1rem 0;"></div>
+        <p id="final-msg"></p>
+        <div id="vocab-list" style="margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 1rem;">
+            <h3>Technical Terms Mastered:</h3>
+            <div id="vocab-container"></div>
+        </div>
+        <button class="choice-btn" style="width: 100%; text-align: center; margin-top: 2rem;" onclick="location.reload()">Start New Shift</button>
+    </div>
+</div>
+
+<script>
+const steps = {
+    s1: {
+        title: "The Porosity Problem",
+        desc: "The morning shift reports severe porosity (holes) in the critical structural I-beam welds. Production is delayed. What is your call?",
+        choices: [
+            { text: "Stop work, check the argon shielding gas flow, and clean the joints.", pts: 3, type: "good", fb: "Perfect. You found a blocked gas nozzle and saved the entire batch from failing inspection." },
+            { text: "Tell them to grind it out and re-weld it quickly.", pts: 2, type: "good", fb: "It fixes the immediate issue, but you didn't solve the root cause. It will likely happen again." },
+            { text: "Increase the welding current and hope it burns through the impurities.", pts: 1, type: "bad", fb: "Poor choice. The excessive heat warped the beam and didn't fix the porosity." },
+            { text: "Ship it as-is and hope the client's QA doesn't notice.", pts: -1, type: "bad", fb: "The client rejected the entire shipment. Your reputation is ruined. Choose again!" }
+        ],
+        next: "s2"
+    },
+    s2: {
+        title: "The Fume Hazard",
+        desc: "A welder is doing heavy flux-cored arc welding (FCAW) but hasn't positioned the local exhaust extractor arm over the weld pool.",
+        choices: [
+            { text: "Stop them and position the extractor arm correctly immediately.", pts: 3, type: "good", fb: "Excellent. Respiratory health is non-negotiable. You protected your worker." },
+            { text: "Give them a P100 respirator and let them continue.", pts: 2, type: "good", fb: "It protects the welder, but now the rest of the shop is filling with toxic fumes." },
+            { text: "Yell at them from the office window to follow the rules.", pts: 1, type: "bad", fb: "You addressed it, but your communication style destroys shop morale." },
+            { text: "Ignore it. Welding fumes are just part of the job.", pts: -1, type: "bad", fb: "Safety violation! You just failed an unannounced OSHA inspection. Try again!" }
+        ],
+        next: "s3"
+    },
+    s3: {
+        title: "The Equipment Choice",
+        desc: "You need a new TIG machine for precision aerospace parts. Do you buy the 'Premium Inverter' or the 'Budget Transformer'?",
+        choices: [
+            { text: "Premium Inverter: Expensive, but offers precise pulse controls and arc stability.", pts: 3, type: "good", path: "pathQuality", fb: "The smart play. High precision means zero defects on expensive aerospace materials." },
+            { text: "Budget Transformer: Cheap, durable, but lacks advanced digital controls.", pts: 3, type: "good", path: "pathBudget", fb: "You saved capital, but your welders will have to work twice as hard to maintain quality." },
+            { text: "Buy a used, heavily worn machine from a local scrapyard.", pts: 1, type: "bad", next: "e1", fb: "It barely strikes an arc. You're losing money on downtime now." },
+            { text: "Make two welders share a single machine to save space.", pts: -1, type: "bad", fb: "Production just ground to a halt. Completely inefficient. Try again!" }
+        ]
+    },
+    pathQuality: {
+        title: "Quality Path: The WPS Audit",
+        desc: "The Premium machine arrives. You need a new Welding Procedure Specification (WPS) to use it on client parts.",
+        choices: [
+            { text: "Hire a certified welding engineer to qualify the new procedures.", pts: 3, type: "good", fb: "Professional and compliant. The client is thrilled with your documentation." },
+            { text: "Let your best welder figure out the parameters via trial and error.", pts: 2, type: "good", fb: "They got it working, but you wasted expensive base materials during the 'trial' phase." },
+            { text: "Copy an old WPS and just cross out the machine name with a pen.", pts: 1, type: "bad", fb: "An auditor caught this. It's a major non-conformance." },
+            { text: "Forgo the WPS entirely and just start welding.", pts: -1, type: "bad", fb: "You are manufacturing uncertified aerospace parts. That's a massive liability. Try again!" }
+        ],
+        next: "e1"
+    },
+    pathBudget: {
+        title: "Budget Path: The Duty Cycle",
+        desc: "The Budget machine is overheating and shutting down because it has a low duty cycle.",
+        choices: [
+            { text: "Implement a strict work/rest rotation to respect the machine's duty cycle.", pts: 3, type: "good", fb: "Good management. You are working within the equipment's limitations safely." },
+            { text: "Demand the welder works faster to finish before it overheats.", pts: 2, type: "good", fb: "The welder is stressed and the weld bead looks rushed and sloppy." },
+            { text: "Point a heavy-duty shop fan directly at the power source.", pts: 1, type: "bad", fb: "It blew grinding dust directly into the machine's circuitry. It's broken now." },
+            { text: "Bypass the thermal overload switch so it never shuts down.", pts: -1, type: "bad", fb: "The machine literally caught on fire. Disastrous decision. Choose again!" }
+        ],
+        next: "e1"
+    },
+    e1: {
+        title: "EMERGENCY: The Acetylene Leak",
+        isEmergency: true,
+        desc: "You smell a distinct garlic-like odor near the oxy-fuel cutting station. Acetylene is leaking!",
+        choices: [
+            { text: "Evacuate the area, shut off the main cylinder valves, and ventilate without causing sparks.", pts: 0, type: "good", next: "s5", fb: "Textbook crisis management. You prevented a deadly explosion." },
+            { text: "Turn on a standard electric fan to blow the gas out the door.", pts: 0, type: "bad", gameOver: true, fb: "FATAL ERROR: The electric fan motor sparked and ignited the gas. Game Over." },
+            { text: "Open the blast doors wide and let the draft clear the gas naturally.", pts: 0, type: "good", next: "s5", fb: "Safe. The gas dissipated without incident, though production stopped for an hour." },
+            { text: "Light a striker tool to see where the leak is burning from.", pts: 0, type: "bad", gameOver: true, fb: "FATAL ERROR: You ignited the gas cylinder directly. Massive explosion. Game Over." }
+        ]
+    },
+    s5: {
+        title: "The Rushed Piping Spool",
+        desc: "A client desperately needs a stainless steel pipe spool by Monday morning.",
+        choices: [
+            { text: "Authorize weekend overtime and ensure the pipe is prepped with proper argon back-purging.", pts: 3, type: "good", fb: "Expensive, but the interior root weld is flawless. The client is a customer for life." },
+            { text: "Weld it yourself over the weekend to save on labor costs.", pts: 2, type: "good", fb: "You got it done, but you are exhausted and neglected your managerial duties on Monday." },
+            { text: "Skip the argon back-purge process to save 4 hours of setup time.", pts: 1, type: "bad", fb: "The inside of the weld oxidized entirely (sugaring). The pipe is ruined." },
+            { text: "Force the crew to work 16-hour shifts without extra breaks.", pts: -1, type: "bad", fb: "A fatigued welder made a critical error and got hurt. Total failure in leadership. Try again!" }
+        ],
+        next: "s6"
+    },
+    s6: {
+        title: "The NDT Failure",
+        desc: "Non-Destructive Testing (ultrasonic) shows 'lack of fusion' deep inside a heavy plate weld.",
+        choices: [
+            { text: "Gouge out the defect, prep the joint, and re-weld according to the repair WPS.", pts: 3, type: "good", fb: "Proper procedure. It costs time, but the structural integrity is fully restored." },
+            { text: "Argue with the NDT inspector that their ultrasound equipment is faulty.", pts: 2, type: "good", fb: "You stood up for your team, but a re-test confirmed the defect anyway. You wasted time." },
+            { text: "Just weld an extra heavy pass over the top to make it look stronger.", pts: 1, type: "bad", fb: "Cosmetics don't fix internal flaws. The joint failed under load testing." },
+            { text: "Bribe the inspector to pass the weld.", pts: -1, type: "bad", fb: "Criminal corruption. You've lost your business license. Choose an ethical path!" }
+        ],
+        next: "s7"
+    },
+    s7: {
+        title: "The Consumable Shortage",
+        desc: "You just ran out of low-hydrogen E7018 electrodes for a major structural contract.",
+        choices: [
+            { text: "Expedite an order from your trusted supplier and do joint prep work in the meantime.", pts: 3, type: "good", fb: "Great pivot. The team stayed productive and the correct wire arrived by noon." },
+            { text: "Send someone to a local hardware store to buy whatever welding rods they have.", pts: 2, type: "good", fb: "They found E7018, but it wasn't kept in a rod oven. Moisture compromised the welds." },
+            { text: "Use E6011 cellulosic electrodes instead without telling the structural engineer.", pts: 1, type: "bad", fb: "The welds cracked due to hydrogen embrittlement. Complete disaster." },
+            { text: "Tell the entire crew to go home for the week.", pts: -1, type: "bad", fb: "You missed the contract deadline by miles. Unacceptable management. Try again!" }
+        ],
+        next: "e2"
+    },
+    e2: {
+        title: "EMERGENCY: Confined Space",
+        isEmergency: true,
+        desc: "A welder needs to fix a baffle inside a large, deep steel storage tank.",
+        choices: [
+            { text: "Issue a confined space permit, test the air, and post a safety 'hole watch'.", pts: 0, type: "good", next: "s8", fb: "Flawless safety protocol. The repair was completed with zero risk." },
+            { text: "Send them in alone with just a standard welding mask.", pts: 0, type: "bad", gameOver: true, fb: "FAILED: Shielding gas displaced the oxygen. The welder suffocated. Game Over." },
+            { text: "Set up a continuous fume extractor and air monitor before they enter.", pts: 0, type: "good", next: "s8", fb: "Highly secure. You ensured breathable air throughout the entire operation." },
+            { text: "Tell them to just hold their breath while welding the bottom seam.", pts: 0, type: "bad", gameOver: true, fb: "FAILED: Asphyxiation is silent and deadly. Never compromise in confined spaces. Game Over." }
+        ]
+    },
+    s8: {
+        title: "The Heat Distortion",
+        desc: "A large stainless steel frame is warping significantly from the heat of the welding arcs.",
+        choices: [
+            { text: "Implement a staggered welding sequence and clamp it rigidly to a strongback.", pts: 3, type: "good", fb: "Excellent metallurgical understanding. The heat was distributed evenly; the frame is perfectly square." },
+            { text: "Heat the opposite side with an oxy-acetylene torch to bend it back.", pts: 2, type: "good", fb: "Flame-straightening works, but it altered the heat-affected zone (HAZ) properties slightly." },
+            { text: "Hit it with a sledgehammer while it's still glowing hot.", pts: 1, type: "bad", fb: "You straightened it, but induced massive stress fractures in the metal." },
+            { text: "Ignore it. The client can bend it into place during assembly.", pts: -1, type: "bad", fb: "The client couldn't assemble it and demanded a full refund. Choose a professional fix." }
+        ],
+        next: "s9"
+    },
+    s9: {
+        title: "The Cobot Investment",
+        desc: "You are considering buying a collaborative welding robot (cobot) for high-volume, repetitive parts.",
+        choices: [
+            { text: "Pitch it to management with an ROI plan and train your best welder to program it.", pts: 3, type: "good", fb: "Forward-thinking! The cobot handles the boring stuff while your experts handle complex joints." },
+            { text: "Introduce it slowly without explaining to the team why it's there.", pts: 2, type: "good", fb: "It works, but the welders are highly suspicious and morale is dropping." },
+            { text: "Buy it secretly using the maintenance budget.", pts: 1, type: "bad", fb: "You got caught misappropriating funds. The CFO is furious." },
+            { text: "Threaten the welders that the cobot is going to take all their jobs.", pts: -1, type: "bad", fb: "You caused a shop-floor walkout. Terrible leadership. Choose a collaborative path." }
+        ],
+        next: "s10"
+    },
+    s10: {
+        title: "The Master Welder Retiring",
+        desc: "Your most experienced fabricator is retiring in one month. They hold all the custom machine settings in their head.",
+        choices: [
+            { text: "Have them mentor the apprentices and formally document all their custom parameters.", pts: 3, type: "good", fb: "Legacy secured. Decades of knowledge are now permanent shop assets." },
+            { text: "Throw them a great retirement party, but don't bother capturing their knowledge.", pts: 2, type: "good", fb: "A nice gesture, but next week production slows down because nobody knows how to set up the aluminum welder." },
+            { text: "Beg them to stay and offer them your own salary.", pts: 1, type: "bad", fb: "Desperate and unprofessional. You need a transition plan, not a plea." },
+            { text: "Fire them immediately to show that no single person is irreplaceable.", pts: -1, type: "bad", fb: "Toxic and vindictive. Half your remaining staff just quit in protest. Try again!" }
+        ],
+        next: "final"
+    }
+};
+
+const BANDS = [
+    { min: 25, max: 30, label: "Master Welding Engineer", msg: "Flawless. You are a titan of fabrication. The workshop is efficient, safe, and producing top-tier welds." },
+    { min: 15, max: 24, label: "Senior Fabricator", msg: "Solid work. Production is moving, though you took some shortcuts that might cost you down the line." },
+    { min: 0, max: 14, label: "Tack Welder", msg: "You survived, but the shop is a mess. You need more training in metallurgy, safety, and leadership." }
+];
+
+const VOCAB = ["Porosity", "NDT (Non-Destructive Testing)", "WPS (Welding Procedure Specification)", "Duty Cycle", "Acetylene", "Back-purging", "Lack of Fusion", "Confined Space Permit", "Heat-Affected Zone (HAZ)", "Cobot"];
+
+let score = 0;
+let currentStepId = "s1";
+
+/**
+ * Fisher-Yates Shuffle
+ * Ensures true mathematical randomness for choice positioning.
+ */
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function startGame() {
+    showScreen("game");
+    renderStep();
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+}
+
+function updateScore() {
+    document.getElementById('scoreDisplay').innerText = score;
+}
+
+function renderStep() {
+    const data = steps[currentStepId];
+    const container = document.getElementById('choices-container');
+    const header = document.getElementById('step-header');
+    
+    header.innerHTML = data.isEmergency ? `<div class="emergency-badge">⚠️ EMERGENCY SITUATION</div>` : "";
+    document.getElementById('step-title').innerText = data.title;
+    document.getElementById('step-desc').innerText = data.desc;
+    
+    container.innerHTML = "";
+    document.getElementById('feedback-box').style.display = "none";
+    document.getElementById('btn-next').style.display = "none";
+
+    // Create a copy and shuffle it to maintain data integrity
+    const shuffledChoices = shuffleArray([...data.choices]);
+
+    shuffledChoices.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = "choice-btn";
+        btn.innerText = choice.text;
+        // Data integrity: the choice object contains its own pts, fb, and metadata
+        btn.onclick = () => handleChoice(choice, btn);
+        container.appendChild(btn);
+    });
+}
+
+function handleChoice(choice, btn) {
+    const fbBox = document.getElementById('feedback-box');
+    const label = document.getElementById('points-label');
+    const data = steps[currentStepId];
+
+    label.innerText = choice.pts >= 0 ? `+${choice.pts} Points` : `${choice.pts} Point`;
+    if (data.isEmergency) label.innerText = choice.type === "bad" ? "FAILED" : "GOOD CHOICE";
+    
+    document.getElementById('feedback-text').innerText = choice.fb;
+    fbBox.className = "feedback fb-" + (choice.type === "good" ? "good" : "bad");
+    fbBox.style.display = "block";
+
+    if (choice.gameOver) {
+        setTimeout(() => { alert(choice.fb); location.reload(); }, 3000);
+        return;
+    }
+
+    if (choice.pts === -1) {
+        score += choice.pts; updateScore();
+        btn.disabled = true; return;
+    }
+
+    score += choice.pts; updateScore();
+    document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+    const nextBtn = document.getElementById('btn-next');
+    nextBtn.style.display = "block";
+    nextBtn.onclick = () => {
+        currentStepId = choice.path || choice.next || steps[currentStepId].next;
+        if (currentStepId === "final") showFinal(); else renderStep();
+    };
+}
+
+function showFinal() {
+    showScreen("final");
+    document.getElementById('final-stats').innerText = `Score: ${score} / 30`;
+    const band = BANDS.find(b => score >= b.min && score <= b.max) || BANDS[BANDS.length-1];
+    document.getElementById('final-msg').innerHTML = `<strong>Rank: ${band.label}</strong><br>${band.msg}`;
+    
+    const vContainer = document.getElementById('vocab-container');
+    VOCAB.forEach(word => {
+        vContainer.innerHTML += `<span class="vpill">${word}</span>`;
+    });
+}
+</script>
+</body>
+</html>

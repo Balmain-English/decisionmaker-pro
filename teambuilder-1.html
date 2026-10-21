@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teambuilding Week: The Culture Boss</title>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0F172A;--surface:#1E293B;--primary:#6366F1;--accent:#F59E0B;
+  --text:#F1F5F9;--success:#10B981;--danger:#EF4444;--radius:16px;
+}
+body{font-family:'Lexend',sans-serif;background:var(--bg);color:var(--text);margin:0;padding:20px;display:flex;justify-content:center;}
+.container{width:100%;max-width:950px;}
+.card{background:var(--surface);padding:35px;border-radius:var(--radius);box-shadow:0 20px 25px -5px rgba(0,0,0,0.3);border:1px solid #334155;position:relative;}
+
+.stats-grid {display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px;}
+.stat-card {background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; text-align: center; border: 1px solid #475569;}
+.stat-val {display: block; font-size: 1.5rem; font-weight: 700; font-family: 'Space Mono', monospace;}
+.stat-label {font-size: 0.75rem; text-transform: uppercase; color: #94A3B8; letter-spacing: 1px;}
+
+.day-badge {background: var(--accent); color: #0F172A; padding: 6px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: 700; margin-bottom: 15px; display: inline-block;}
+h1 {font-size: 2.2rem; margin: 0 0 15px 0; color: var(--primary); text-shadow: 0 2px 4px rgba(0,0,0,0.2);}
+.scenario-text {font-size: 1.15rem; line-height: 1.6; color: #CBD5E1; margin-bottom: 30px; min-height: 80px;}
+
+.choice-list {display: grid; gap: 12px;}
+.choice-btn {
+    background: #334155; border: 1px solid #475569; color: white; padding: 18px; text-align: left;
+    border-radius: 12px; cursor: pointer; transition: 0.2s; font-size: 1rem; line-height: 1.4;
+    font-weight: 600; display: flex; justify-content: space-between; align-items: center;
+}
+.choice-btn:hover:not(:disabled) {background: var(--primary); border-color: white; transform: scale(1.01); box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);}
+.choice-btn:disabled {opacity: 0.4; cursor: not-allowed; transform: none; background: #1e293b; border-color: #334155;}
+.choice-cost {font-family: 'Space Mono', monospace; font-size: 0.9rem; padding: 4px 8px; border-radius: 6px; background: rgba(0,0,0,0.2); margin-left: 15px; white-space: nowrap;}
+.cost-free {color: var(--success);}
+.cost-expensive {color: var(--danger);}
+
+.feedback {margin-top: 25px; padding: 20px; border-radius: 12px; display: none; border-left: 5px solid var(--accent); background: rgba(245, 158, 11, 0.1); font-size: 1.05rem;}
+.next-btn {
+    background: var(--success); color: white; border: none; padding: 18px 30px; 
+    border-radius: 12px; cursor: pointer; font-weight: 700; margin-top: 20px; width: 100%;
+    font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; transition: 0.2s;
+}
+.next-btn:hover {opacity: 0.9; transform: translateY(-2px);}
+.hidden {display: none;}
+.glossary {margin-top: 40px; font-size: 0.85rem; color: #94A3B8; border-top: 1px solid #334155; padding-top: 20px; line-height: 1.5;}
+.glossary b {color: var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div id="intro-screen" class="card">
+        <h1>Welcome to Teambuilding Week!</h1>
+        <p>You have exactly <b>7 days</b> split into <b>14 critical shifts (Mornings & Afternoons)</b> to plan the company's big <b>Innovation Summit</b>! 🚀</p>
+        <p>Your goals are simple but challenging:</p>
+        <ul>
+            <li>Keep employee <b>Morale</b> high (happy workers work better!).</li>
+            <li>Do not run out of <b>Budget</b> (choices that cost more than your current budget will be locked!).</li>
+            <li>Get as many <b>Innovation</b> points as possible.</li>
+        </ul>
+        <p>⚠️ <b>Careful:</b> Making critical strategic errors, running over budget, or letting Morale drop too low will result in immediate termination by the CEO! Good luck, Boss!</p>
+        <button class="next-btn" onclick="startSim()">Let's Start Day 1 Morning!</button>
+    </div>
+
+    <div id="game-screen" class="card hidden">
+        <div class="stats-grid">
+            <div class="stat-card"><span class="stat-label">Time Progress</span><span id="stat-d" class="stat-val">1/14</span></div>
+            <div class="stat-card"><span class="stat-label">😃 Morale</span><span id="stat-m" class="stat-val">50</span></div>
+            <div class="stat-card"><span class="stat-label">💰 Budget</span><span id="stat-b" class="stat-val">$5,000</span></div>
+            <div class="stat-card"><span class="stat-label">💡 Innovation</span><span id="stat-i" class="stat-val">0</span></div>
+        </div>
+
+        <div id="day-container">
+            <span class="day-badge" id="day-badge">Day 1 - Morning</span>
+            <div class="scenario-text" id="scenario-text">Loading your task...</div>
+            <div class="choice-list" id="choice-list"></div>
+            
+            <div id="feedback-box" class="feedback">
+                <p id="feedback-text"></p>
+                <button class="next-btn" id="next-day-btn" onclick="nextDay()">Advance Shift</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="end-screen" class="card hidden">
+        <h1 id="end-title">Game Over</h1>
+        <p id="end-body"></p>
+        <button class="next-btn" onclick="location.reload()">Play Again 🔄</button>
+    </div>
+
+    <div class="glossary">
+        <p><b>Useful Words to Know:</b><br> 
+        <b>Burn Rate:</b> How fast you spend your money. | 
+        <b>Buy-in:</b> Getting people to agree with your plan and support you. | 
+        <b>Bandwidth:</b> The time, energy, and mental space people have to do work. | 
+        <b>Scalability:</b> The ability of a plan or system to grow bigger without breaking down.</p>
+    </div>
+</div>
+
+<script>
+const DECISIONS = [
+    {
+        timeLabel: "Day 1 - Morning: Venue Selection",
+        text: "You need to find a location for the summit. The CEO wants a fancy venue, but the CFO demands cost savings. What do you do?",
+        choices: [
+            {text: "Book a cool, modern hotel downtown.", cost: 2500, m: 5, b: -2500, i: 15, fb: "The team loves the beautiful rooms! However, your burn rate is now very high. You spent a lot of money!"},
+            {text: "Use the company cafeteria.", cost: 200, m: -15, b: -200, i: 2, fb: "Oh no! The employees feel cheap and sad. They think the bosses do not care about them."},
+            {text: "Rent a creative, shared co-working office.", cost: 1000, m: 10, b: -1000, i: 8, fb: "Great choice! It feels fresh and modern, but the price is fair. Everyone is happy."},
+            {text: "Host it entirely out in the public park without an event permit.", cost: 0, m: -5, b: 0, i: 5, fb: "It is unique, but rain clouds are forming, and security tells you that hosting corporate events here is illegal."}
+        ]
+    },
+    {
+        timeLabel: "Day 1 - Afternoon: Event Branding",
+        text: "The marketing design team needs a fast direction for the summit's visual style and promotional media assets.",
+        choices: [
+            {text: "Hire an external elite agency to develop a custom high-end brand kit.", cost: 1200, m: 10, b: -1200, i: 10, fb: "The visuals look gorgeous and high-end, instantly raising team buy-in and excitement!"},
+            {text: "Use standard stock templates and design them internally.", cost: 100, m: -5, b: -100, i: 0, fb: "It is highly cost-effective, but the results look a little corporate, basic, and generic."},
+            {text: "Launch an internal team-building logo competition with a small prize.", cost: 300, m: 15, b: -300, i: 5, fb: "Excellent choice! It rallies employee engagement, generating great energy around the project."},
+            {text: "Steal copyrighted artwork directly from a competitor's website.", cost: 0, m: 0, b: 0, i: 0, isGameOver: true, fb: "DISMISSAL BY CEO: 'Are you out of your mind? The competitor filed a cease-and-desist lawsuit within three hours! Your reckless behavior exposes us to massive legal risk. Pack your bags immediately.'"}
+        ]
+    },
+    {
+        timeLabel: "Day 2 - Morning: Guest Speaker",
+        text: "Who will deliver the keynote presentation speech at the event? You need someone interesting!",
+        choices: [
+            {text: "Hire a famous social media tech influencer.", cost: 2000, m: 15, b: -2000, i: 2, fb: "The staff loves taking selfies! But the speaker knows nothing about business or deep technology. Zero real innovation."},
+            {text: "Ask our own Chief Technology Officer (CTO) to speak.", cost: 0, m: 0, b: 0, i: 20, fb: "The speech is incredibly smart and costs nothing! However, the slides are complex and people feel sleepy."},
+            {text: "Invite a respected expert from the tech industry.", cost: 1000, m: 5, b: -1000, i: 10, fb: "Very professional choice. The speech is highly engaging and makes our company look stellar."},
+            {text: "Cancel the speech entirely to run a quiet self-study hour.", cost: 0, m: -15, b: 0, i: -10, fb: "The event schedule looks blank. Employees feel this is turning into a standard, boring administrative meeting."}
+        ]
+    },
+    {
+        timeLabel: "Day 2 - Afternoon: Catering Strategy",
+        text: "A summit needs quality refreshments. Food heavily impacts employee happiness during long sessions.",
+        choices: [
+            {text: "Book premium, healthy organic lunch boxes.", cost: 1200, m: 15, b: -1200, i: 0, fb: "The food is amazing and looks high-quality. You get a lot of positive employee buy-in!"},
+            {text: "Order cheap standard fast-food pizza options.", cost: 400, m: -5, b: -400, i: 0, fb: "People eat it, but heavy pizza makes everyone sluggish and sleepy in the afternoon. Energy levels drop."},
+            {text: "Partner with local trendy food trucks for a diverse courtyard setup.", cost: 800, m: 10, b: -800, i: 5, fb: "Great compromise! It feels contemporary and interactive, and it leaves the budget in good shape."},
+            {text: "Provide only tap water and raw crackers to cut costs completely.", cost: 50, m: -25, b: -50, i: -5, fb: "Morale takes an immediate, crushing blow. Employees openly complain that management is acting cheap."}
+        ]
+    },
+    {
+        timeLabel: "Day 3 - Morning: Workshop Tech Assets",
+        text: "The collaborative interactive workshops require software tools. How will you host the event workspace?",
+        choices: [
+            {text: "Purchase professional enterprise collaboration licenses.", cost: 800, m: 5, b: -800, i: 12, fb: "Everything works seamlessly. The platform features robust scalability and easy logins."},
+            {text: "Configure various free tools that require manual accounts.", cost: 0, m: -10, b: 0, i: 2, fb: "Saves money, but setting it up drains your team's bandwidth. They are getting frustrated by the bugs."},
+            {text: "Utilize traditional physical whiteboards and sticky notes.", cost: 150, m: 5, b: -150, i: -5, fb: "People enjoy the tactile teamwork approach, though it lacks high-tech innovation points."},
+            {text: "Order the software development team to pause client work and build a platform from scratch.", cost: 0, m: -20, b: 0, i: 10, fb: "The engineers hate this move. Client deadlines are slipping, and the internal tool is still highly unstable."}
+        ]
+    },
+    {
+        timeLabel: "Day 3 - Afternoon: Evening Entertainment",
+        text: "You need an optional social activity for the end of the summit day to celebrate team success.",
+        choices: [
+            {text: "Host a quiet, high-quality coffee and acoustic music lounge.", cost: 400, m: 10, b: -400, i: 2, fb: "A nice, relaxed evening. Everyone enjoys chatting and heads home on time to rest up."},
+            {text: "Hire an expensive live tech DJ and rent an open bar setup.", cost: 1500, m: 20, b: -1500, i: 0, fb: "The party is absolutely wild! However, your remaining budget takes a serious, painful hit."},
+            {text: "Organize a collaborative, team-based tech trivia tournament.", cost: 100, m: 5, b: -100, i: 10, fb: "Excellent value choice. Low cost, fun engagement, and aligns perfectly with the event theme."},
+            {text: "Force mandatory corporate strategy roleplay games until late at night.", cost: 0, m: -20, b: 0, i: -5, fb: "Employees look visibly drained. This isn't entertainment; it feels like forced unpaid overtime."}
+        ]
+    },
+    {
+        timeLabel: "Day 4 - Morning: EMERGENCY! Ransomware Attack",
+        text: "CRITICAL CRISIS: An employee accidentally opened a phishing email, and a ransomware screen flashes across the event servers! The presentation prototypes are locked down tightly. The event launch is at serious risk!",
+        choices: [
+            {text: "Authorize emergency funding for top cybersec specialists to scrub systems and restore backups.", cost: 1500, m: 5, b: -1500, i: 10, fb: "They work fast and clean out the virus in three hours! Data is safely recovered, but the budget takes a big hit."},
+            {text: "Force internal IT to stay online all day to rebuild data manually.", cost: 0, m: -20, b: 0, i: 5, fb: "They manage to piece it together, but they are completely exhausted. Internal IT morale plummets toward zero."},
+            {text: "Quietly pay the anonymous hackers their cryptocurrency demand using corporate financial data.", cost: 0, m: 0, b: 0, i: 0, isGameOver: true, fb: "TERMINATION BY CEO: 'You wired corporate cash to international criminals without consulting legal or engineering? The FBI is literally calling our office! Your judgment is a corporate liability. You are dismissed immediately.'"},
+            {text: "Ignore the warnings, wipe the hard drives completely, and proceed without any workshop data.", cost: 0, m: -15, b: 0, i: -15, fb: "The systems are clean now, but all custom innovation content built over the last weeks is completely gone."}
+        ]
+    },
+    {
+        timeLabel: "Day 4 - Afternoon: Planning Team Burnout",
+        text: "Following the recent intense work schedule, your core planning team looks completely exhausted.",
+        choices: [
+            {text: "Hire freelance virtual assistants to take over administrative work.", cost: 600, m: 15, b: -600, i: 0, fb: "Smart management. The immense stress stops. Your team now has the bandwidth to recharge."},
+            {text: "Distribute basic free energy drinks and tell them to push forward.", cost: 50, m: -15, b: -50, i: 2, fb: "A developer abruptly quits. Your remaining planning workforce is no longer sustainable or scalable."},
+            {text: "Temporarily pause non-essential daily tasks so they focus strictly on the summit.", cost: 0, m: 5, b: 0, i: -2, fb: "A balanced choice. The team feels a bit better, but other department workflows face slight delays."},
+            {text: "Extend working hours by adding an extra tracking meeting every night.", cost: 0, m: -25, b: 0, i: 0, fb: "Pure disaster. People are actively browsing recruitment websites during your update meetings."}
+        ]
+    },
+    {
+        timeLabel: "Day 5 - Morning: Swag & Attendee Gifts",
+        text: "What corporate promotional merchandise will you provide to guests and team members arriving at the event?",
+        choices: [
+            {text: "Distribute premium, durable leather notebooks with high-end pens.", cost: 700, m: 10, b: -700, i: 2, fb: "Excellent feedback. The staff feels highly valued, and the gifts look professional and sleek."},
+            {text: "Order cheap plastic corporate trinkets that carry the company logo.", cost: 200, m: -5, b: -200, i: -5, fb: "Most people toss them right into the trash bin. You spent budget on literal plastic garbage."},
+            {text: "Offer zero physical products; gift useful digital cloud storage allowances.", cost: 100, m: 0, b: -100, i: 10, fb: "The tech staff thinks this eco-friendly choice is very clever, though non-technical teams are slightly indifferent."},
+            {text: "Do not provide any merchandise or gifts whatsoever.", cost: 0, m: -10, b: 0, i: 0, fb: "Saves cash, but it makes the summit feel less like an exciting corporate event and more like a routine workday."}
+        ]
+    },
+    {
+        timeLabel: "Day 5 - Afternoon: Presentation App Breakdown",
+        text: "The dedicated smartphone app built for scheduling and audience polls crashes during its final test run.",
+        choices: [
+            {text: "Pay an external senior contractor a premium to debug and patch it tonight.", cost: 500, m: 0, b: -500, i: 12, fb: "The hotfix works flawlessly! But your available budget continues to slip away."},
+            {text: "Abandon the mobile application and print out all schedules on basic paper packages.", cost: 100, m: -5, b: -100, i: -10, fb: "It gets the basic job done, but moving from digital to physical paper heavily lowers your innovation score."},
+            {text: "Instruct everyone to manage schedules using their personal calendars.", cost: 0, m: -10, b: 0, i: -2, fb: "People find it confusing, and several workshop tracks are missing correct coordinates."},
+            {text: "Deploy a highly unstable, unverified community patch without testing it.", cost: 0, m: 0, b: 0, i: 0, isGameOver: true, fb: "FIRED BY THE CEO: 'The untested patch you pushed leaked our clients' internal phone numbers and emails to the public web store! Data security is non-negotiable. Step away from your desk right now.'"}
+        ]
+    },
+    {
+        timeLabel: "Day 6 - Morning: Press & PR Request",
+        text: "A prominent regional tech publisher asks for a feature interview regarding your upcoming Innovation Summit.",
+        choices: [
+            {text: "Dedicating hours to craft a beautiful, high-end media kit and statement.", cost: 200, m: 5, b: -200, i: 15, fb: "Excellent publicity! The resulting news article frames our company as a true market leader."},
+            {text: "Decline the press request to stay concentrated entirely on logistics updates.", cost: 0, m: 0, b: 0, i: 0, fb: "You remain safely on schedule, but nobody outside company walls hears about the cool event."},
+            {text: "Assign our newest summer intern to take the journalist interview unsupervised.", cost: 0, m: -5, b: 0, i: 5, fb: "The intern accidentally leaks internal operational metrics. The PR team has to sprint to fix the narrative."},
+            {text: "Pay for a massive, expensive front-page advertising push to force media buzz.", cost: 1500, m: 5, b: -1500, i: 2, fb: "The visibility is vast, but it burns up far too much capital for standard marketing outreach."}
+        ]
+    },
+    {
+        timeLabel: "Day 6 - Afternoon: Executive Visual Request",
+        text: "The CEO wants a massive ice sculpture of the company logo installed at the main registration entrance.",
+        choices: [
+            {text: "Approve the expense immediately and order the premium ice layout.", cost: 800, m: 2, b: -800, i: 0, fb: "The CEO smiles upon arrival, but your budget is now dangerously low. Ice sculptures are expensive!"},
+            {text: "Counter-propose an immersive, reusable digital 3D hologram logo display.", cost: 400, m: 10, b: -400, i: 15, fb: "Brilliant! The executive team is blown away by your tech vision. You build massive buy-in!"},
+            {text: "Politely decline the sculpture because budget limits cannot support it.", cost: 0, m: -5, b: 0, i: 0, fb: "Your budget stays protected, but the boss subtly sighs and thinks your creative imagination is limited."},
+            {text: "Buy a cheap plastic cooler and throw loose ice cubes on the lobby table.", cost: 50, m: -15, b: -50, i: -10, fb: "It looks incredibly unprofessional. The executive team thinks you are actively mocking their requests."}
+        ]
+    },
+    {
+        timeLabel: "Day 7 - Morning: Logistic Transport Crisis",
+        text: "The main shuttle fleet arranged to move attendees from the transit station to the venue breaks down.",
+        choices: [
+            {text: "Instantly reserve professional on-demand rideshare vehicles to fetch everyone.", cost: 1000, m: 15, b: -1000, i: 0, fb: "The arriving attendees feel pampered. However, your remaining budget takes a punishing hit."},
+            {text: "Send a message instructing all attendees to walk the 20 minutes to the site.", cost: 0, m: -20, b: 0, i: 0, fb: "A sudden rain shower hits! Everyone arrives soaking wet and incredibly frustrated. Morale takes a huge dive."},
+            {text: "Reframe the trek as a gamified outdoor 'Active Networking Walk' with mobile check-ins.", cost: 0, m: 10, b: 0, i: 8, fb: "Pure tactical genius! You turned a logistics failure into an innovative, high-energy team icebreaker."},
+            {text: "Delay the start of the entire summit by three hours until standard public transit arrives.", cost: 0, m: -15, b: 0, i: -5, fb: "The entire morning timeline is ruined. The keynote speaker has to cut their presentation short."}
+        ]
+    },
+    {
+        timeLabel: "Day 7 - Afternoon: EMERGENCY! Competitor Sabotage",
+        text: "CRITICAL CRISIS: Right as the final product reveal session begins, our primary market competitor launches an identical software solution online, catching everyone off guard! The crowd is murmuring and looking at their phones.",
+        choices: [
+            {text: "Pivot the final live demo layout instantly to showcase our unique security and scalability advantages.", cost: 0, m: 10, b: 0, i: 25, fb: "A masterclass in agile leadership! You completely won over the audience and proved our distinct value."},
+            {text: "Stay completely calm and execute the original presentation script exactly as prepared.", cost: 0, m: 5, b: 0, i: 5, fb: "The event concludes smoothly. You avoided erratic choices and completed the baseline project scope targets."},
+            {text: "Panic openly, stop the presentation, and cancel the final workshop tracks to hold emergency meetings.", cost: 0, m: -20, b: 0, i: -15, fb: "Abruptly quitting makes the enterprise look terrified and weak. The audience leaves with a highly negative impression."},
+            {text: "Use the main presentation stage to launch a furious, unscripted rant calling the competitor thieves.", cost: 0, m: 0, b: 0, i: 0, isGameOver: true, fb: "TERMINATION BY CEO: 'Your emotional meltdown on stage was captured on video and is currently trending on tech blogs! You humiliated our brand and destroyed our professional standing. You are terminated immediately.'"}
+        ]
+    }
+];
+
+let state = {
+    d: 1, // Current index placeholder for decisions tracking 1 through 14
+    m: 50,
+    b: 5000,
+    i: 0
+};
+let choiceLocked = false;
+
+// Robust Fisher-Yates Shuffle Algorithm for randomizing choice arrays cleanly
+function shuffleChoices(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startSim() {
+    document.getElementById('intro-screen').classList.add('hidden');
+    document.getElementById('game-screen').classList.remove('hidden');
+    state.d = 1;
+    state.m = 50;
+    state.b = 5000;
+    state.i = 0;
+    renderShift();
+}
+
+function renderShift() {
+    choiceLocked = false;
+    if (state.d > DECISIONS.length) {
+        endSim();
+        return;
+    }
+
+    const currentDecision = DECISIONS[state.d - 1];
+    document.getElementById('day-badge').innerText = currentDecision.timeLabel;
+    document.getElementById('scenario-text').innerText = currentDecision.text;
+    
+    const list = document.getElementById('choice-list');
+    list.innerHTML = '';
+    
+    // Process choices through Fisher-Yates shuffle engine to avoid position bias
+    const shuffled = shuffleChoices(currentDecision.choices);
+
+    shuffled.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        
+        let costLabel = c.cost === 0 ? "FREE" : `$${c.cost}`;
+        let costClass = c.cost === 0 ? "cost-free" : (c.cost >= 1200 ? "cost-expensive" : "");
+        
+        btn.innerHTML = `<span>${c.text}</span> <span class="choice-cost ${costClass}">${costLabel}</span>`;
+        
+        // Block choices that exceed available budget metrics
+        if (c.cost > state.b) {
+            btn.disabled = true;
+            btn.title = "Action exceeds your remaining budget resources!";
+        } else {
+            btn.onclick = () => handleChoice(c);
+        }
+        
+        list.appendChild(btn);
+    });
+
+    document.getElementById('feedback-box').style.display = 'none';
+    updateStats();
+}
+
+function handleChoice(c) {
+    if (choiceLocked) return;
+    choiceLocked = true;
+    
+    state.m += c.m;
+    state.b += c.b;
+    state.i += c.i;
+
+    if (state.m < 0) state.m = 0;
+    if (state.i < 0) state.i = 0;
+
+    const btns = document.querySelectorAll('.choice-btn');
+    btns.forEach(b => b.disabled = true);
+
+    document.getElementById('feedback-text').innerText = c.fb;
+    document.getElementById('feedback-box').style.display = 'block';
+
+    updateStats();
+
+    // Trigger instant evaluation checks
+    if (c.isGameOver) {
+        setTimeout(() => triggerGameOver(c.fb), 1200);
+    } else if (state.m <= 5) {
+        setTimeout(() => triggerGameOver("❌ GAME OVER: Team morale has hit rock bottom! Your planning committee signed an open petition refusing to cooperate under your leadership. They walked out, and the event collapsed."), 1200);
+    }
+}
+
+function updateStats() {
+    document.getElementById('stat-d').innerText = `${state.d}/${DECISIONS.length}`;
+    document.getElementById('stat-m').innerText = state.m;
+    
+    if(state.b < 0) {
+        document.getElementById('stat-b').innerText = `-$${Math.abs(state.b)}`;
+        document.getElementById('stat-b').style.color = "var(--danger)";
+    } else {
+        document.getElementById('stat-b').innerText = `$${state.b}`;
+        document.getElementById('stat-b').style.color = "var(--text)";
+    }
+    
+    document.getElementById('stat-i').innerText = state.i;
+}
+
+function nextDay() {
+    state.d++;
+    renderShift();
+}
+
+function triggerGameOver(msg) {
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    document.getElementById('end-title').innerText = "🛑 YOU ARE FIRED!";
+    document.getElementById('end-body').innerText = msg;
+}
+
+function endSim() {
+    document.getElementById('game-screen').classList.add('hidden');
+    document.getElementById('end-screen').classList.remove('hidden');
+    
+    let score = (state.m + state.i) / 2;
+    let rank, msg;
+
+    if (score > 60 && state.b >= 0) {
+        rank = "🌟 RATING: THE LEGENDARY BOSS!";
+        msg = "Astounding management work! You successfully steered the organization through complex emergencies and logistical friction points. The Innovation Summit was a magnificent company victory!";
+    } else if (score > 30) {
+        rank = "👍 RATING: THE SURVIVOR!";
+        msg = "You made highly taxing compromises and expended nearly your entire budget allocation, but the event structure survived. Good learning curve!";
+    } else {
+        rank = "⚠️ RATING: THE BORING MANAGER";
+        msg = "The event successfully concluded, but cultural engagement flatlined. Team motivation is remarkably low, and key developers are updating their CVs.";
+    }
+
+    document.getElementById('end-title').innerText = rank;
+    document.getElementById('end-body').innerText = `${msg}\n\n🏆 Final Metrics -> Morale Score: ${state.m} | Innovation Index: ${state.i} | Leftover Capital: $${state.b}`;
+}
+</script>
+</body>
+</html>

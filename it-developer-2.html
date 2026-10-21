@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wall Street Surge — Financial Trading Engine Launch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0E14; --surface:#161B22; --surface2:#21262D; --surface3:#30363D;
+  --ink:#F0F6FC; --ink2:#8B949E; --ink3:#6E7681;
+  --line:rgba(255,255,255,0.1); --accent:#2563EB; --accent2:#1D4ED8;
+  
+  --green-bg:#0D2818;--green-bd:#2EA043;--green-tx:#56D364;
+  --blue-bg:#0D1D30;--blue-bd:#388BFD;--blue-tx:#79C0FF;
+  --ochre-bg:#2D2206;--ochre-bd:#D29922;--ochre-tx:#E3B341;
+  --red-bg:#271010;--red-bd:#F85149;--red-tx:#FF7B72;
+  
+  --r:12px; --rs:8px; --shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem;}
+.shell{width:100%;max-width:720px;}
+
+/* INTRO */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:2.5rem;box-shadow:var(--shadow);}
+h1{font-size:30px;font-weight:600;margin-bottom:1rem;letter-spacing:-0.02em;color:#FFF;}
+.intro-text{color:var(--ink2);margin-bottom:2rem;font-size:15px;}
+.btn-start{background:var(--accent);color:#fff;border:none;padding:1rem 2rem;border-radius:var(--rs);font-size:16px;font-weight:500;cursor:pointer;transition:0.2s;}
+.btn-start:hover{background:var(--accent2);transform:translateY(-1px);}
+
+/* GAME */
+.game-ui{display:none;width:100%;}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;padding:0 0.5rem;}
+.score-box{font-family:'DM Mono',monospace;background:var(--surface2);padding:0.5rem 1rem;border-radius:20px;border:1px solid var(--line);font-size:14px;}
+.step-indicator{color:var(--ink3);font-size:12px;text-transform:uppercase;letter-spacing:0.1em;font-weight:600;}
+
+.scenario-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:2rem;margin-bottom:1.5rem;box-shadow:var(--shadow);}
+.emergency-tag{display:inline-block;background:var(--red-bg);color:var(--red-tx);border:1px solid var(--red-bd);padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;margin-bottom:1rem;text-transform:uppercase;letter-spacing:0.05em;}
+.scenario-text{font-size:16px;margin-bottom:1.25rem;}
+.vocab-box{background:var(--surface2);padding:1rem;border-radius:var(--rs);margin-bottom:1.5rem;font-size:13px;border-left:3px solid var(--accent);}
+.vocab-box b{color:var(--blue-tx);margin-right:5px;}
+
+.options{display:grid;gap:10px;}
+.opt-btn{background:var(--surface2);border:1px solid var(--line);color:var(--ink);padding:1rem 1.25rem;border-radius:var(--rs);text-align:left;cursor:pointer;font-size:14px;transition:0.2s;display:flex;justify-content:space-between;align-items:center;}
+.opt-btn:hover:not(:disabled){background:var(--surface3);border-color:var(--ink2);}
+.opt-btn:disabled{cursor:not-allowed;opacity:0.4;}
+
+.feedback{margin-top:1.5rem;padding:1.25rem;border-radius:var(--rs);display:none;animation:fadeIn 0.25s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+.fb-green{background:var(--green-bg);border:1px solid var(--green-bd);color:var(--green-tx);}
+.fb-blue{background:var(--blue-bg);border:1px solid var(--blue-bd);color:var(--blue-tx);}
+.fb-ochre{background:var(--ochre-bg);border:1px solid var(--ochre-bd);color:var(--ochre-tx);}
+.fb-red{background:var(--red-bg);border:1px solid var(--red-bd);color:var(--red-tx);}
+
+.next-btn{margin-top:1.5rem;background:var(--ink);color:var(--bg);border:none;padding:1rem 2rem;border-radius:var(--rs);font-weight:600;cursor:pointer;display:none;width:100%;transition:0.2s;}
+.next-btn:hover{opacity:0.9;}
+
+/* FINAL */
+.final-card{display:none;text-align:center;}
+.final-score{font-size:56px;font-family:'DM Mono',monospace;margin:1rem 0;}
+</style>
+</head>
+<body>
+
+<div class="shell" id="intro">
+  <div class="card">
+    <h1>Wall Street Surge</h1>
+    <p class="intro-text">You are the Chief Technology Officer at Apex Financial Capital. Over the next 7 days, your firm is migrating to a high-frequency algorithmic trading engine. Market volatility is extreme, compliance regulators are watching, and millions in capital flow through your execution pipelines. Make strategic calls to navigate the week successfully.</p>
+    <button class="btn-start" onclick="startGame()">Initialize Trading Week</button>
+  </div>
+</div>
+
+<div class="shell game-ui" id="game">
+  <div class="header">
+    <div class="step-indicator" id="step-count">Scenario 1 of 12</div>
+    <div class="score-box">Score: <span id="score">0</span></div>
+  </div>
+  
+  <div class="scenario-card">
+    <div id="emergency-tag"></div>
+    <div class="scenario-text" id="scenario-text"></div>
+    <div class="vocab-box" id="vocab-box"></div>
+    <div class="options" id="options"></div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next-btn" id="next-btn" onclick="nextStep()">Advance to Next Stage</button>
+  </div>
+</div>
+
+<div class="shell final-card" id="final">
+  <div class="card">
+    <h1>Weekly Audit Report</h1>
+    <div class="final-score" id="fin-num">0</div>
+    <h2 id="fin-grade">Rank</h2>
+    <p class="intro-text" id="fin-body"></p>
+    <button class="btn-start" onclick="location.reload()">Reopen Trading Desk</button>
+  </div>
+</div>
+
+<script>
+const DECISIONS = [
+  // 1. MONDAY MORNING
+  {
+    isEmergency: false,
+    text: "<b>MONDAY 07:30 AM:</b> Pre-market prep. The primary FIX API gateway is experiencing <b>latency spikes</b> during market pre-open connections. Institutional buyers are queueing order messages rapidly.",
+    vocab: "<b>Latency Spikes:</b> Sudden, temporary delays in data transmission that degrade real-time order execution speeds.",
+    options: [
+      { t: "Implement intelligent message-batching and dynamic rate-throttling on low-priority orders.", pts: 3, tier: "green", fb: "+3 Excellent! Message-batching normalized latency to sub-millisecond speeds without dropping orders." },
+      { t: "Spin up additional cloud execution instances despite exceeding budget allocations.", pts: 2, tier: "blue", fb: "+2 Good. The gateway stabilized, but finance flagged the unapproved cloud spend." },
+      { t: "Reroute incoming traffic through legacy secondary backup servers.", pts: 1, tier: "ochre", fb: "+1 Average. The servers held, but execution delays caused slippage on client orders." },
+      { t: "Disable latency monitoring alerts to stop alarm fatigue across the infrastructure team.", pts: -1, tier: "red", fb: "-1 Bad Decision! Unmonitored latency caused order bottlenecks. Try again!" }
+    ]
+  },
+  // 2. MONDAY AFTERNOON
+  {
+    isEmergency: false,
+    text: "<b>MONDAY 02:00 PM:</b> A major liquidity provider experiences a connectivity outage. Your engine must handle the sudden loss of order flow without causing <b>slippage</b>.",
+    vocab: "<b>Slippage:</b> The difference between the expected price of a trade and the actual price at which it executes.",
+    options: [
+      { t: "Dynamically route trade liquidity to secondary institutional pools via smart order routing (SOR).", pts: 3, tier: "green", fb: "+3 Excellent! The SOR system maintained tight spreads and prevented trade execution losses." },
+      { t: "Pause automated trading on affected pairs until the provider returns online.", pts: 2, tier: "blue", fb: "+2 Good. Safe approach, though trading volume dropped temporarily during peak market hours." },
+      { t: "Internalize trade matching using the firm's balance sheet reserves.", pts: 1, tier: "ochre", fb: "+1 Average. Internal capital absorbed trades, but exposed the firm to overnight market risk." },
+      { t: "Allow trades to execute against exhausted order books without adjusting price limits.", pts: -1, tier: "red", fb: "-1 Bad Decision! High slippage resulted in severe execution losses for clients. Try again!" }
+    ]
+  },
+  // 3. TUESDAY MORNING
+  {
+    isEmergency: false,
+    text: "<b>TUESDAY 09:30 AM:</b> Market bell rings. An anti-money laundering (AML) detection model triggers false positives, flagging legitimate high-volume corporate accounts as <b>suspicious activity</b>.",
+    vocab: "<b>Suspicious Activity:</b> Financial transactions that raise suspicion of unlawful conduct, requiring regulatory filing.",
+    options: [
+      { t: "Deploy a calibrated threshold rule patch while routing flagged trades to manual expedited compliance review.", pts: 3, tier: "green", fb: "+3 Excellent! Legitimate trading resumed smoothly while compliance standards were upheld." },
+      { t: "Temporarily raise alert sensitivity thresholds across all corporate profiles.", pts: 2, tier: "blue", fb: "+2 Good. False alerts stopped, but lowered compliance monitoring increased regulatory exposure." },
+      { t: "Manually override all flagged accounts without adjusting underlying ML models.", pts: 1, tier: "ochre", fb: "+1 Average. Cleared the backlogged trades, but compliance officers are concerned by the manual bypass." },
+      { t: "Freeze all flagged corporate accounts completely until Friday's audit.", pts: -1, tier: "red", fb: "-1 Bad Decision! Top corporate clients threatened to pull their funds due to frozen assets. Try again!" }
+    ]
+  },
+  // 4. TUESDAY AFTERNOON
+  {
+    isEmergency: false,
+    text: "<b>TUESDAY 04:15 PM:</b> Post-market settlement. A distributed ledger synchronization bug causes a temporary <b>reconciliation discrepancy</b> in corporate balance clearing.",
+    vocab: "<b>Reconciliation Discrepancy:</b> A mismatch between internal ledger records and external clearing house balance reports.",
+    options: [
+      { t: "Execute an automated delta-audit script to isolate and correct corrupted transaction logs from immutable cold backups.", pts: 3, tier: "green", fb: "+3 Excellent! All account ledgers reconciled perfectly before global settlement windows closed." },
+      { t: "Roll back ledger states 3 hours to the last clean database checkpoint.", pts: 2, tier: "blue", fb: "+2 Good. Ledgers cleared safely, but valid trades had to be re-entered manually by operations." },
+      { t: "Issue temporary balancing credits to affected accounts while investigating.", pts: 1, tier: "ochre", fb: "+1 Average. Keeps operations running, but introduces credit risk onto the company ledger." },
+      { t: "Ignore the mismatch and allow morning clearing to auto-adjust figures.", pts: -1, tier: "red", fb: "-1 Bad Decision! Unmatched figures compound, causing overnight accounting discrepancies. Try again!" }
+    ]
+  },
+  // 5. WEDNESDAY MORNING
+  {
+    isEmergency: false,
+    text: "<b>WEDNESDAY 10:00 AM:</b> Mid-week trading peak. An external API market feed updates its data structure unexpectedly, causing feed handlers to drop live <b>order-book quotes</b>.",
+    vocab: "<b>Order-Book Quotes:</b> Real-time electronic lists of buy and sell orders for a financial instrument organized by price level.",
+    options: [
+      { t: "Hot-swap to a fallback data schema transformer to ingest the updated payload dynamically.", pts: 3, tier: "green", fb: "+3 Excellent! Data ingestion normalized instantly with zero dropped price ticks." },
+      { t: "Fail over trading pipelines to a secondary market data vendor.", pts: 2, tier: "blue", fb: "+2 Good. Kept order books accurate, though vendor switch fees incurred higher costs." },
+      { t: "Pause quote updates and operate on 15-minute delayed market feeds.", pts: 1, tier: "ochre", fb: "+1 Average. Avoided crashes, but traders were furious about operating on delayed data." },
+      { t: "Force the feed parser to process corrupted formats by stripping payload validation checks.", pts: -1, tier: "red", fb: "-1 Bad Decision! Bad data flooded execution pipelines, generating invalid trade fills. Try again!" }
+    ]
+  },
+  // 6. WEDNESDAY AFTERNOON - EMERGENCY 1
+  {
+    isEmergency: true,
+    text: "<b>WEDNESDAY 02:30 PM — EMERGENCY CRISIS:</b> A zero-day exploit in your core trade settlement library allows remote memory corruption. A rogue market actor is actively attempting an <b>arbitrage drain</b> on corporate reserves!",
+    vocab: "<b>Arbitrage Drain:</b> Unlawful exploitation of price inaccuracies to drain financial liquid capital from system accounts.",
+    options: [
+      { t: "Immediately trigger emergency circuit-breakers, isolate the vulnerability, and deploy an engineered memory patch.", pts: 2, tier: "blue", fb: "EMERGENCY CLEARED! You isolated the attack vector, protected capital, and preserved firm integrity." },
+      { t: "Attempt to trace the attacker's IP network location without locking down execution endpoints.", pts: 0, tier: "red", fb: "CRITICAL FAILURE! Capital pools were completely drained while you attempted tracing. Regulatory regulators shut down your firm." }
+    ]
+  },
+  // 7. THURSDAY MORNING
+  {
+    isEmergency: false,
+    text: "<b>THURSDAY 08:00 AM:</b> The SEC regulatory compliance team requests a full <b>audit trail</b> of all high-frequency automated trade decisions executed during Monday's volatility event.",
+    vocab: "<b>Audit Trail:</b> A step-by-step sequential record providing documentary evidence of financial transaction sequences.",
+    options: [
+      { t: "Generate encrypted, time-stamped compliance logs using standardized SEC reporting formats.", pts: 3, tier: "green", fb: "+3 Excellent! Regulators commended the transparency and speed of the compliance submission." },
+      { t: "Provide raw server log dumps without structural indexing or regulatory metadata formatting.", pts: 2, tier: "blue", fb: "+2 Good. Satisfied legal requirements, but forced the legal team to work overtime parsing files." },
+      { t: "Request a 5-day extension to organize transaction logs.", pts: 1, tier: "ochre", fb: "+1 Average. The extension was granted, but put the firm under closer regulatory monitoring." },
+      { t: "Refuse the request on grounds of proprietary trade algorithm confidentiality.", pts: -1, tier: "red", fb: "-1 Bad Decision! Refusing regulatory mandates triggered formal SEC fines and investigation. Try again!" }
+    ]
+  },
+  // 8. THURSDAY AFTERNOON
+  {
+    isEmergency: false,
+    text: "<b>THURSDAY 03:00 PM:</b> High trade volumes overwhelm real-time risk calculation systems, causing delayed <b>margin calls</b> for leveraged retail and institutional accounts.",
+    vocab: "<b>Margin Call:</b> A demand by a broker for an investor to deposit additional money or securities so that the account is brought up to the minimum maintenance value.",
+    options: [
+      { t: "Offload risk calculation workloads to secondary high-performance GPU clusters.", pts: 3, tier: "green", fb: "+3 Excellent! Risk models caught up instantly, issuing accurate margin calls without delay." },
+      { t: "Temporarily increase margin requirements across all active positions.", pts: 2, tier: "blue", fb: "+2 Good. Mitigated financial exposure, but upset traders holding margin positions." },
+      { t: "Manually evaluate top 20 institutional portfolio risk profiles.", pts: 1, tier: "ochre", fb: "+1 Average. Protected major accounts, but left retail portfolio exposure unmonitored." },
+      { t: "Disable automated liquidation checks until market close.", pts: -1, tier: "red", fb: "-1 Bad Decision! Unmonitored margin defaults led to significant bad debt exposure. Try again!" }
+    ]
+  },
+  // 9. FRIDAY MORNING
+  {
+    isEmergency: false,
+    text: "<b>FRIDAY 09:15 AM:</b> Cross-border SWIFT payment gateways experience regional <b>settlement delays</b>, threatening international market transaction completions ahead of the weekend.",
+    vocab: "<b>Settlement Delays:</b> Postponements in the final transfer of funds or securities between trading counterparties.",
+    options: [
+      { t: "Activate pre-funded international collateral liquidity reserves to guarantee instant settlement.", pts: 3, tier: "green", fb: "+3 Excellent! Seamless execution; cross-border trades completed without market interruption." },
+      { t: "Reroute wire transfers through alternative regional correspondent banks.", pts: 2, tier: "blue", fb: "+2 Good. Transactions cleared safely, though clearing transaction fees were higher." },
+      { t: "Notify clients that international settlements will delay until Monday morning.", pts: 1, tier: "ochre", fb: "+1 Average. Transparent, but clients expressed frustration over blocked liquidity." },
+      { t: "Cancel all pending international settlements and reverse user trade orders.", pts: -1, tier: "red", fb: "-1 Bad Decision! Canceling valid settlements triggered contract breach notices. Try again!" }
+    ]
+  },
+  // 10. FRIDAY AFTERNOON - EMERGENCY 2
+  {
+    isEmergency: true,
+    text: "<b>FRIDAY 03:45 PM — EMERGENCY CRISIS:</b> 15 minutes before market close! A catastrophic primary database cluster corruption wipes out active <b>position state indexes</b> across all desks!",
+    vocab: "<b>Position State:</b> The real-time record of net holdings, long/short exposure, and open obligations held by an entity.",
+    options: [
+      { t: "Fail over immediately to synchronized active-active standby databases and restore in-memory state snapshots.", pts: 2, tier: "blue", fb: "EMERGENCY CLEARED! Real-time state restored within seconds. The desk closed market hours safely!" },
+      { t: "Reboot primary database servers while keeping execution gateways open to inbound trades.", pts: 0, tier: "red", fb: "CRITICAL FAILURE! Trades executed blind without position tracking, creating unhedged liabilities. Firm insolvent!" }
+    ]
+  },
+  // 11. SATURDAY MAINTENANCE
+  {
+    isEmergency: false,
+    text: "<b>SATURDAY 11:00 AM:</b> Weekend operational review. The lead software engineer reports severe team <b>burnout</b> following intense market volatility and technical incidents.",
+    vocab: "<b>Burnout:</b> Physical or mental collapse caused by overwork, stress, and intense pressure.",
+    options: [
+      { t: "Implement mandatory rest rotations, award spot performance bonuses, and recruit contract support.", pts: 3, tier: "green", fb: "+3 Excellent! Team morale recovered completely while infrastructure maintenance stayed on track." },
+      { t: "Grant Monday off for non-critical staff while engineering leads handle maintenance.", pts: 2, tier: "blue", fb: "+2 Good. Staff appreciated the time off, though technical debt reduction slowed slightly." },
+      { t: "Order catered meals for the office during weekend maintenance shifts.", pts: 1, tier: "ochre", fb: "+1 Average. A nice gesture, but fails to address underlying workload exhaustion." },
+      { t: "Demand mandatory 12-hour weekend shifts to prepare for next week's trading volume.", pts: -1, tier: "red", fb: "-1 Bad Decision! Key senior developers tendered resignations ahead of core deployments. Try again!" }
+    ]
+  },
+  // 12. SUNDAY FINAL PREPARATION
+  {
+    isEmergency: false,
+    text: "<b>SUNDAY 04:00 PM:</b> Final system sign-off before Asian markets open. You must allocate remaining weekend budget to ensure long-term system stability.",
+    vocab: "<b>System Stability:</b> The resilience of an IT ecosystem to handle peak loads without failure or performance drop.",
+    options: [
+      { t: "Invest in high-availability infrastructure upgrades, redundant database nodes, and automated test suites.", pts: 3, tier: "green", fb: "+3 Excellent! The trading engine is robust, fault-tolerant, and ready for global execution scale." },
+      { t: "Allocate capital toward expanding high-frequency marketing campaigns to acquire new retail accounts.", pts: 2, tier: "blue", fb: "+2 Good. Customer acquisition rose, though platform load limits will need future monitoring." },
+      { t: "Distribute the remaining funds entirely as an executive project completion bonus.", pts: 1, tier: "ochre", fb: "+1 Average. Executives are happy, but technical infrastructure debt remains unaddressed." },
+      { t: "Cut operational hosting budgets to demonstrate quarterly short-term profit growth to shareholders.", pts: -1, tier: "red", fb: "-1 Bad Decision! Cutting server capacity guarantees outages during next week's trading peak. Try again!" }
+    ]
+  }
+];
+
+let S = { score: 0, step: 0, resolvedStep: false, shuffledOptions: [] };
+
+function shuffleArray(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startGame() {
+  document.getElementById('intro').style.display = 'none';
+  document.getElementById('game').style.display = 'block';
+  renderStep();
+}
+
+function renderStep() {
+  S.resolvedStep = false;
+  const data = DECISIONS[S.step];
+  
+  document.getElementById('step-count').textContent = `Scenario ${S.step + 1} of ${DECISIONS.length}`;
+  document.getElementById('scenario-text').innerHTML = data.text;
+  document.getElementById('vocab-box').innerHTML = data.vocab;
+  
+  const fb = document.getElementById('feedback');
+  fb.style.display = 'none';
+  fb.className = 'feedback';
+  
+  document.getElementById('next-btn').style.display = 'none';
+  
+  const et = document.getElementById('emergency-tag');
+  if (data.isEmergency) {
+    et.innerHTML = '<span class="emergency-tag">🚨 Critical Emergency Scenario</span>';
+  } else {
+    et.innerHTML = '';
+  }
+
+  const optContainer = document.getElementById('options');
+  optContainer.innerHTML = '';
+
+  // Randomize choices each time scenario renders
+  S.shuffledOptions = shuffleArray(data.options);
+
+  S.shuffledOptions.forEach((opt, idx) => {
+    const b = document.createElement('button');
+    b.className = 'opt-btn';
+    b.id = `opt-btn-${idx}`;
+    b.innerHTML = `<span>${opt.t}</span>`;
+    b.onclick = () => handleChoice(idx);
+    optContainer.appendChild(b);
+  });
+}
+
+function handleChoice(idx) {
+  const data = DECISIONS[S.step];
+  const selectedOpt = S.shuffledOptions[idx];
+  const fb = document.getElementById('feedback');
+  const clickedBtn = document.getElementById(`opt-btn-${idx}`);
+
+  // Emergency Scenario Processing
+  if (data.isEmergency) {
+    if (selectedOpt.pts > 0) {
+      S.score += selectedOpt.pts;
+      document.getElementById('score').textContent = S.score;
+      fb.textContent = selectedOpt.fb;
+      fb.className = 'feedback fb-blue';
+      fb.style.display = 'block';
+      disableAllOptions();
+      document.getElementById('next-btn').style.display = 'block';
+    } else {
+      showGameOver(selectedOpt.fb);
+    }
+    return;
+  }
+
+  // Standard Scenario Processing
+  if (selectedOpt.pts === -1) {
+    // Bad Choice: Deduct 1 point, disable bad choice, require retry
+    S.score -= 1;
+    document.getElementById('score').textContent = S.score;
+    
+    fb.textContent = selectedOpt.fb;
+    fb.className = 'feedback fb-red';
+    fb.style.display = 'block';
+    
+    clickedBtn.disabled = true; // Block picking this wrong choice again
+  } else {
+    // Green, Blue, or Ochre choice made
+    if (!S.resolvedStep) {
+      S.score += selectedOpt.pts;
+      document.getElementById('score').textContent = S.score;
+      S.resolvedStep = true;
+    }
+
+    fb.textContent = selectedOpt.fb;
+    if (selectedOpt.tier === 'green') fb.className = 'feedback fb-green';
+    else if (selectedOpt.tier === 'blue') fb.className = 'feedback fb-blue';
+    else if (selectedOpt.tier === 'ochre') fb.className = 'feedback fb-ochre';
+    
+    fb.style.display = 'block';
+    disableAllOptions();
+    document.getElementById('next-btn').style.display = 'block';
+  }
+}
+
+function disableAllOptions() {
+  const btns = document.querySelectorAll('.opt-btn');
+  btns.forEach(b => b.disabled = true);
+}
+
+function nextStep() {
+  if (S.step < DECISIONS.length - 1) {
+    S.step++;
+    renderStep();
+  } else {
+    showFinal();
+  }
+}
+
+function showGameOver(msg) {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('final').style.display = 'block';
+  document.getElementById('fin-num').textContent = "💥";
+  document.getElementById('fin-grade').textContent = "Terminated / Firm Insolvent";
+  document.getElementById('fin-body').textContent = msg;
+}
+
+function showFinal() {
+  document.getElementById('game').style.display = 'none';
+  document.getElementById('final').style.display = 'block';
+  document.getElementById('fin-num').textContent = S.score;
+  
+  let g, b;
+  if (S.score >= 28) {
+    g = "Wall Street Titan (Chief Risk & Tech Officer)";
+    b = "Outstanding leadership! You successfully navigated extreme volatility, maintained regulatory compliance, protected firm liquidity, and optimized financial IT operations. Your strategic decisions were flawless.";
+  } else if (S.score >= 20) {
+    g = "Competent Trading Desk Director";
+    b = "A successful trading week! You incurred minor operational friction and budget overruns, but systems remained online, compliance standards were met, and client capital was protected.";
+  } else {
+    g = "At-Risk Systems Director";
+    b = "The trading week concluded, but performance was marred by execution delays, compliance flags, and team exhaustion. Substantial operational remediation is required before next week's market open.";
+  }
+  document.getElementById('fin-grade').textContent = g;
+  document.getElementById('fin-body').textContent = b;
+}
+</script>
+
+</body>
+</html>

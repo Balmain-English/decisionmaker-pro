@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offshore Training Lead — Interactive Scenario</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F172A; /* Deep slate / industrial navy */
+  --surface: #1E293B;
+  --surface-hover: #334155;
+  --text-main: #F8FAFC;
+  --text-muted: #94A3B8;
+  --accent: #EAB308; /* Safety Yellow */
+  --accent-hover: #CA8A04;
+  --success-bg: #064E3B;
+  --success-bd: #10B981;
+  --success-tx: #A7F3D0;
+  --warn-bg: #78350F;
+  --warn-bd: #F59E0B;
+  --warn-tx: #FDE68A;
+  --danger-bg: #7F1D1D;
+  --danger-bd: #EF4444;
+  --danger-tx: #FECACA;
+  --info-bg: #1E3A8A;
+  --info-bd: #3B82F6;
+  --info-tx: #BFDBFE;
+  --radius: 8px;
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg);
+  color: var(--text-main);
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid #334155;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+.header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #0B0F19;
+  border-bottom: 2px solid var(--accent);
+}
+
+.title {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 1.1rem;
+}
+
+.status-area {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.progress-track {
+  display: flex;
+  gap: 5px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #334155;
+  border-radius: 2px;
+}
+.dot.done { background: var(--accent); opacity: 0.5; }
+.dot.active { background: var(--accent); }
+.dot.emg { background: var(--danger-bd); animation: pulse 1s infinite; }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+.score-badge {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: rgba(234, 179, 8, 0.1);
+  color: var(--accent);
+  padding: 4px 10px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+}
+
+.content-body {
+  padding: 2rem;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+
+.stage-label {
+  font-family: var(--font-mono);
+  color: var(--accent);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.scenario-text {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  font-weight: 300;
+}
+
+.vocab-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: #0B0F19;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #334155;
+}
+
+.options-container { display: flex; flex-direction: column; gap: 12px; }
+
+.btn-option {
+  background: transparent;
+  border: 1px solid #475569;
+  color: var(--text-main);
+  padding: 1rem;
+  text-align: left;
+  border-radius: var(--radius);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.5;
+}
+
+.btn-option:hover:not(:disabled) {
+  background: var(--surface-hover);
+  border-color: var(--text-muted);
+}
+
+.btn-option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.feedback-box, .discussion-box {
+  margin-top: 1.5rem;
+  padding: 1rem;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  display: none;
+  border-left: 4px solid;
+}
+
+.feedback-box.show, .discussion-box.show { display: block; animation: fadeIn 0.3s ease-in-out; }
+
+.discussion-box {
+  background: var(--info-bg);
+  border-color: var(--info-bd);
+  color: var(--info-tx);
+  font-style: italic;
+}
+
+.btn-next {
+  margin-top: 2rem;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: var(--radius);
+  cursor: pointer;
+  display: none;
+  float: right;
+  transition: background 0.2s;
+}
+
+.btn-next:hover { background: var(--accent-hover); }
+.btn-next.show { display: inline-block; }
+
+.clearfix::after { content: ""; clear: both; display: table; }
+
+/* Debriefing styles */
+.debriefing { text-align: center; }
+.debriefing h1 { font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem; }
+.debriefing .final-score { font-family: var(--font-mono); font-size: 1.2rem; margin-bottom: 2rem; }
+.band-box { text-align: left; padding: 1.5rem; border-radius: var(--radius); border-left: 5px solid; margin-bottom: 2rem; }
+.band-1 { background: var(--success-bg); border-color: var(--success-bd); color: var(--success-tx); }
+.band-2 { background: var(--info-bg); border-color: var(--info-bd); color: var(--info-tx); }
+.band-3 { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn-tx); }
+.band-4 { background: var(--danger-bg); border-color: var(--danger-bd); color: var(--danger-tx); }
+
+.landing-content { text-align: center; }
+.landing-content p { margin: 1rem 0; font-size: 1.05rem; color: var(--text-muted); }
+.landing-content ul { text-align: left; background: #0B0F19; padding: 1.5rem 2.5rem; border-radius: var(--radius); margin-bottom: 2rem; }
+.landing-content li { margin-bottom: 0.5rem; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <div class="header-bar" id="header-bar" style="display: none;">
+      <div class="title">Offshore Training Lead Simulator</div>
+      <div class="status-area">
+        <div class="progress-track" id="progress-dots"></div>
+        <div class="score-badge" id="score-display">0 / 40 pts</div>
+      </div>
+    </div>
+    <div class="content-body" id="app-content"></div>
+  </div>
+</div>
+
+<script>
+let state = { score: 0, answered: false, stageIdx: 0, routeTracker: [] };
+
+const SCENARIOS = {
+  s1: {
+    type: 'decision',
+    label: "Day 1: Office Preparation",
+    scene: "Reviewing the technical syllabus for the upcoming offshore maintenance crew training, you notice the latest manufacturer updates on high-pressure valves are entirely missing from the official corporate documentation.",
+    vocab: ["syllabus", "documentation", "high-pressure", "manufacturer"],
+    opts: [
+      { t: "Integrate the new updates immediately and send the revised comprehensive syllabus for urgent management approval.", pts: 3, fb: "Excellent choice. Proactively updating documentation ensures your technical training remains fully compliant with industry standards and accurately reflects the latest manufacturer engineering specifications." },
+      { t: "Prepare a detailed supplementary handout with the technical updates to distribute manually during the offshore session.", pts: 2, fb: "Very good. This is a practical logistical workaround, though formally amending the core corporate syllabus is generally considered standard best practice for long-term compliance." },
+      { t: "Plan to verbally mention the critical equipment updates during the practical training without altering the core written documents.", pts: 1, fb: "Acceptable, but risky. Providing purely verbal engineering instructions without written documentation means critical safety details can be easily forgotten or misunderstood by trainees." },
+      { t: "Ignore the new updates entirely as the maintenance crew is only formally assessed on the older, established curriculum.", pts: -1, fb: "Poor choice. Deliberately ignoring critical equipment modifications compromises operational safety and violates your professional integrity as an instructor. Lose 1 point and choose again." }
+    ],
+    next: 's2'
+  },
+  s2: {
+    type: 'decision',
+    label: "Day 1: Instructor Coordination",
+    scene: "A junior colleague asks for advice on handling uncooperative senior technicians who frequently disrupt mandatory safety briefings with cynical comments regarding corporate protocols.",
+    vocab: ["uncooperative", "disrupt", "cynical", "protocols"],
+    opts: [
+      { t: "Recommend acknowledging their vast field experience and actively asking them to share practical insights with the broader group.", pts: 3, fb: "Excellent strategy. Leveraging their operational experience validates their expertise while seamlessly re-engaging them constructively into the formal learning environment." },
+      { t: "Suggest maintaining strict adherence to the planned agenda and firmly managing any disruptive technical interruptions.", pts: 2, fb: "A strong, disciplined approach. Maintaining classroom control is necessary, though it risks alienating highly experienced field personnel if applied too rigidly." },
+      { t: "Advise letting the senior staff take a passive background role as long as they do not actively disrupt the ongoing session.", pts: 1, fb: "A minimal-conflict resolution. However, allowing passive disengagement means valuable operational knowledge isn't shared, weakening the overall effectiveness of the training." },
+      { t: "Propose threatening to report their uncooperative behaviour directly to their line managers to guarantee strict immediate compliance.", pts: -1, fb: "Poor choice. Escalating immediately to managerial threats destroys psychological safety and guarantees future hostility from the operational workforce. Lose 1 point and choose again." }
+    ],
+    next: 's3'
+  },
+  s3: {
+    type: 'decision',
+    label: "Day 2: Logistical Shift",
+    scene: "The logistics coordinator informs you that your scheduled offshore departure has been brought forward by a full day due to a severe incoming maritime weather system.",
+    vocab: ["logistics", "departure", "severe", "maritime"],
+    opts: [
+      { t: "Re-prioritize your immediate schedule, notify all key stakeholders, and rapidly consolidate your technical training materials.", pts: 3, fb: "Superb adaptability. Rapidly consolidating resources and communicating with stakeholders demonstrates excellent logistical awareness and ensures continuity of operational training." },
+      { t: "Accept the abrupt schedule change immediately and plan to finalize your remaining administrative preparations during the helicopter transit.", pts: 2, fb: "Good flexibility. While completing work during noisy helicopter transit is highly challenging, accepting the logistical shift ensures you arrive safely before the storm." },
+      { t: "Request a slight operational delay to the flight, hoping the severe weather forecast improves sufficiently before the afternoon departure window.", pts: 1, fb: "Risky decision. Maritime weather forecasts in the energy sector are generally precise, and delaying could result in being grounded onshore entirely." },
+      { t: "Refuse the early departure completely, arguing forcefully that your training schedule is firmly fixed and the weather is unpredictable.", pts: -1, fb: "Poor choice. Offshore operations always prioritize aviation safety over administrative schedules. Refusing compromises the mission entirely. Lose 1 point and choose again." }
+    ],
+    disc: "How does demonstrating flexibility in logistical planning directly contribute to overall operational safety in challenging offshore environments?",
+    next: 's4'
+  },
+  s4: {
+    type: 'decision',
+    label: "Day 3: Arrival & Induction",
+    scene: "Upon arriving at the offshore rig, the Offshore Installation Manager (OIM) is exceptionally busy and urgently suggests you conduct a self-guided safety induction tour to save time.",
+    vocab: ["induction", "self-guided", "exceptionally", "urgently"],
+    opts: [
+      { t: "Politely decline the offer, insisting on a formal safety briefing as mandatory platform protocols require verified supervised inductions.", pts: 3, fb: "Outstanding integrity. Strict adherence to platform induction protocols ensures all personnel are genuinely aware of active hazards, regardless of operational urgency." },
+      { t: "Review the written induction materials thoroughly in the breakroom and ask a safety officer to sign the formal verification later.", pts: 2, fb: "A functional compromise. You avoid delaying the OIM while studying the material, though skipping the physical tour diminishes spatial awareness of emergency routes." },
+      { t: "Proceed with the self-guided orientation tour but stay exclusively within the clearly marked, non-hazardous living accommodation areas.", pts: 1, fb: "Acceptable caution. Staying in safe zones mitigates immediate risk, but failing to formally clear the induction process violates standard offshore compliance." },
+      { t: "Accept the offer enthusiastically and explore the heavy processing areas independently to rapidly familiarize yourself with the equipment.", pts: -1, fb: "Poor choice. Entering hazardous petrochemical processing zones without a formal safety orientation is a critical regulatory violation. Lose 1 point and choose again." }
+    ],
+    next: 's5'
+  },
+  s5: {
+    type: 'decision',
+    label: "Day 3: Practical Session",
+    scene: "During hands-on theoretical training regarding gas compressor maintenance, you clearly observe an experienced technician using a slightly modified, unapproved calibration tool.",
+    vocab: ["compressor", "calibration", "modified", "unapproved"],
+    opts: [
+      { t: "Stop the exercise immediately, explain the specific operational risks of improvised tools, and demonstrate the procedure with the correct equipment.", pts: 3, fb: "Excellent intervention. Halting unsafe practices immediately and explaining the mechanical rationale reinforces a strong culture of compliance and prevents equipment damage." },
+      { t: "Let them safely finish the immediate task, then conduct a comprehensive group review emphasizing the absolute necessity of proper tooling.", pts: 2, fb: "A solid educational approach. Addressing the issue collectively prevents individual embarrassment, although it temporarily permits a non-compliant action to continue." },
+      { t: "Confiscate the modified tool quietly and hand them the correct equipment without drawing widespread attention to the safety violation.", pts: 1, fb: "A weak response. Correcting the immediate problem without discussing the underlying hazard misses a critical educational opportunity for the broader team." },
+      { t: "Ignore the violation completely, assuming they know the heavy equipment well enough and it saves valuable time during a busy schedule.", pts: -1, fb: "Poor choice. Tolerating the normalization of deviance undermines the entire purpose of technical safety training. Lose 1 point and choose again." }
+    ],
+    next: 's6'
+  },
+  s6: {
+    type: 'decision',
+    label: "Day 3: Equipment Anomaly",
+    scene: "A strange, high-frequency vibration is detected in a nearby operational centrifugal pump during your session. The local operators seem completely unconcerned by the unusual noise.",
+    vocab: ["high-frequency", "vibration", "centrifugal", "unconcerned"],
+    opts: [
+      { t: "Halt the training immediately, notify the central control room, and evacuate the immediate processing area as a precautionary measure.", pts: 3, fb: "Outstanding safety leadership. Treating unexplained mechanical anomalies as imminent hazards prevents potential catastrophic failures and protects personnel proactively." },
+      { t: "Instruct the trainees to step back to a safe distance while you personally inspect the vibration parameters and diagnostic logging gauges.", pts: 2, fb: "A measured, professional response. Securing the trainees while gathering technical data is highly logical, though potentially dangerous if the pump seal fails suddenly." },
+      { t: "Continue the training session normally but keep a close, vigilant eye on the pump, planning to report it once the curriculum concludes.", pts: 1, fb: "A passive, risky choice. Delaying the reporting of mechanical anomalies allows conditions to deteriorate, potentially escalating into an uncontrollable containment breach." },
+      { t: "Trust the local operators' nonchalance completely and physically lean on the vibrating equipment to demonstrate your total confidence.", pts: -1, fb: "Poor choice. Physical contact with anomalous high-pressure rotating equipment is exceptionally dangerous and sets a terrible example. Lose 1 point and choose again." }
+    ],
+    disc: "Why is the 'normalization of deviance' (ignoring warning signs because they happen frequently without incident) extremely dangerous in high-pressure petrochemical facilities?",
+    next: 'e1'
+  },
+  e1: {
+    type: 'emergency',
+    label: "EMERGENCY: Catastrophic Seal Failure",
+    scene: "The pump vibration suddenly escalates into a catastrophic mechanical seal failure, rapidly releasing a massive, high-pressure hydrocarbon gas cloud into your training area.",
+    vocab: ["catastrophic", "hydrocarbon", "escalates", "containment"],
+    opts: [
+      { t: "Activate the general platform alarm, instruct trainees to don emergency breathing apparatus, and proceed systematically to the designated muster point.", pts: 2, fb: "Correct protocol execution. Rapid structured evacuation and immediate use of protective breathing gear are essential for surviving toxic hydrocarbon gas releases." },
+      { t: "Order the trainees to run immediately towards the nearest physical external exit without waiting to grab their protective breathing equipment.", pts: 1, fb: "Highly risky. Running blindly without breathing apparatus exposes the team to fatal toxic inhalation if the expanding gas cloud shifts direction." },
+      { t: "Attempt to manually isolate the volatile leak yourself by aggressively searching for the shut-off valve within the expanding gas cloud.", pts: -99, isGameOver: true, fb: "<strong>GAME OVER.</strong> Entering a highly toxic, explosive hydrocarbon gas cloud without specialized isolation gear is immediately fatal and violates core survival directives." }
+    ],
+    next: 'bonus1_check'
+  },
+  b1: {
+    type: 'bonus',
+    label: "BONUS OPPORTUNITY: Technical Assessment",
+    scene: "To stabilize the broader facility, the central control room urgently requests your professional technical assessment of the failed pump seal prior to the rupture.",
+    vocab: ["stabilize", "assessment", "professional", "rupture"],
+    opts: [
+      { tier: 'best', t: "Provide a concise, highly factual summary of the specific vibration characteristics and frequency changes you observed prior to the mechanical failure." },
+      { tier: 'mid', t: "Speculate broadly on the potential underlying causes of the seal failure based primarily on your previous offshore engineering experience." },
+      { tier: 'poor', t: "Refuse to comment entirely, stating aggressively that formal maintenance investigations are strictly outside the scope of a training instructor." }
+    ],
+    next: 's7'
+  },
+  s7: {
+    type: 'decision',
+    label: "Day 4: Session Resumption",
+    scene: "Following the successful containment of the gas leak, morale among the crew is visibly low, and the trainees appear highly distracted and visibly anxious.",
+    vocab: ["containment", "morale", "anxious", "distracted"],
+    opts: [
+      { t: "Facilitate a structured debriefing session to discuss the traumatic incident constructively before attempting to resume the technical curriculum.", pts: 3, fb: "Superb human-factors management. Addressing psychological stress directly allows trainees to process the event, significantly improving their focus for subsequent technical learning." },
+      { t: "Acknowledge the operational tension briefly, then smoothly pivot to a highly engaging, hands-on practical mechanical activity to distract them.", pts: 2, fb: "A solid instructional pivot. Practical activities demand physical engagement, effectively refocusing the trainees' attention away from residual post-incident anxiety." },
+      { t: "Suggest an extended coffee break to let everyone manually calm their nerves before continuing with the standard theoretical presentation slides.", pts: 1, fb: "A basic coping strategy. However, returning immediately to dense theoretical slides after a major incident will likely result in minimal information retention." },
+      { t: "Push through the remaining material aggressively, reminding them sternly that offshore petrochemical work is inherently dangerous and requires toughness.", pts: -1, fb: "Poor choice. Aggressively dismissing valid psychological safety concerns severely alienates the crew and destroys your credibility as an instructor. Lose 1 point and choose again." }
+    ],
+    next: 's8'
+  },
+  s8: {
+    type: 'decision',
+    label: "Day 4: Diagnostic Software",
+    scene: "A trainee is severely struggling to grasp the complex diagnostic software interface required for calibrating the new generation of electronic control valves.",
+    vocab: ["diagnostic", "calibrating", "electronic", "interface"],
+    opts: [
+      { t: "Pair them with a more experienced local colleague for structured peer mentoring and offer targeted guidance during the complex diagnostic exercise.", pts: 3, fb: "Outstanding instructional technique. Peer mentoring fosters collaborative team dynamics while providing the struggling trainee with immediate, relatable technical assistance." },
+      { t: "Sit with them individually at the computer terminal and slowly walk through the software interface step-by-step until they completely understand it.", pts: 2, fb: "Highly dedicated instruction. While effective for the individual, focusing solely on one trainee risks neglecting the broader pacing of the entire class." },
+      { t: "Provide them with a detailed supplemental software manual and formally suggest they review the technical procedures during their off-shift hours.", pts: 1, fb: "A minimal-effort approach. Handing over a dense manual shifts the learning burden entirely onto the trainee, reducing the value of instructor-led training." },
+      { t: "Openly criticize their lack of technical preparation in front of the group to aggressively motivate them to study harder tonight.", pts: -1, fb: "Poor choice. Public humiliation is an unprofessional, destructive pedagogical tactic that breeds resentment and eliminates collaborative learning. Lose 1 point and choose again." }
+    ],
+    next: 's9'
+  },
+  s9: {
+    type: 'decision',
+    label: "Day 4: Supervisor Conflict",
+    scene: "A maintenance supervisor interrupts your session, aggressively demanding that two key trainees leave immediately to fix an urgent, though non-critical, pipeline issue.",
+    vocab: ["interrupts", "aggressively", "non-critical", "pipeline"],
+    opts: [
+      { t: "Negotiate firmly, explaining the strict compliance necessity of the formal training, but proactively offer to release them slightly early.", pts: 3, fb: "Excellent conflict resolution. You successfully maintained the integrity of the compliance training while pragmatically acknowledging the operational pressures faced by the supervisor." },
+      { t: "Refuse the request outright, aggressively citing the rigid corporate mandate that mandatory safety training must never be interrupted by maintenance.", pts: 2, fb: "A strictly compliant stance. Protecting the training mandate is procedurally correct, though an aggressive refusal damages long-term working relationships with local supervisors." },
+      { t: "Reluctantly allow the trainees to leave immediately, but require them to independently complete a lengthy written assignment to make up the time.", pts: 1, fb: "A weak concession. Compromising the scheduled training degrades its perceived value, and self-study assignments rarely replicate the rigor of supervised technical instruction." },
+      { t: "Agree enthusiastically, stating publicly that real-world reactive maintenance always takes absolute precedence over classroom theoretical learning.", pts: -1, fb: "Poor choice. Undermining your own curriculum signals to the crew that corporate safety compliance is merely optional bureaucracy. Lose 1 point and choose again." }
+    ],
+    disc: "How can safety training coordinators effectively manage scheduling conflicts without undermining the operational authority of local site supervisors?",
+    next: 's10'
+  },
+  s10: {
+    type: 'decision',
+    label: "Day 4: Departure Delay",
+    scene: "Your return helicopter is scheduled, but a sudden technical query arises regarding the highly specific correct reassembly procedure for the repaired pump.",
+    vocab: ["helicopter", "reassembly", "procedure", "query"],
+    opts: [
+      { t: "Provide a comprehensive written engineering handover detailing the correct maintenance procedures before boarding the scheduled transit flight.", pts: 3, fb: "Outstanding professionalism. Leaving explicit written instructions ensures safe, accurate equipment reassembly without violating your strict aviation departure schedule." },
+      { t: "Give a rapid verbal technical briefing to the lead engineer and promise to send detailed diagnostic documentation once you reach the mainland office.", pts: 2, fb: "A functional response. A verbal brief provides immediate guidance, but delays in sending written confirmation increase the risk of reassembly errors." },
+      { t: "Advise them to independently consult the manufacturer's operational manual, as your scheduled departure time is rapidly approaching.", pts: 1, fb: "A dismissive conclusion. While factually correct, failing to leverage your specific expertise leaves the local team unsupported during a critical technical transition." },
+      { t: "Delay your return flight indefinitely to personally oversee the mechanical repair, severely violating the strict offshore logistics schedule.", pts: -1, fb: "Poor choice. Deliberately missing offshore aviation transport disrupts complex logistical chains and creates severe scheduling consequences for multiple crews. Lose 1 point and choose again." }
+    ],
+    next: 'e2'
+  },
+  e2: {
+    type: 'emergency',
+    label: "EMERGENCY: Mid-Air Turbulence",
+    scene: "During the transit flight back to the mainland, the helicopter experiences sudden, severe atmospheric turbulence and a critical engine warning light prominently illuminates.",
+    vocab: ["transit", "atmospheric", "illuminates", "turbulence"],
+    opts: [
+      { t: "Ensure your safety harness is securely fastened, adopt the mandated brace position, and calmly follow the pilot's emergency communication instructions.", pts: 2, fb: "Perfect crisis behaviour. Adhering strictly to aviation emergency protocols and maintaining passenger discipline maximizes the chances of a safe, controlled response." },
+      { t: "Unbuckle your harness slightly to peer out the helicopter window and attempt to visually identify the external source of the engine malfunction.", pts: 1, fb: "Highly dangerous. Unbuckling during severe atmospheric turbulence risks fatal blunt-force trauma and distracts the flight crew from handling the critical mechanical emergency." },
+      { t: "Panic openly and attempt to physically assist the pilot by forcefully suggesting alternative emergency autorotation landing protocols.", pts: -99, isGameOver: true, fb: "<strong>GAME OVER.</strong> Interfering physically or verbally with an aviation crew during a critical mid-air emergency guarantees catastrophic results." }
+    ],
+    next: 'bonus2_check'
+  },
+  b2: {
+    type: 'bonus',
+    label: "BONUS OPPORTUNITY: Incident Statement",
+    scene: "Upon landing safely, the regional aviation authority immediately requests a preliminary passenger witness statement regarding the turbulent flight conditions.",
+    vocab: ["aviation", "preliminary", "witness", "turbulent"],
+    opts: [
+      { tier: 'best', t: "Draft a precise, highly objective timeline detailing the sequence of events and atmospheric warning signs you observed during the turbulent flight." },
+      { tier: 'mid', t: "Provide a brief verbal account to the investigating officials, focusing heavily on your personal emotional response to the severe turbulence." },
+      { tier: 'poor', t: "Decline the official request entirely, aggressively arguing that as a non-aviation passenger, your technical insights are completely irrelevant." }
+    ],
+    next: 's11'
+  },
+  s11: {
+    type: 'decision',
+    label: "Day 5: Office Reporting",
+    scene: "Back at headquarters, senior management requests a comprehensive report detailing both the technical training effectiveness and the offshore pump incident.",
+    vocab: ["headquarters", "comprehensive", "effectiveness", "incident"],
+    opts: [
+      { t: "Compile a heavily integrated report intelligently combining the required training metrics with critical root-cause observations from the pump failure.", pts: 3, fb: "Superb executive communication. Integrating the data highlights the vital connection between technical training standards and real-world mechanical reliability." },
+      { t: "Write two separate detailed documents: one standard mandatory training summary and one highly confidential incident observation report.", pts: 2, fb: "Very organized approach. Separating the documentation maintains administrative boundaries, though it requires management to independently connect the underlying themes." },
+      { t: "Submit the standard training matrix as originally requested and simply mention the catastrophic pump incident briefly in the concluding paragraph.", pts: 1, fb: "A severely lacking report. Minimizing a major mechanical failure in a training document fails to provide management with actionable safety intelligence." },
+      { t: "Focus the entire management report exclusively on the mechanical incident, completely neglecting the core training metrics that were originally requested.", pts: -1, fb: "Poor choice. Ignoring the primary directive of reporting training outcomes fails your core administrative responsibilities as an instructor. Lose 1 point and choose again." }
+    ],
+    next: 's12'
+  },
+  s12: {
+    type: 'decision',
+    label: "Day 5: Curriculum Update",
+    scene: "The global training director proposes radically updating the company-wide safety syllabus based specifically on your recent firsthand offshore experience.",
+    vocab: ["radically", "syllabus", "firsthand", "proposes"],
+    opts: [
+      { t: "Collaborate extensively with the engineering team to intelligently draft practical, scenario-based learning modules reflecting the recent catastrophic events.", pts: 3, fb: "Outstanding strategic leadership. Translating real-world operational crises into structured, scenario-based training permanently elevates the technical competency of the entire organization." },
+      { t: "Provide your personal field notes directly to the corporate curriculum developers and let them independently interpret the complex technical requirements.", pts: 2, fb: "A solid contribution. Handing over data is helpful, but distancing yourself from the curriculum drafting process risks the misinterpretation of nuanced technical realities." },
+      { t: "Suggest aggressively buying a generic off-the-shelf training package that roughly covers the new safety regulations and contemporary industry standards.", pts: 1, fb: "A missed opportunity. Generic packages fulfill basic compliance but fail to capture the specific, high-stakes operational realities unique to your company's infrastructure." },
+      { t: "Argue forcefully that the current syllabus is perfectly adequate and the recent offshore incident was merely a statistically unlikely anomaly.", pts: -1, fb: "Poor choice. Refusing to adapt training curricula in the face of near-miss disasters demonstrates a dangerous lack of progressive safety leadership. Lose 1 point and choose again." }
+    ],
+    disc: "Why is incorporating real-world incident data into standardized training curricula essential for continuous organizational learning and risk mitigation?",
+    next: 'end'
+  }
+};
+
+const route = ["s1","s2","s3","s4","s5","s6","e1","b1","s7","s8","s9","s10","e2","b2","s11","s12"];
+const displayStages = ["s1","s2","s3","s4","s5","s6","e1","s7","s8","s9","s10","e2","s11","s12"]; // For dots
+
+function fisherYatesShuffle(array) {
+  let arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function init() {
+  const content = document.getElementById('app-content');
+  content.innerHTML = `
+    <div class="landing-content">
+      <h1 style="font-size:2.2rem; color:var(--accent); margin-bottom:1rem;">Offshore Training Lead</h1>
+      <p>Assume the role of an International Training Engineer specializing in high-pressure energy industry equipment.</p>
+      <p>Navigate a turbulent week spanning corporate headquarters and a remote offshore rig. Your technical expertise, regulatory compliance, and crisis management will be tested.</p>
+      
+      <ul>
+        <li><strong>12 Core Scenarios:</strong> Evaluate complex situations. Select the optimal response for maximum points.</li>
+        <li><strong>2 Critical Emergencies:</strong> Survive extreme situations. A wrong move results in immediate failure.</li>
+        <li><strong>Performance Bands:</strong> Your final score out of 40 will determine your professional tier.</li>
+      </ul>
+      <button class="btn-next show" style="float:none; display:inline-block;" onclick="loadStage('s1')">Initiate Deployment </button>
+    </div>
+  `;
+}
+
+function updateDots(currentId) {
+  const track = document.getElementById('progress-dots');
+  track.innerHTML = '';
+  
+  let currentIndex = displayStages.indexOf(currentId);
+  if (currentIndex === -1) {
+    if (currentId === 'b1') currentIndex = displayStages.indexOf('e1');
+    if (currentId === 'b2') currentIndex = displayStages.indexOf('e2');
+  }
+
+  displayStages.forEach((id, idx) => {
+    let div = document.createElement('div');
+    div.className = 'dot';
+    if (idx < currentIndex) div.classList.add('done');
+    if (idx === currentIndex) div.classList.add('active');
+    if (id.startsWith('e') && idx === currentIndex) div.classList.add('emg');
+    track.appendChild(div);
+  });
+}
+
+function updateScore() {
+  document.getElementById('score-display').innerText = `${state.score} / 40 pts`;
+}
+
+function getNextValidStage(currentId) {
+  if (currentId === 'e1') {
+    const maxSoFar = 6 * 3 + 2; // 20
+    if (state.score < maxSoFar) return 'b1';
+    return 's7';
+  }
+  if (currentId === 'b1') return 's7';
+  if (currentId === 'e2') {
+    const maxSoFar = 34;
+    if (state.score < maxSoFar) return 'b2';
+    return 's11';
+  }
+  if (currentId === 'b2') return 's11';
+  return SCENARIOS[currentId].next;
+}
+
+function loadStage(id) {
+  if (id === 'end') return finishGame(false);
+  
+  document.getElementById('header-bar').style.display = 'flex';
+  updateDots(id);
+  updateScore();
+  
+  state.answered = false;
+  const stage = SCENARIOS[id];
+  
+  let html = `
+    <span class="stage-label">${stage.label}</span>
+    <div class="scenario-text">${stage.scene}</div>
+    <div class="vocab-tags">
+      ${stage.vocab.map(v => `<span class="tag">${v}</span>`).join('')}
+    </div>
+    <div class="options-container" id="options-area">
+  `;
+  
+  let opts = fisherYatesShuffle(stage.opts);
+  opts.forEach((o, i) => {
+    const safeO = JSON.stringify(o).replace(/'/g, "&#39;").replace(/"/g, '&quot;');
+    html += `<button class="btn-option" id="opt-${i}" onclick='handleSelect("${id}", ${i}, ${safeO})'>${o.t}</button>`;
+  });
+  
+  html += `
+    </div>
+    <div class="feedback-box" id="feedback"></div>
+    <div class="discussion-box" id="discussion"></div>
+    <div class="clearfix">
+      <button class="btn-next" id="btn-continue"></button>
+    </div>
+  `;
+  
+  document.getElementById('app-content').innerHTML = html;
+}
+
+function handleSelect(stageId, btnIndex, optData) {
+  if (state.answered && optData.pts !== -1) return;
+  
+  const stageType = SCENARIOS[stageId].type;
+  const isPoor = optData.pts === -1 && stageType === 'decision';
+  
+  const fb = document.getElementById('feedback');
+  fb.innerHTML = optData.fb || (optData.tier === 'best' ? "Excellent technical assessment. This precisely provides the critical data needed." : optData.tier === 'mid' ? "Acceptable, though highly speculative input is less reliable during crises." : "Poor choice. Failing to assist completely negates your value in an emergency.");
+  fb.className = 'feedback-box show';
+  
+  // Set colours based on result
+  if (optData.isGameOver || isPoor || optData.tier === 'poor') {
+    fb.style.backgroundColor = 'var(--danger-bg)';
+    fb.style.borderColor = 'var(--danger-bd)';
+    fb.style.color = 'var(--danger-tx)';
+  } else if (optData.pts === 3 || optData.pts === 2 || optData.tier === 'best') {
+    fb.style.backgroundColor = 'var(--success-bg)';
+    fb.style.borderColor = 'var(--success-bd)';
+    fb.style.color = 'var(--success-tx)';
+  } else {
+    fb.style.backgroundColor = 'var(--warn-bg)';
+    fb.style.borderColor = 'var(--warn-bd)';
+    fb.style.color = 'var(--warn-tx)';
+  }
+
+  const btnCont = document.getElementById('btn-continue');
+
+  if (isPoor) {
+    state.score -= 1;
+    updateScore();
+    document.getElementById(`opt-${btnIndex}`).disabled = true;
+    return;
+  }
+  
+  state.answered = true;
+  
+  // Disable all options
+  const buttons = document.getElementById('options-area').getElementsByTagName('button');
+  for (let b of buttons) b.disabled = true;
+  document.getElementById(`opt-${btnIndex}`).style.borderColor = 'var(--accent)';
+
+  if (stageType === 'bonus') {
+    const target = stageId === 'b1' ? 20 : 34;
+    const shortfall = target - state.score;
+    let actualPts = 0;
+    if (optData.tier === 'best') actualPts = shortfall;
+    if (optData.tier === 'mid') actualPts = Math.max(1, Math.floor(shortfall / 2));
+    state.score += actualPts;
+  } else {
+    state.score += (optData.pts || 0);
+  }
+  
+  updateScore();
+
+  const discBox = document.getElementById('discussion');
+  if (SCENARIOS[stageId].disc && !optData.isGameOver) {
+    discBox.innerHTML = `<strong>Discussion Point:</strong> ${SCENARIOS[stageId].disc}`;
+    discBox.className = 'discussion-box show';
+  }
+
+  if (optData.isGameOver) {
+    btnCont.innerText = "Initiate Incident Review";
+    btnCont.onclick = () => finishGame(true);
+    btnCont.className = 'btn-next show';
+    btnCont.style.backgroundColor = 'var(--danger-bd)';
+  } else {
+    btnCont.innerText = "Proceed to Next Event";
+    btnCont.onclick = () => loadStage(getNextValidStage(stageId));
+    btnCont.className = 'btn-next show';
+  }
+}
+
+function finishGame(isGameOver) {
+  document.getElementById('header-bar').style.display = 'none';
+  const c = document.getElementById('app-content');
+  
+  let bClass, bTitle, bText;
+  
+  if (isGameOver) {
+    bClass = "band-4";
+    bTitle = "Band 4: Operational Fatality (Game Over)";
+    bText = "A critical failure occurred under extreme pressure. In the offshore energy sector, compromising core survival directives during emergencies inevitably results in catastrophic loss of life and massive infrastructure destruction.";
+  } else if (state.score >= 36) {
+    bClass = "band-1";
+    bTitle = "Band 1: Outstanding International Training Lead (36–40 pts)";
+    bText = "Exceptional performance. You flawlessly balanced demanding logistical pressures, rigid safety compliance, and complex human factors. Your highly adaptive leadership actively prevented disasters and optimized organizational training metrics.";
+  } else if (state.score >= 28) {
+    bClass = "band-2";
+    bTitle = "Band 2: Competent Senior Formateur (28–35 pts)";
+    bText = "Strong management. You successfully maintained overall operational integrity and navigated severe crises safely. Minor compromises were made regarding procedure, but your foundational technical leadership remains highly effective.";
+  } else if (state.score >= 20) {
+    bClass = "band-3";
+    bTitle = "Band 3: Developing Technical Instructor (20–27 pts)";
+    bText = "You survived the deployment, but relied heavily on reactive decision-making. Overlooking critical maintenance warning signs and compromising compliance standards exposed the crew to unnecessary, severe industrial risks.";
+  } else {
+    bClass = "band-4";
+    bTitle = "Band 4: Immediate Procedural Review (Under 20 pts)";
+    bText = "Severe regulatory and technical failures marked your rotation. Bypassing essential protocols and demonstrating poor hazard recognition actively jeopardized the facility. An immediate, intensive retraining period is required.";
+  }
+  
+  c.innerHTML = `
+    <div class="debriefing">
+      <h1>Deployment Complete</h1>
+      <div class="final-score">Final Assessment Score: ${state.score} / 40</div>
+      
+      <div class="band-box ${bClass}">
+        <h2 style="font-size:1.2rem; margin-bottom:8px;">${bTitle}</h2>
+        <p>${bText}</p>
+      </div>
+      
+      <button class="btn-next show" style="float:none; display:inline-block;" onclick="location.reload()">Restart Scenario </button>
+    </div>
+  `;
+}
+
+init();
+</script>
+</body>
+</html>

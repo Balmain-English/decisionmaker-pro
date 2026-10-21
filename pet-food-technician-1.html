@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Food Factory Shift: Easy English Game</title>
+    <style>
+        :root {
+            --bg-factory: #1e293b;
+            --card-bg: #ffffff;
+            --factory-blue: #2563eb;
+            --factory-blue-hover: #1d4ed8;
+            --warning-amber: #d97706;
+            --success-green: #16a34a;
+            --info-blue: #0284c7;
+            --text-dark: #0f172a;
+            --border-color: #cbd5e1;
+            --error-red: #dc2626;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-factory);
+            background-image: radial-gradient(#334155 1.5px, transparent 0);
+            background-size: 24px 24px;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 780px;
+            border-radius: 12px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border: 3px solid var(--factory-blue);
+        }
+
+        header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            color: var(--factory-blue);
+            font-size: 1.6rem;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: #f1f5f9;
+            padding: 8px 14px;
+            border-radius: 20px;
+            color: var(--text-dark);
+        }
+
+        .scenario-box {
+            margin-bottom: 20px;
+        }
+
+        .scenario-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .feedback-banner {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            display: none;
+            border-left: 5px solid;
+        }
+
+        .feedback-banner.success {
+            background-color: #f0fdf4;
+            color: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        .feedback-banner.info-blue {
+            background-color: #f0f9ff;
+            color: var(--info-blue);
+            border-color: var(--info-blue);
+        }
+
+        .feedback-banner.warning {
+            background-color: #fffbeb;
+            color: var(--warning-amber);
+            border-color: var(--warning-amber);
+        }
+
+        .feedback-banner.error {
+            background-color: #fef2f2;
+            color: var(--error-red);
+            border-color: var(--error-red);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        .btn-option:hover {
+            border-color: var(--factory-blue);
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .btn-action {
+            background-color: var(--factory-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-block;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-action:hover {
+            background-color: var(--factory-blue-hover);
+            transform: scale(1.02);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .final-score {
+            font-size: 2.2rem;
+            color: var(--factory-blue);
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--factory-blue);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .landing-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .landing-card h2 {
+            color: var(--factory-blue);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .landing-card p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <header id="game-header" class="hidden">
+        <h1>Pet Food Factory Helper</h1>
+        <div class="status-bar">
+            <span>Decisions: <span id="decision-count">0</span></span>
+            <span>Score: <span id="score-display">0</span></span>
+        </div>
+    </header>
+
+    <main id="game-body">
+        <!-- LANDING PAGE -->
+        <div id="landing-screen" class="landing-card">
+            <h2>Welcome to Happy Tail Pet Food Factory!</h2>
+            <p>You work in a pet food factory today. Visitors come at 10:00 AM. One machine makes a bad noise, and another machine is hot!</p>
+            
+            <p>This game helps you practise your <strong>English reading</strong> and work safety skills!</p>
+
+            <p style="text-align: center; font-weight: bold; color: var(--factory-blue);">Put on your boots and start your work!</p>
+
+            <button class="btn-action" onclick="startGame()">Start Work</button>
+        </div>
+
+        <!-- GAMEPLAY & FINAL SCREEN -->
+        <div id="gameplay-screen" class="hidden">
+            <div id="feedback" class="feedback-banner"></div>
+            
+            <div class="scenario-box">
+                <span class="badge" id="location-badge">Location: Locker Room</span>
+                <div class="scenario-text" id="scenario-text">Loading game...</div>
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Option buttons injected dynamically -->
+            </div>
+
+            <button id="restart-btn" class="btn-action hidden" onclick="resetToLanding()">Play Again</button>
+        </div>
+    </main>
+</div>
+
+<script>
+const gameData = {
+    start: {
+        location: "Locker Room (06:00 AM)",
+        text: "You arrive at work. Visitors come at 10:00 AM. What do you do before you start work?",
+        options: [
+            { 
+                text: "Put on clean boots, a safety vest, ear protection, and a hairnet. Wash your hands.", 
+                score: 3, 
+                next: "morning_briefing",
+                feedback: "Great start! Clean hands and safety clothes are necessary in a food factory."
+            },
+            { 
+                text: "Put on boots and a vest. Put the hairnet in your pocket.", 
+                score: 2, 
+                next: "morning_briefing",
+                feedback: "Good, but wear your hairnet before going near food lines."
+            },
+            { 
+                text: "Put on boots, but do not wash your hands because you are late.", 
+                score: 1, 
+                next: "hygiene_catchup",
+                feedback: "Not good! Dirty hands bring germs to machines. Go wash them now."
+            },
+            { 
+                text: "Wear dirty street shoes into the factory.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Dangerous! Dirty shoes carry outside dirt into food areas. Try again!"
+            }
+        ]
+    },
+
+    hygiene_catchup: {
+        location: "Door Gate",
+        text: "The door light is red because your hands are dirty. What do you do now?",
+        options: [
+            { 
+                text: "Wash hands with soap and water for 20 seconds.", 
+                score: 3, 
+                next: "morning_briefing",
+                feedback: "Great! The door light turns green. Clean hands keep pet food safe."
+            },
+            { 
+                text: "Wash hands quickly with cold water only.", 
+                score: 2, 
+                next: "morning_briefing",
+                feedback: "The door opens, but cold water without soap does not kill germs."
+            },
+            { 
+                text: "Ask another worker to open the door for you.", 
+                score: 1, 
+                next: "morning_briefing",
+                feedback: "You got inside, but you must always wash your hands."
+            },
+            { 
+                text: "Climb over the safety gate.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Not allowed! Climbing safety gates makes the alarm ring. Try again!"
+            }
+        ]
+    },
+
+    morning_briefing: {
+        location: "Control Room",
+        text: "Your boss says: 'Machine 2 makes a loud noise.' How do you check the machine?",
+        options: [
+            { 
+                text: "Press the red Stop button, turn off the power, and check the machine.", 
+                score: 3, 
+                next: "mixer_problem",
+                feedback: "Great work! Turning off power first stops bad accidents."
+            },
+            { 
+                text: "Turn off the wall switch and open the cover slowly.", 
+                score: 2, 
+                next: "mixer_problem",
+                feedback: "Okay, but other workers can turn wall switches back on by accident."
+            },
+            { 
+                text: "Look through the window while the machine works.", 
+                score: 1, 
+                next: "mixer_catchup",
+                feedback: "Looking helps, but you must stop the machine to fix problems inside."
+            },
+            { 
+                text: "Open the metal cover while parts move fast.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Very dangerous! Never open machine covers while parts move. Try again!"
+            }
+        ]
+    },
+
+    mixer_catchup: {
+        location: "Machine 2",
+        text: "You look through the window. Smoke comes from the machine! What do you do?",
+        options: [
+            { 
+                text: "Press the red Stop button and call your boss.", 
+                score: 3, 
+                next: "mixer_problem",
+                feedback: "Great reaction! Pressing the Stop button cuts power and stops fires."
+            },
+            { 
+                text: "Get a fire extinguisher and stand near the machine.", 
+                score: 2, 
+                next: "mixer_problem",
+                feedback: "Good idea, but cutting power first is safer."
+            },
+            { 
+                text: "Open the box to check wires while smoke comes out.", 
+                score: 1, 
+                next: "mixer_problem",
+                feedback: "Dangerous! Opening wire boxes with smoke can give you an electric shock."
+            },
+            { 
+                text: "Throw a bucket of water on the machine.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Dangerous! Water on electric machines causes fire. Try again!"
+            }
+        ]
+    },
+
+    mixer_problem: {
+        location: "Mixing Room",
+        text: "Inside Machine 2, a metal bolt is loose near the blades. What do you do?",
+        options: [
+            { 
+                text: "Fix the loose bolt and check pet food with the metal detector.", 
+                score: 3, 
+                next: "emergency_1",
+                feedback: "Perfect! Fixing the bolt stops damage, and metal detectors keep food safe."
+            },
+            { 
+                text: "Take out the bolt, tighten nearby screws, and start the machine.", 
+                score: 2, 
+                next: "emergency_1",
+                feedback: "Good job, but always test food for metal pieces."
+            },
+            { 
+                text: "Put the bolt in your pocket and run the machine slow.", 
+                score: 1, 
+                next: "metal_catchup",
+                feedback: "Not good! Running slow does not stop other parts from falling."
+            },
+            { 
+                text: "Leave the loose bolt inside the machine.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Bad idea! Loose metal breaks machines and hurts animals. Try again!"
+            }
+        ]
+    },
+
+    metal_catchup: {
+        location: "Packing Line",
+        text: "You did not check the metal detector earlier. Now the alarm rings! What do you do?",
+        options: [
+            { 
+                text: "Stop the machine, throw away bad bags into waste bins, and test the detector.", 
+                score: 3, 
+                next: "emergency_1",
+                feedback: "Great job! Removing unsafe bags keeps pets healthy."
+            },
+            { 
+                text: "Put a test metal piece into the detector to see if it works.", 
+                score: 2, 
+                next: "emergency_1",
+                feedback: "Good test, but remember to remove bad bags too."
+            },
+            { 
+                text: "Turn off the alarm sound and let bags continue moving.", 
+                score: 1, 
+                next: "emergency_1",
+                feedback: "Not safe! Turning off alarms lets bad food go to stores."
+            },
+            { 
+                text: "Unplug the metal detector.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Not allowed! Turning off safety machines creates big risks. Try again!"
+            }
+        ]
+    },
+
+    emergency_1: {
+        isEmergency: true,
+        location: "Hot Pipe Area - DANGER!",
+        text: "DANGER: A hot pipe breaks! Hot liquid spills near electric wires. You see sparks! What do you do?",
+        options: [
+            { 
+                text: "Press the main Stop button, tell workers to go out, and turn off the pipe valve.", 
+                score: 3, 
+                next: "biscuit_extruder", 
+                survive: true,
+                feedback: "Great job! Cutting power stops electric shocks, and closing the valve stops hot spills."
+            },
+            { 
+                text: "Use a mop to clean hot liquid near electric sparks.", 
+                score: 0, 
+                survive: false, 
+                failReason: "GAME OVER: Mopping liquid on electric sparks causes electric shocks! Always cut power first!"
+            }
+        ]
+    },
+
+    biscuit_extruder: {
+        location: "Hot Biscuit Machine",
+        text: "The biscuit machine is very hot (210°C). Biscuits are burning. What do you do?",
+        options: [
+            { 
+                text: "Lower the heat, check cooling water, and slow down the machine.", 
+                score: 3, 
+                next: "liquid_ingredients",
+                feedback: "Great work! Lowering heat and checking water fixes the temperature fast."
+            },
+            { 
+                text: "Add more water to the food mix to cool it down.", 
+                score: 2, 
+                next: "liquid_ingredients",
+                feedback: "It lowers heat, but too much water makes food soft and bad."
+            },
+            { 
+                text: "Turn on fans and keep cooking.", 
+                score: 1, 
+                next: "extruder_catchup",
+                feedback: "Fans help a little, but heat inside stays too high."
+            },
+            { 
+                text: "Pour cold oil into the machine.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Dangerous! Adding oil to a hot machine causes fire. Try again!"
+            }
+        ]
+    },
+
+    extruder_catchup: {
+        location: "Hot Biscuit Machine",
+        text: "Burnt food blocks the machine blades. How do you clean it?",
+        options: [
+            { 
+                text: "Stop the machine, wait for it to cool down, and use plastic safety tools.", 
+                score: 3, 
+                next: "liquid_ingredients",
+                feedback: "Excellent! Safe tools stop damage to parts."
+            },
+            { 
+                text: "Put on big leather gloves and pull out burnt food.", 
+                score: 2, 
+                next: "liquid_ingredients",
+                feedback: "Good gloves help, but cooling the machine first is much safer."
+            },
+            { 
+                text: "Use a sharp metal tool to scrape burnt food while hot.", 
+                score: 1, 
+                next: "liquid_ingredients",
+                feedback: "Metal tools can scratch and break expensive machine parts."
+            },
+            { 
+                text: "Use bare hands to pull food near moving blades.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Dangerous! Never put bare hands near hot moving blades. Try again!"
+            }
+        ]
+    },
+
+    liquid_ingredients: {
+        location: "Oil Pump Area",
+        text: "Fish oil is good for cat food. The screen shows zero oil flow, but the motor turns. What is wrong?",
+        options: [
+            { 
+                text: "Check the valve and clean dirty oil filters.", 
+                score: 3, 
+                next: "auditor_visit",
+                feedback: "Great work! Dirty filters are the main reason oil stops moving."
+            },
+            { 
+                text: "Hit the pump gently with a rubber hammer.", 
+                score: 2, 
+                next: "auditor_visit",
+                feedback: "Gentle taps can open stuck valves, but cleaning filters is better."
+            },
+            { 
+                text: "Make the pump go at full speed.", 
+                score: 1, 
+                next: "oil_catchup",
+                feedback: "Running empty pumps at full speed breaks machine parts."
+            },
+            { 
+                text: "Take off oil hoses while the pump is working.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Messy! Removing hoses sprays fish oil on the floor. Try again!"
+            }
+        ]
+    },
+
+    oil_catchup: {
+        location: "Oil Pump Area",
+        text: "The pump broke! Fish oil spills on the floor. How do you clean it?",
+        options: [
+            { 
+                text: "Put down spill powder, put up yellow 'Wet Floor' signs, and clean with soap.", 
+                score: 3, 
+                next: "auditor_visit",
+                feedback: "Excellent! Powder stops oil from making people fall."
+            },
+            { 
+                text: "Mop the floor with hot water and soap.", 
+                score: 2, 
+                next: "auditor_visit",
+                feedback: "Good, but without powder, water spreads oil across the floor."
+            },
+            { 
+                text: "Cover the oil with cardboard boxes.", 
+                score: 1, 
+                next: "auditor_visit",
+                feedback: "Not safe! Boxes get wet with oil and make workers fall."
+            },
+            { 
+                text: "Do nothing and go on your break.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Not good! Oil on the floor causes bad falls. Always clean spills!"
+            }
+        ]
+    },
+
+    auditor_visit: {
+        location: "Factory Floor (10:00 AM)",
+        text: "Visitors arrive! A visitor asks: 'How often do you check weight scales?'",
+        options: [
+            { 
+                text: "Show computer records and answer in simple English.", 
+                score: 3, 
+                next: "packaging_line",
+                feedback: "Very good! Clear records and good English impress visitors."
+            },
+            { 
+                text: "Point to the green test sticker on the scale.", 
+                score: 2, 
+                next: "packaging_line",
+                feedback: "Good! Test stickers show machines follow safety rules."
+            },
+            { 
+                text: "Smile, nod, and say: 'Scales are very good every day!'", 
+                score: 1, 
+                next: "auditor_catchup",
+                feedback: "Friendly, but visitors need written proof, not just words."
+            },
+            { 
+                text: "Hide papers under a table and stay quiet.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Bad idea! Hiding papers is wrong. Answer visitors politely!"
+            }
+        ]
+    },
+
+    auditor_catchup: {
+        location: "Factory Floor",
+        text: "The visitor asks: 'Can you show me a test weight?' What do you do?",
+        options: [
+            { 
+                text: "Get the official 10 kg test weight and put it on the scale.", 
+                score: 3, 
+                next: "packaging_line",
+                feedback: "Great job! Showing 10.00 kg on the screen proves the scale works."
+            },
+            { 
+                text: "Ask your manager to bring test papers from the office.", 
+                score: 2, 
+                next: "packaging_line",
+                feedback: "Good teamwork! Managers help answer visitor questions."
+            },
+            { 
+                text: "Put a 10 kg bag of pet food on the scale.", 
+                score: 1, 
+                next: "packaging_line",
+                feedback: "Food bags do not have exact weights. Official metal weights are better."
+            },
+            { 
+                text: "Press your foot on the scale to change numbers.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Wrong! Pressing scales with your foot looks bad. Do it correctly!"
+            }
+        ]
+    },
+
+    packaging_line: {
+        location: "Canning Area",
+        text: "It is 01:00 PM. The canning machine is stuck and cans are bending. What do you do?",
+        options: [
+            { 
+                text: "Fix machine guides and replace old rubber parts.", 
+                score: 3, 
+                next: "pesticide_hazard",
+                feedback: "Great job! Replacing old parts stops cans from bending."
+            },
+            { 
+                text: "Slow down machine speed by 15% to stop cans hitting each other.", 
+                score: 2, 
+                next: "pesticide_hazard",
+                feedback: "Slower speed helps, but replacing parts is better."
+            },
+            { 
+                text: "Use a hammer to hit machine parts while running.", 
+                score: 1, 
+                next: "canning_catchup",
+                feedback: "Not good! Hitting working machines damages precision parts."
+            },
+            { 
+                text: "Put bent cans directly into shipping boxes.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Bad quality! Bent cans let in air and spoil food. Throw out damaged cans!"
+            }
+        ]
+    },
+
+    canning_catchup: {
+        location: "Canning Area",
+        text: "A robot arm dropped a box of metal cans. How do you clean the area?",
+        options: [
+            { 
+                text: "Stop the robot, wear safety gloves, and pick up cans.", 
+                score: 3, 
+                next: "pesticide_hazard",
+                feedback: "Safe action! Safety gloves protect your hands from sharp metal edges."
+            },
+            { 
+                text: "Use a magnetic broom to pick up metal cans.", 
+                score: 2, 
+                next: "pesticide_hazard",
+                feedback: "Smart tool choice! Magnetic brooms pick up cans fast and safely."
+            },
+            { 
+                text: "Start the robot arm again and hope it clears the cans.", 
+                score: 1, 
+                next: "pesticide_hazard",
+                feedback: "Risky! Robots cannot clear broken cans by themselves."
+            },
+            { 
+                text: "Kick cans under the machine with your boots.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Bad cleaning! Hiding dirty cans brings bugs. Keep floors clean!"
+            }
+        ]
+    },
+
+    pesticide_hazard: {
+        location: "Warehouse",
+        text: "A worker leaves a bag of pest spray near pet food grain! What do you do?",
+        options: [
+            { 
+                text: "Stop the worker, move spray to locked storage, and tell your manager.", 
+                score: 3, 
+                next: "emergency_2",
+                feedback: "Important food safety action! Pest sprays must NEVER go near food."
+            },
+            { 
+                text: "Tell the worker to put the spray in sealed boxes far from food.", 
+                score: 2, 
+                next: "emergency_2",
+                feedback: "Good action. Sealed boxes far from food are safe."
+            },
+            { 
+                text: "Move the spray 5 metres away behind wooden boxes.", 
+                score: 1, 
+                next: "pesticide_catchup",
+                feedback: "Not far enough! Spray chemicals can still leak near pet food."
+            },
+            { 
+                text: "Do nothing because pest spray is not your job.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Not good! Food safety is everyone's job. Spray near food ruins batch quality!"
+            }
+        ]
+    },
+
+    pesticide_catchup: {
+        location: "Warehouse",
+        text: "A forklift hit the chemical bag! Powder spills on the floor. How do you clean it?",
+        options: [
+            { 
+                text: "Block the area, wear a mask and gloves, and use a chemical spill kit.", 
+                score: 3, 
+                next: "emergency_2",
+                feedback: "Great safety response! Spill kits stop chemical dust in the air."
+            },
+            { 
+                text: "Sweep powder into a dustpan and throw it into a sealed bin.", 
+                score: 2, 
+                next: "emergency_2",
+                feedback: "Okay, but always wear a mask so you do not breathe chemical dust."
+            },
+            { 
+                text: "Blow chemical powder away with an air hose.", 
+                score: 1, 
+                next: "emergency_2",
+                feedback: "Dangerous! Air hoses blow toxic dust into the air and onto food!"
+            },
+            { 
+                text: "Wash chemical powder down the floor drain with water.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Illegal! Washing chemicals down drains poisons water and breaks laws!"
+            }
+        ]
+    },
+
+    emergency_2: {
+        isEmergency: true,
+        location: "Freezer Room - DANGER!",
+        text: "DANGER: Gas leaks in the freezer room! Bad gas fills the air. Workers are inside! What do you do?",
+        options: [
+            { 
+                text: "Press the alarm button, wear a safety mask, and help workers go outside.", 
+                score: 3, 
+                next: "final_shift_end", 
+                survive: true,
+                feedback: "Great response! Bad gas is dangerous. Alarms and masks save lives!"
+            },
+            { 
+                text: "Run into the freezer room with a wet cloth on your mouth.", 
+                score: 0, 
+                survive: false, 
+                failReason: "GAME OVER: Wet cloths do not stop bad gas! Always wear a real safety mask!"
+            }
+        ]
+    },
+
+    final_shift_end: {
+        location: "Shift Change Room (02:00 PM)",
+        text: "Your workday is finished. The next worker asks for your report. What do you do?",
+        options: [
+            { 
+                text: "Write clear notes in the book, explain repairs, and talk to the worker in English.", 
+                score: 3, 
+                next: "finish",
+                feedback: "Excellent finish! Clear notes help the next team work safely."
+            },
+            { 
+                text: "Give a quick 2-minute talk and hand over keys.", 
+                score: 2, 
+                next: "finish",
+                feedback: "Good work! Talking helps, but writing notes in books is better."
+            },
+            { 
+                text: "Leave a short note: 'Machine fixed, good luck!' and go home.", 
+                score: 1, 
+                next: "finish",
+                feedback: "Basic effort. Short notes miss important safety details."
+            },
+            { 
+                text: "Go home without talking to the next worker.", 
+                score: -1, 
+                retry: true, 
+                feedback: "Not good! Leaving without talking causes confusion for the next shift!"
+            }
+        ]
+    }
+};
+
+let currentScore = 0;
+let decisionCount = 0;
+let currentNodeKey = "start";
+
+const landingScreenEl = document.getElementById('landing-screen');
+const gameplayScreenEl = document.getElementById('gameplay-screen');
+const gameHeaderEl = document.getElementById('game-header');
+
+const scenarioTextEl = document.getElementById('scenario-text');
+const optionsContainerEl = document.getElementById('options-container');
+const scoreDisplayEl = document.getElementById('score-display');
+const decisionCountEl = document.getElementById('decision-count');
+const locationBadgeEl = document.getElementById('location-badge');
+const feedbackEl = document.getElementById('feedback');
+const restartBtnEl = document.getElementById('restart-btn');
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startGame() {
+    landingScreenEl.classList.add('hidden');
+    gameHeaderEl.classList.remove('hidden');
+    gameplayScreenEl.classList.remove('hidden');
+    
+    currentScore = 0;
+    decisionCount = 0;
+    currentNodeKey = "start";
+    
+    scoreDisplayEl.textContent = currentScore;
+    decisionCountEl.textContent = decisionCount;
+    
+    feedbackEl.style.display = 'none';
+    restartBtnEl.classList.add('hidden');
+    
+    renderNode(currentNodeKey);
+}
+
+function resetToLanding() {
+    gameplayScreenEl.classList.add('hidden');
+    gameHeaderEl.classList.add('hidden');
+    landingScreenEl.classList.remove('hidden');
+}
+
+function renderNode(nodeKey) {
+    if (nodeKey === "finish") {
+        renderFinalResults();
+        return;
+    }
+
+    const node = gameData[nodeKey];
+
+    if (!node) {
+        console.error("Node missing:", nodeKey);
+        return;
+    }
+
+    locationBadgeEl.textContent = `Location: ${node.location}`;
+    scenarioTextEl.textContent = node.text;
+    optionsContainerEl.innerHTML = '';
+
+    const shuffledOptions = shuffleArray(node.options);
+
+    shuffledOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.textContent = option.text;
+        btn.onclick = () => handleChoice(option, node);
+        optionsContainerEl.appendChild(btn);
+    });
+}
+
+function handleChoice(option, currentNode) {
+    feedbackEl.style.display = 'block';
+    feedbackEl.textContent = option.feedback || option.failReason;
+
+    if (option.score === -1) {
+        currentScore -= 1;
+        scoreDisplayEl.textContent = currentScore;
+        feedbackEl.className = 'feedback-banner error';
+        return;
+    }
+
+    if (currentNode.isEmergency) {
+        decisionCount++;
+        decisionCountEl.textContent = decisionCount;
+
+        if (!option.survive) {
+            locationBadgeEl.textContent = "GAME OVER";
+            scenarioTextEl.textContent = option.failReason;
+            optionsContainerEl.innerHTML = '';
+            
+            feedbackEl.className = 'feedback-banner error';
+            restartBtnEl.classList.remove('hidden');
+            return;
+        } else {
+            currentScore += option.score;
+            scoreDisplayEl.textContent = currentScore;
+            feedbackEl.className = 'feedback-banner success';
+            currentNodeKey = option.next;
+            renderNode(currentNodeKey);
+            return;
+        }
+    }
+
+    currentScore += option.score;
+    decisionCount++;
+
+    scoreDisplayEl.textContent = currentScore;
+    decisionCountEl.textContent = decisionCount;
+
+    if (option.score === 3) {
+        feedbackEl.className = 'feedback-banner success';
+    } else if (option.score === 2) {
+        feedbackEl.className = 'feedback-banner info-blue';
+    } else {
+        feedbackEl.className = 'feedback-banner warning';
+    }
+
+    currentNodeKey = option.next;
+    renderNode(currentNodeKey);
+}
+
+function renderFinalResults() {
+    optionsContainerEl.innerHTML = '';
+    locationBadgeEl.textContent = "Shift End: Factory Exit";
+    
+    let bandTitle = "";
+    let bandDescription = "";
+
+    if (currentScore >= 33) {
+        bandTitle = "Level 1: Expert Worker (33+ Points)";
+        bandDescription = "Great job! You made top decisions for cleaning, repairs, and safety. Your English and work choices were excellent. Pet food was made safely, machines ran well, and you handled emergencies like an expert!";
+    } else if (currentScore >= 24) {
+        bandTitle = "Level 2: Good Worker (24–32 Points)";
+        bandDescription = "Good job! You fixed machines, cleaned spills, and finished your shift safely. You made a few small mistakes, but your choices kept pet food production running safely!";
+    } else if (currentScore >= 15) {
+        bandTitle = "Level 3: Junior Trainee (15–23 Points)";
+        bandDescription = "You finished your shift, but you had machine problems and spills! Practice your English vocabulary, review safety rules, and try again!";
+    } else {
+        bandTitle = "Level 4: Needs Practice (Under 15 Points)";
+        bandDescription = "You finished your shift with low points. You made unsafe choices with cleaning, machines, and chemical safety. Read safety rules carefully, practice your English reading, and play again!";
+    }
+
+    scenarioTextEl.innerHTML = `
+        <h2>Shift Finished!</h2>
+        <div class="final-score">Final Score: ${currentScore} pts</div>
+        <p style="margin-bottom: 12px;"><strong>${bandTitle}</strong></p>
+        <p style="line-height: 1.6; font-size: 1.05rem;">${bandDescription}</p>
+    `;
+
+    restartBtnEl.classList.remove('hidden');
+}
+</script>
+
+</body>
+</html>

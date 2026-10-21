@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="B1 workplace English decision game for an accountant in a shipping and transportation software company.">
+<title>A Busy Day — Accountant at a Shipping Software Company</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#f7f7f4;--surface:#fff;--surface2:#efeee8;--border:#d9d8d2;
+  --text:#1d1d1b;--muted:#6c6c67;--blue:#e7f1fb;--blue-b:#83b7ea;--blue-t:#124a7c;
+  --green:#eaf4df;--green-b:#94c65a;--green-t:#28540b;
+  --amber:#faf0dc;--amber-b:#e9a33b;--amber-t:#684008;
+  --red:#fceaea;--red-b:#e99393;--red-t:#762020;--fatal:#df4545;
+  --radius:10px
+}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:Arial,Helvetica,sans-serif;display:flex;justify-content:center;
+  padding:28px 14px 55px}
+.wrap{width:100%;max-width:740px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.kicker{font-size:12px;color:#92928c;text-transform:uppercase;letter-spacing:.09em}
+.level{font-size:11px;color:var(--blue-t);background:var(--blue);border:1px solid var(--blue-b);
+  border-radius:20px;padding:5px 10px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:26px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.header{display:flex;justify-content:space-between;gap:14px;border-bottom:1px solid var(--border);
+  padding-bottom:16px;margin-bottom:18px}
+.name{font-weight:700;font-size:15px}.role{font-size:12px;color:var(--muted);margin-top:3px}
+.right{display:flex;align-items:center;gap:10px}.dots{display:flex;gap:4px}.dot{width:8px;height:8px;border-radius:50%;background:#d7d6d0}
+.dot.done{background:#6c9f2e}.dot.active{background:#3988d4}.dot.emergency{background:var(--fatal)}
+.score{font-size:12px;font-weight:700;background:var(--green);color:var(--green-t);
+  border:1px solid var(--green-b);border-radius:20px;padding:5px 11px;white-space:nowrap}
+.time{font-size:11px;color:#92928c;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.alert{background:var(--red);border:1px solid var(--red-b);color:var(--red-t);padding:11px 13px;
+  border-radius:7px;font-size:13px;margin-bottom:13px}
+.vocab{display:flex;flex-wrap:wrap;gap:5px;align-items:center;color:var(--muted);font-size:12px;margin-bottom:14px}
+.pill{font-size:11px;background:var(--blue);color:var(--blue-t);padding:4px 8px;border-radius:5px}
+.scene{font-size:15px;line-height:1.7;margin-bottom:17px}
+.options{display:grid;gap:10px}
+.option{width:100%;text-align:left;background:#fff;border:1px solid var(--border);border-radius:7px;
+  padding:14px 15px;font:inherit;font-size:14px;line-height:1.55;cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.option:hover:not(:disabled){background:var(--surface2);border-color:#aaa}
+.option:focus-visible,.next:focus-visible,.restart:focus-visible{outline:3px solid #9bc6ee;outline-offset:2px}
+.option:disabled{cursor:not-allowed;opacity:0.85}
+.option.good{background:var(--green);border-color:var(--green-b);color:var(--green-t)}
+.option.ok{background:var(--blue);border-color:var(--blue-b);color:var(--blue-t)}
+.option.ochre{background:var(--amber);border-color:var(--amber-b);color:var(--amber-t)}
+.option.bad{background:var(--red);border-color:var(--red-b);color:var(--red-t)}
+.option.fatal{background:var(--red);border:2px solid var(--fatal);color:var(--red-t)}
+.tag{font-size:11px;font-weight:700;margin-left:10px;padding:3px 7px;border-radius:12px;visibility:hidden;white-space:nowrap}
+.tag.show{visibility:visible}
+.tag3{background:var(--green);color:var(--green-t)}
+.tag2{background:var(--blue);color:var(--blue-t)}
+.tag1{background:var(--amber);color:var(--amber-t)}
+.tag-neg{background:var(--red);color:var(--red-t)}
+.feedback,.discussion{display:none;margin-top:15px;padding:14px 15px;border-radius:7px;font-size:14px;line-height:1.65}
+.feedback.show,.discussion.show{display:block}
+.feedback.good{background:var(--green);border:1px solid var(--green-b);color:var(--green-t)}
+.feedback.ok{background:var(--blue);border:1px solid var(--blue-b);color:var(--blue-t)}
+.feedback.ochre{background:var(--amber);border:1px solid var(--amber-b);color:var(--amber-t)}
+.feedback.bad{background:var(--red);border:1px solid var(--red-b);color:var(--red-t)}
+.feedback.fatal{background:var(--red);border:2px solid var(--fatal);color:var(--red-t)}
+.discussion{background:var(--blue);border:1px solid var(--blue-b);color:var(--blue-t)}
+.discussion strong,.feedback strong{display:block;margin-bottom:4px}
+.next,.restart{margin-top:15px;background:#fff;border:1px solid #999;border-radius:7px;padding:10px 20px;
+  font:inherit;font-size:14px;cursor:pointer;display:none}.next.show,.restart.show{display:inline-block}
+.final{text-align:center}.final-label{font-size:11px;color:#92928c;text-transform:uppercase;letter-spacing:.08em}
+.final-score{font-size:58px;font-weight:700;line-height:1.1;margin:9px 0 2px}
+.final-max{font-size:13px;color:var(--muted);margin-bottom:15px}
+.bar{height:10px;background:var(--surface2);border-radius:20px;overflow:hidden;margin-bottom:18px}
+.fill{height:100%;width:0;background:#6c9f2e;transition:width .8s ease}
+.grade{font-size:18px;font-weight:700;margin-bottom:10px}.final-text{text-align:left;font-size:14px;line-height:1.7}
+.debrief{margin-top:18px;text-align:left;background:var(--blue);border:1px solid var(--blue-b);
+  border-radius:7px;padding:15px;font-size:14px;line-height:1.7}
+.debrief h3{font-size:14px;margin:0 0 8px}.debrief ul{margin:7px 0 0 20px;padding:0}
+.footer{border-top:1px solid var(--border);margin-top:18px;padding-top:13px;color:var(--muted);font-size:11px}
+@media(max-width:520px){body{padding:18px 10px 40px}.card{padding:18px}.right{gap:6px}.dots{display:none}.final-score{font-size:46px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><div class="kicker">English in the Workplace</div><div class="level">Strong B1</div></div>
+  <main class="card" id="game" aria-live="polite"></main>
+</div>
+
+<script>
+"use strict";
+
+const SCENARIOS = [
+  {
+    id: 1, type: "regular", label: "08:30 — Morning Priorities & Missing Invoice",
+    scene: "You arrive at RouteFlow, a shipping software company, to find an email from <strong>NorthStar Logistics</strong>. They claim they have not received their monthly software subscription invoice and cannot close their accounts. Simultaneously, your sales manager demands an urgent revenue figure for an executive customer meeting.",
+    vocab: ["subscription", "invoice", "revenue figure", "priority"],
+    opts: [
+      { t: "Check the billing system directly, confirm NorthStar's missing invoice, and promise an update by 09:30.", pts: 3, fb: "Excellent decision. Checking the billing system directly gives you facts before making commitments, preserving customer trust and business cash flow." },
+      { t: "Send the sales manager a preliminary revenue draft, then immediately check NorthStar's billing status.", pts: 2, fb: "Reasonable compromise. Providing a preliminary revenue figure helps sales, but ensure you follow up on NorthStar's missing invoice quickly." },
+      { t: "Forward NorthStar's email to the account manager and focus strictly on the sales manager's revenue report.", pts: 1, fb: "Passing the email delays resolution. While focusing on revenue is helpful, NorthStar cannot close their month without an accurate invoice." },
+      { t: "Tell NorthStar to re-submit their query through customer support and ignore the sales manager's deadline.", pts: -1, fb: "Incorrect choice. Telling an important client to re-submit through support damages client relationships. You lose 1 point. Choose another option." }
+    ],
+    discussion: "How do you decide which urgent task gets priority when two managers ask for help at the same time?"
+  },
+  {
+    id: 2, type: "regular", label: "09:15 — Unapproved Price Change",
+    scene: "Investigating NorthStar's account shows their monthly subscription rate was recently altered to £1,850 per month in the system. However, there is no formal approval document attached—only an informal email thread between the account manager and client.",
+    vocab: ["approval document", "subscription rate", "audit trail", "alteration"],
+    opts: [
+      { t: "Verify email approval with the account manager, document the exception, and issue the correct £1,850 invoice.", pts: 3, fb: "Great work. Confirming written price approvals protects company revenue while ensuring the customer receives a verified, accurate subscription invoice." },
+      { t: "Issue the invoice for £1,850 now, but flag it internally for formal approval form completion tomorrow.", pts: 2, fb: "Acceptable for speed, but issuing unverified invoices risks billing disputes. Ensure formal documentation is gathered promptly to close the loop." },
+      { t: "Invoice NorthStar at the old rate of £1,500 to stay safe and send an adjustment invoice later if needed.", pts: 1, fb: "Invoicing at the lower rate avoids friction today, but creates extra administrative work later to correct the missing revenue." },
+      { t: "Change the system billing rate back to £1,500 without telling anyone and delete the unverified price record.", pts: -1, fb: "Serious error. Reverting system rates without authorization obscures real customer data and damages audit integrity. You lose 1 point. Choose another option." }
+    ],
+    discussion: "Why is an audit trail essential when modifying pricing in software subscription billing?"
+  },
+  {
+    id: 3, type: "regular", label: "10:15 — Unallocated Cash & Payment Matching",
+    scene: "NorthStar's finance manager calls back stating they paid last month's £3,200 invoice last week. Looking through bank reconciliation records, you find an unallocated £3,200 payment with an incorrect reference code sitting in a holding account.",
+    vocab: ["bank reconciliation", "unallocated cash", "reference code", "holding account"],
+    opts: [
+      { t: "Match the £3,200 payment to the original invoice, update system ledgers, and send an accurate account statement.", pts: 3, fb: "Perfect reconciliation. Matching unallocated cash to the original payment reference clears the open balance and provides an accurate statement." },
+      { t: "Send an interim statement noting the £3,200 unallocated cash while verifying bank references with finance.", pts: 2, fb: "Transparent communication. An interim statement keeps the client informed, though resolving the unallocated payment directly is preferable." },
+      { t: "Ask NorthStar to re-send bank proof before making any manual adjustments to their statement.", pts: 1, fb: "Demanding bank proof delays resolution when internal cash records already contain the unallocated payment. Look inward before burdening clients." },
+      { t: "Apply the £3,200 payment to NorthStar's newest invoice because the total balance is roughly similar.", pts: -1, fb: "Dangerous practice. Misallocating cash to random invoices corrupts account ledgers and creates legal disputes. You lose 1 point. Choose another option." }
+    ],
+    discussion: "What steps should finance teams take to prevent unallocated cash from building up?"
+  },
+  {
+    id: 4, type: "regular", label: "11:30 — Suspicious Refund Request",
+    scene: "A customer support lead submits an urgent £4,800 refund request for BlueHaul due to alleged software downtime. You notice the request contains newly updated bank account details that differ from BlueHaul's primary profile.",
+    vocab: ["refund request", "bank details", "verification", "fraud risk"],
+    opts: [
+      { t: "Pause the £4,800 refund and verify new bank details via a known, trusted phone contact at BlueHaul.", pts: 3, fb: "Outstanding fraud prevention. Verifying bank details through trusted phone contacts protects company funds from potential cyber fraud." },
+      { t: "Request written authorization from the support lead's supervisor before processing the payment.", pts: 2, fb: "Escalating authorization adds safety, but does not replace verifying the changed bank account details directly with the customer." },
+      { t: "Process the refund to the old bank account on file and notify BlueHaul of the change.", pts: 1, fb: "Refusing updated bank details avoids fraud but inconveniences legitimate clients. Direct verification remains the best professional compromise." },
+      { t: "Approve the £4,800 refund immediately to the new bank account to meet the support team's urgent request.", pts: -1, fb: "High fraud risk! Approving large refunds to unverified new bank accounts bypasses critical internal controls. You lose 1 point. Choose another option." }
+    ],
+    discussion: "Why are changed bank account details a major red flag in corporate accounting?"
+  },
+  {
+    id: "E1", type: "emergency", label: "12:15 — EMERGENCY: Ransomware Security Alert",
+    scene: "IT issues an urgent company-wide pop-up: <strong>'Possible ransomware breach detected. Disconnect from network drives. Do NOT approve automated bank transfers or open financial attachments.'</strong> You are in the middle of processing a £27,000 vendor payment run.",
+    vocab: ["ransomware breach", "network drives", "bank transfers", "security threat"],
+    opts: [
+      { t: "Immediately halt all payment processing, isolate your computer from the network, and notify your finance director by phone.", pts: 3, fb: "Superior response. Halting financial systems during a suspected cyber attack prevents catastrophic fraud and secures accounting ledgers." },
+      { t: "Pause payment processing and wait silently at your desk until IT sends a follow-up clearing email.", pts: 1, fb: "Cautious but passive. Stopping processing is correct, but failing to notify management delays executive emergency response." },
+      { t: "Quickly approve the pending £27,000 vendor payment run before IT locks access to the bank portal.", gameOver: true, fb: "GAME OVER. Processing payments during an active cyber attack leads to unauthorized transfers and compromised financial data." }
+    ],
+    discussion: "What emergency protocols should finance professionals follow during severe IT breaches?"
+  },
+  {
+    id: 5, type: "regular", label: "13:30 — Client SLA Downtime Dispute",
+    scene: "OceanBridge Logistics refuses to pay their £18,000 software invoice, claiming a 6-hour system downtime ruined their vessel booking schedule. Their contract contains a Service Level Agreement (SLA) clause for credits during outages.",
+    vocab: ["SLA clause", "service outage", "credit note", "dispute resolution"],
+    opts: [
+      { t: "Review outage logs and contract SLA terms with IT before negotiating a credit note with OceanBridge.", pts: 3, fb: "Professional approach. Reviewing downtime SLA logs with IT establishes clear facts before issuing binding credit notes to clients." },
+      { t: "Issue a temporary hold on the £18,000 invoice while IT and legal review the outage report.", pts: 2, fb: "Putting the invoice on hold protects cash flow while investigations proceed, though proactive SLA verification is faster." },
+      { t: "Offer a standard 10% goodwill discount immediately without checking contract downtime terms.", pts: 1, fb: "Offering arbitrary discounts without checking downtime logs sets a bad precedent and unnecessarily sacrifices corporate revenue." },
+      { t: "Reject OceanBridge's claim completely and demand full payment, threatening to suspend their software access.", pts: -1, fb: "Unprofessional reaction. Threatening valued clients before investigating service outages damages commercial relationships. You lose 1 point. Choose another option." }
+    ],
+    discussion: "How can accounting teams handle contract disputes without damaging key client relationships?"
+  },
+  {
+    id: 6, type: "regular", label: "14:30 — Premature Revenue Recognition Pressure",
+    scene: "A senior sales lead asks you to record £50,000 revenue for a new shipping software deployment today. The customer sent a verbal confirmation, but the written contract has not yet been signed.",
+    vocab: ["revenue recognition", "verbal confirmation", "contract execution", "audit standards"],
+    opts: [
+      { t: "Refuse early recognition, offering to label the deal as 'contract pending' in executive management reports.", pts: 3, fb: "Excellent revenue recognition practice. Refusing prematurely booked revenue maintains audit compliance while supporting sales presentation needs." },
+      { t: "Escalate the request to the senior finance controller for written authorization before booking revenue.", pts: 2, fb: "Escalating to the controller protects you personally, but premature revenue booking should be consistently rejected upfront." },
+      { t: "Record the revenue in a temporary holding account, waiting for the signed contract before closing books.", pts: 1, fb: "Holding accounts insulate main books, but booking unexecuted contracts creates unnecessary month-end audit complications." },
+      { t: "Book the £50,000 revenue today because the sales lead assures you the contract will be signed tomorrow.", pts: -1, fb: "Severe audit violation. Booking revenue without signed contracts constitutes financial misrepresentation. You lose 1 point. Choose another option." }
+    ],
+    discussion: "Why is strict adherence to revenue recognition rules critical for software companies?"
+  },
+  {
+    id: 7, type: "regular", label: "15:45 — Missing Procurement Documentation",
+    scene: "A key server maintenance supplier demands immediate payment for an urgent £3,500 invoice. However, the purchase order (PO) and tax documentation are missing required managerial sign-offs.",
+    vocab: ["purchase order", "tax compliance", "managerial sign-off", "audit exceptions"],
+    opts: [
+      { t: "Hold the payment, contact the supplier urgently for missing tax details, and log the delay justification.", pts: 3, fb: "Rigorous compliance. Holding unverified vendor payments protects corporate tax compliance and maintains proper procurement audit trails." },
+      { t: "Pay only the verified base amount, holding back the tax portion until proper documentation arrives.", pts: 2, fb: "Partial payment satisfies immediate vendor needs while protecting tax compliance, though complete documentation is always preferred." },
+      { t: "Request your manager's written sign-off to process an emergency manual exception payment.", pts: 1, fb: "Managerial sign-off shifts responsibility, but processing unverified documentation still exposes the company to audit penalties." },
+      { t: "Process the payment in full without documentation and mark 'files to follow' in the audit system.", pts: -1, fb: "Compliance failure. Processing vendor payments without tax documentation breaches statutory regulations. You lose 1 point. Choose another option." }
+    ],
+    discussion: "What risks arise when companies grant frequent exceptions to procurement policies?"
+  },
+  {
+    id: 8, type: "regular", label: "16:30 — Board Deck Financial Projections",
+    scene: "Your finance manager asks you to prepare month-end financial projections for the executive board deck. He suggests using highly optimistic revenue figures that ignore pending contract disputes and unallocated balances.",
+    vocab: ["projections", "board deck", "optimistic figures", "financial disclosure"],
+    opts: [
+      { t: "Provide realistic figures with clear risk annotations highlighting potential revenue delays.", pts: 3, fb: "Impeccable ethical standards. Providing realistic figures with risk notes protects executive leadership from making flawed financial decisions." },
+      { t: "Present a range (best-case vs realistic) so executives clearly see the underlying financial uncertainty.", pts: 2, fb: "Scenario modeling offers useful context to executives, provided realistic boundaries are clearly emphasized over best-case figures." },
+      { t: "Use the optimistic figures but add a small footnote stating numbers are subject to quarter-end audit.", pts: 1, fb: "Footnoting optimistic numbers offers weak compliance protection when executive decisions rely primarily on headline financial figures." },
+      { t: "Inflate the revenue projection as requested by your manager to make the board presentation look successful.", pts: -1, fb: "Unethical accounting. Intentionally inflating financial projections misleads the board and breaches professional code of conduct. You lose 1 point. Choose another option." }
+    ],
+    discussion: "Why must internal financial forecasts remain objective despite management expectations?"
+  },
+  {
+    id: "E2", type: "emergency", label: "17:15 — EMERGENCY: Server Crash During General Ledger Commit",
+    scene: "While finalizing the month-end ledger commit at 17:15, the core database server crashes mid-transaction. System logs show half of the ledger entries were posted, creating potential duplicate records and corrupted database tables.",
+    vocab: ["general ledger", "database crash", "duplicate records", "ledger commit"],
+    opts: [
+      { t: "Halt operations, log exact transaction timestamps, and alert database administrators before attempting re-entry.", pts: 3, fb: "Flawless incident management. Halting operations and logging timestamps prevents database corruption and eliminates duplicate transaction risk." },
+      { t: "Wait 15 minutes for servers to recover and inspect transaction logs without creating new manual entries.", pts: 1, fb: "Acceptable caution. Waiting minimizes risk, but proactively contacting database administrators resolves technical outages much faster." },
+      { t: "Repeatedly force-submit the ledger batch to ensure month-end closing finishes before 17:30.", gameOver: true, fb: "GAME OVER. Repeatedly forcing database commits during server crashes corrupts general ledgers and breaks system records." }
+    ],
+    discussion: "How should finance professionals collaborate with technical IT teams during critical system failures?"
+  }
+];
+
+const MAX_SCORE = 30;
+const S = { score: 0, idx: 0, gameOver: false, selectedOpts: [] };
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+function shuffle(a){
+  const x=a.slice();
+  for(let i=x.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[x[i],x[j]]=[x[j],x[i]]}
+  return x;
+}
+
+function renderDots(){
+  let html = "";
+  SCENARIOS.forEach((sc, i) => {
+    let cls = "dot";
+    if (i < S.idx) cls += " done";
+    else if (i === S.idx) cls += sc.type === "emergency" ? " emergency" : " active";
+    html += `<span class="${cls}"></span>`;
+  });
+  return html;
+}
+
+function renderScenario(){
+  if (S.idx >= SCENARIOS.length) {
+    showDebrief();
+    return;
+  }
+
+  const sc = SCENARIOS[S.idx];
+  const game = document.getElementById("game");
+  const isEmergency = sc.type === "emergency";
+  const alertHtml = isEmergency ? `<div class="alert"><strong>⚠ Emergency Situation</strong> — Make a swift, safe operational decision.</div>` : "";
+  const vocabHtml = sc.vocab?.length ? `<div class="vocab"><span>Key terminology:</span>${sc.vocab.map(v=>`<span class="pill">${esc(v)}</span>`).join("")}</div>` : "";
+
+  game.innerHTML = `
+    <div class="header">
+      <div><div class="name">Sam Taylor</div><div class="role">Accountant — RouteFlow (Shipping Software)</div></div>
+      <div class="right"><div class="dots">${renderDots()}</div><div class="score" id="score-display">${S.score} / ${MAX_SCORE} pts</div></div>
+    </div>
+    <div class="time">${esc(sc.label)}</div>
+    ${alertHtml}${vocabHtml}
+    <div class="scene">${sc.scene}</div>
+    <div class="options" id="options-container"></div>
+    <div class="feedback" id="feedback-box"></div>
+    <div class="discussion" id="discussion-box"></div>
+    <button class="next" id="next-btn">Next Scenario →</button>
+  `;
+
+  const container = document.getElementById("options-container");
+  const shuffledOpts = shuffle(sc.opts);
+
+  shuffledOpts.forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.type = "button";
+    btn.innerHTML = `<span>${opt.t}</span><span class="tag"></span>`;
+    btn.addEventListener("click", () => handleChoice(opt, btn, shuffledOpts));
+    container.appendChild(btn);
+  });
+}
+
+function handleChoice(opt, btn, allOpts){
+  const sc = SCENARIOS[S.idx];
+  const fbBox = document.getElementById("feedback-box");
+  const discBox = document.getElementById("discussion-box");
+  const nextBtn = document.getElementById("next-btn");
+  const scoreDisp = document.getElementById("score-display");
+
+  if (sc.type === "regular" && opt.pts === -1) {
+    S.score = Math.max(0, S.score - 1);
+    scoreDisp.textContent = `${S.score} / ${MAX_SCORE} pts`;
+    btn.classList.add("bad");
+    btn.disabled = true;
+
+    const tag = btn.querySelector(".tag");
+    tag.textContent = "-1 pt";
+    tag.className = "tag tag-neg show";
+
+    fbBox.className = "feedback show bad";
+    fbBox.innerHTML = `<strong>Penalty (-1 Point)</strong> ${opt.fb}`;
+    return;
+  }
+
+  document.querySelectorAll(".option").forEach(b => b.disabled = true);
+
+  if (opt.gameOver) {
+    S.gameOver = true;
+    btn.classList.add("fatal");
+    fbBox.className = "feedback show fatal";
+    fbBox.innerHTML = `<strong>Game Over</strong> ${opt.fb}`;
+
+    discBox.className = "discussion show";
+    discBox.innerHTML = `<strong>Discussion Point</strong> ${sc.discussion}`;
+
+    nextBtn.textContent = "Go to Debriefing Page";
+    nextBtn.className = "next show";
+    nextBtn.onclick = () => showDebrief();
+    return;
+  }
+
+  S.score += opt.pts;
+  scoreDisp.textContent = `${S.score} / ${MAX_SCORE} pts`;
+
+  const tag = btn.querySelector(".tag");
+  tag.textContent = `+${opt.pts} pts`;
+
+  if (opt.pts === 3) {
+    btn.classList.add("good");
+    tag.className = "tag tag3 show";
+    fbBox.className = "feedback show good";
+    fbBox.innerHTML = `<strong>Best Option (+3 Points)</strong> ${opt.fb}`;
+  } else if (opt.pts === 2) {
+    btn.classList.add("ok");
+    tag.className = "tag tag2 show";
+    fbBox.className = "feedback show ok";
+    fbBox.innerHTML = `<strong>Good Option (+2 Points)</strong> ${opt.fb}`;
+  } else if (opt.pts === 1) {
+    btn.classList.add("ochre");
+    tag.className = "tag tag1 show";
+    fbBox.className = "feedback show ochre";
+    fbBox.innerHTML = `<strong>Average Option (+1 Point)</strong> ${opt.fb}`;
+  }
+
+  discBox.className = "discussion show";
+  discBox.innerHTML = `<strong>Discussion Point</strong> ${sc.discussion}`;
+
+  nextBtn.className = "next show";
+  if (S.idx === SCENARIOS.length - 1) {
+    nextBtn.textContent = "Final Debriefing →";
+    nextBtn.onclick = () => showDebrief();
+  } else {
+    nextBtn.textContent = "Next Scenario →";
+    nextBtn.onclick = () => {
+      S.idx++;
+      renderScenario();
+    };
+  }
+}
+
+function showDebrief(){
+  const game = document.getElementById("game");
+  const pct = Math.round((S.score / MAX_SCORE) * 100);
+  let title = "", text = "", bandClass = "";
+
+  if (S.gameOver) {
+    title = "Performance Band 4: Critical Incident (Game Over)";
+    text = "Critical operational risks identified. Your choices exposed the company to financial loss, audit failures, or severe security vulnerabilities. Bypassing compliance rules, making unverified payments, or misrepresenting financial data severely harms organizational trust. Focus on mastering internal controls, strict adherence to IT security protocols, and standing firm against operational pressure.";
+  } else if (S.score >= 26) {
+    title = "Performance Band 1: Exceptional Financial Steward (26–30 Points)";
+    text = "Outstanding financial stewardship and exemplary professional judgement! You consistently prioritized accuracy, internal controls, and transparent communication under high pressure. You effectively managed client disputes, audit compliance, and unexpected security threats without compromising integrity. You demonstrated the ideal balance between operational helpfulness and strict risk management required in modern software accounting.";
+  } else if (S.score >= 20) {
+    title = "Performance Band 2: Proficient Accountant (20–25 Points)";
+    text = "Strong overall performance with reliable accounting instincts. You navigated complex daily challenges and maintained solid compliance throughout most scenarios. A few minor decisions favoured speed over full verification, but you kept core financial controls intact and responded calmly to emergencies. Focus on double-checking unapproved rate changes and documentation exceptions in future.";
+  } else if (S.score >= 12) {
+    title = "Performance Band 3: Developing Performance (12–19 Points)";
+    text = "Solid fundamental skills, but several choices introduced avoidable business risks. You occasionally allowed workplace pressure or client urgency to bypass standard verification and audit procedures. In accounting, short-term convenience can lead to revenue leakage or compliance failures. Work on assertive communication, enforcing authorization controls, and strictly verifying unusual transactions.";
+  } else {
+    title = "Performance Band 4: At Risk / Needs Improvement (0–11 Points)";
+    text = "Critical operational risks identified. Your choices exposed the company to financial loss, audit failures, or severe security vulnerabilities. Bypassing compliance rules, making unverified payments, or misrepresenting financial data severely harms organizational trust. Focus on mastering internal controls, strict adherence to IT security protocols, and standing firm against operational pressure.";
+  }
+
+  game.innerHTML = `
+    <div class="final">
+      <div class="final-label">Final Debriefing — Sam Taylor, RouteFlow</div>
+      <div class="final-score">${S.gameOver ? "FAIL" : S.score}</div>
+      <div class="final-max">${S.gameOver ? "Game Over — Security/Ledger Incident" : "Maximum Score: " + MAX_SCORE + " Points"}</div>
+      <div class="bar"><div class="fill" id="fill"></div></div>
+      <div class="grade">${title}</div>
+      <div class="final-text">${text}</div>
+      <div class="debrief">
+        <h3>Reflection & Workplace Discussion</h3>
+        <div><strong>1.</strong> Which scenario posed the highest commercial risk to RouteFlow?</div>
+        <div><strong>2.</strong> How do you handle internal pressure from sales managers asking for early numbers?</div>
+        <div><strong>3.</strong> What specific procedure will you improve in your daily accounting routine?</div>
+      </div>
+      <button class="restart show" type="button" id="restart-btn">Play Again — Try Different Path</button>
+    </div>
+  `;
+
+  requestAnimationFrame(() => {
+    const f = document.getElementById("fill");
+    if (f) f.style.width = S.gameOver ? "0%" : pct + "%";
+  });
+
+  document.getElementById("restart-btn").onclick = restartGame;
+}
+
+function restartGame(){
+  S.score = 0;
+  S.idx = 0;
+  S.gameOver = false;
+  S.selectedOpts = [];
+  renderScenario();
+}
+
+renderScenario();
+</script>
+</body>
+</html>

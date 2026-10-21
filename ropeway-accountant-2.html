@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project Accountant — Ropeway Construction Simulation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F8F7F4;--surface:#FFFFFF;--surface2:#F1EFE8;
+  --border:rgba(0,0,0,0.11);--border2:rgba(0,0,0,0.2);
+  --text:#1A1A18;--text2:#6B6B67;--text3:#9A9A96;
+  --green-bg:#EAF3DE;--green-bd:#97C459;--green-tx:#27500A;
+  --amber-bg:#FAEEDA;--amber-bd:#EF9F27;--amber-tx:#633806;
+  --red-bg:#FCEBEB;--red-bd:#F09595;--red-tx:#791F1F;
+  --fatal-bd:#E24B4A;--fatal-tx:#501313;
+  --blue-bg:#E6F1FB;--blue-bd:#85B7EB;--blue-tx:#0C447C;
+  --r3-bg:#C5E4A0;--r3-bd:#4C9A1E;--r3-tx:#1B4407;
+  --r2-bg:#E6F3D6;--r2-bd:#A6CF74;--r2-tx:#2F5A12;
+  --r1-bg:#F1DFA6;--r1-bd:#BC8F1F;--r1-tx:#5A4006;
+  --r0-bg:#FBE4E2;--r0-bd:#EBA09C;--r0-tx:#7A1F1F;
+  --rf-bg:#F7CFCC;--rf-bd:#D63C3A;--rf-tx:#4A1010;
+  --r:10px;--rs:6px
+}
+body{font-family:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:2rem 1rem 4rem}
+.page-header{width:100%;max-width:720px;margin-bottom:1.75rem;display:flex;align-items:center;justify-content:space-between}
+.page-title{font-size:13px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--text3)}
+.level-tag{font-size:11px;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;background:var(--blue-bg);color:var(--blue-tx);border:.5px solid var(--blue-bd);border-radius:20px;padding:3px 10px}
+.card{background:var(--surface);border:.5px solid var(--border);border-radius:var(--r);padding:1.75rem;width:100%;max-width:720px;box-shadow:0 1px 5px rgba(0,0,0,0.05)}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;padding-bottom:1rem;border-bottom:.5px solid var(--border);gap:1rem}
+.char-name{font-size:15px;font-weight:500;margin-bottom:2px}
+.char-role{font-size:12px;color:var(--text2)}
+.header-right{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.step-track{display:flex;gap:4px;align-items:center}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--border);transition:background .3s}
+.dot.done{background:#639922}.dot.active{background:#378ADD}.dot.emg{background:#E24B4A}
+.score-pill{font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:500;background:var(--green-bg);color:var(--green-tx);border:.5px solid var(--green-bd);border-radius:20px;padding:4px 12px;min-width:58px;text-align:center}
+.time-label{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);font-weight:500;margin-bottom:.5rem}
+.emg-alert{background:var(--red-bg);border:.5px solid var(--red-bd);border-radius:var(--rs);padding:10px 14px;font-size:13px;color:var(--red-tx);margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.vocab-row{margin-bottom:1rem;font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.vpill{display:inline-block;font-size:11px;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;background:var(--blue-bg);color:var(--blue-tx);border-radius:var(--rs);padding:2px 8px}
+.scenario{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:1.5rem}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:1.25rem}
+.opt-btn{text-align:left;padding:14px 16px;border:.5px solid var(--border);border-radius:var(--rs);background:var(--surface);cursor:pointer;font-family:inherit;font-size:14px;color:var(--text);line-height:1.55;transition:background .15s,border-color .15s;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;width:100%}
+.opt-btn:hover:not(:disabled){background:var(--surface2);border-color:var(--border2)}
+.opt-btn:disabled{cursor:default}
+.opt-btn:focus-visible,.nxt:focus-visible,.replay:focus-visible{outline:2px solid var(--blue-bd);outline-offset:2px}
+.opt-btn.r3{background:var(--r3-bg);border-color:var(--r3-bd);color:var(--r3-tx)}
+.opt-btn.r2{background:var(--r2-bg);border-color:var(--r2-bd);color:var(--r2-tx)}
+.opt-btn.r1{background:var(--r1-bg);border-color:var(--r1-bd);color:var(--r1-tx)}
+.opt-btn.r0{background:var(--r0-bg);border-color:var(--r0-bd);color:var(--r0-tx)}
+.opt-btn.rf{background:var(--rf-bg);border-color:var(--rf-bd);color:var(--rf-tx)}
+.opt-btn.picked{box-shadow:0 0 0 2px currentColor}
+.opt-btn.dim{opacity:.75}
+.ptag{flex-shrink:0;font-size:11px;font-weight:500;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;padding:2px 8px;border-radius:20px;white-space:nowrap;margin-top:2px;visibility:hidden;border:.5px solid transparent;background:rgba(255,255,255,.55)}
+.ptag.show{visibility:visible}
+.ptag.r3{border-color:var(--r3-bd)}.ptag.r2{border-color:var(--r2-bd)}.ptag.r1{border-color:var(--r1-bd)}.ptag.r0{border-color:var(--r0-bd)}.ptag.rf{border-color:var(--rf-bd)}
+.fbox{padding:14px 16px;border-radius:var(--rs);font-size:14px;line-height:1.65;margin-bottom:1.25rem;display:none}
+.fbox.show{display:block}
+.fb-rate{display:inline-block;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:4px}
+.fb-r3{background:var(--r3-bg);border:.5px solid var(--r3-bd);color:var(--r3-tx)}
+.fb-r2{background:var(--r2-bg);border:.5px solid var(--r2-bd);color:var(--r2-tx)}
+.fb-r1{background:var(--r1-bg);border:.5px solid var(--r1-bd);color:var(--r1-tx)}
+.fb-r0{background:var(--r0-bg);border:.5px solid var(--r0-bd);color:var(--r0-tx)}
+.fb-rf{background:var(--rf-bg);border:1px solid var(--rf-bd);color:var(--rf-tx)}
+.score-pill.neg{background:var(--r0-bg);color:var(--r0-tx);border-color:var(--r0-bd)}
+.tally{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:1.5rem}
+.tchip{font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12px;padding:3px 10px;border-radius:20px;border:.5px solid}
+.tchip.r3{background:var(--r3-bg);border-color:var(--r3-bd);color:var(--r3-tx)}
+.tchip.r2{background:var(--r2-bg);border-color:var(--r2-bd);color:var(--r2-tx)}
+.tchip.r1{background:var(--r1-bg);border-color:var(--r1-bd);color:var(--r1-tx)}
+.tchip.r0{background:var(--r0-bg);border-color:var(--r0-bd);color:var(--r0-tx)}
+.tchip.rf{background:var(--rf-bg);border-color:var(--rf-bd);color:var(--rf-tx)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+.nxt{padding:10px 22px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rs);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s;display:none}
+.nxt:hover{background:var(--surface2)}
+.nxt.show{display:inline-block}
+.fin{text-align:center}
+.fin-lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);margin-bottom:1rem}
+.fin-num{font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:60px;font-weight:500;line-height:1;margin-bottom:4px}
+.fin-max{font-size:14px;color:var(--text2);margin-bottom:1.25rem}
+.bar-bg{background:var(--surface2);border-radius:20px;height:10px;overflow:hidden;margin-bottom:1.5rem}
+.bar-fill{height:10px;border-radius:20px;background:#639922;width:0%;transition:width .9s cubic-bezier(.34,1.4,.64,1)}
+.fin-grade{font-size:17px;font-weight:500;margin-bottom:.75rem}
+.fin-text{font-size:15px;line-height:1.75;text-align:left}
+.vfooter{margin-top:1.5rem;padding-top:1rem;border-top:.5px solid var(--border);font-size:12px;color:var(--text2);display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.replay{margin-top:1.5rem;padding:10px 24px;background:var(--surface);border:.5px solid var(--border2);border-radius:var(--rs);font-family:inherit;font-size:14px;color:var(--text);cursor:pointer;transition:background .15s}
+.replay:hover{background:var(--surface2)}
+[hidden]{display:none!important}
+.intro-kicker{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text3);font-weight:500;margin-bottom:.5rem}
+.intro-title{font-size:26px;font-weight:500;line-height:1.25;margin-bottom:.75rem}
+.intro-lead{font-size:15px;line-height:1.75;color:var(--text);margin-bottom:1.5rem}
+.intro-sec{margin-bottom:1.5rem}
+.intro-h{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--text3);font-weight:500;margin-bottom:.6rem}
+.intro-facts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.fact{background:var(--surface2);border-radius:var(--rs);padding:12px 14px;text-align:center}
+.fact b{display:block;font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:20px;font-weight:500}
+.fact span{font-size:12px;color:var(--text2)}
+.intro-steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.6}
+.intro-steps li{counter-increment:s;display:flex;gap:10px;align-items:flex-start}
+.intro-steps li::before{content:counter(s);flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--blue-bg);color:var(--blue-tx);font-family:'DM Mono',ui-monospace,Menlo,Consolas,monospace;font-size:12px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.legend{display:flex;flex-direction:column;gap:6px}
+.lg{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 12px;border:.5px solid;border-radius:var(--rs);font-size:13px}
+.lg .ptag{visibility:visible}
+.lg.r3{background:var(--r3-bg);border-color:var(--r3-bd);color:var(--r3-tx)}
+.lg.r2{background:var(--r2-bg);border-color:var(--r2-bd);color:var(--r2-tx)}
+.lg.r1{background:var(--r1-bg);border-color:var(--r1-bd);color:var(--r1-tx)}
+.lg.r0{background:var(--r0-bg);border-color:var(--r0-bd);color:var(--r0-tx)}
+.lg.rf{background:var(--rf-bg);border-color:var(--rf-bd);color:var(--rf-tx)}
+.intro-warn{font-size:13px;line-height:1.6;color:var(--red-tx);background:var(--red-bg);border:.5px solid var(--red-bd);border-radius:var(--rs);padding:10px 14px;margin-top:10px}
+.start{width:100%;padding:14px 24px;background:var(--text);color:#fff;border:none;border-radius:var(--rs);font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;transition:opacity .15s}
+.start:hover{opacity:.88}
+.start:focus-visible{outline:2px solid var(--blue-bd);outline-offset:2px}
+@media(max-width:480px){.intro-title{font-size:22px}.intro-facts{grid-template-columns:1fr}}
+@media(max-width:480px){.card{padding:1.25rem}.fin-num{font-size:44px}}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <div class="page-title">Financial English &middot; Ropeway Industry</div>
+  <div class="level-tag">Strong B1 CEFR</div>
+</div>
+<div class="card" id="intro">
+  <div class="intro-kicker">Project Accounting &middot; Industrial Engineering</div>
+  <h1 class="intro-title">A Busy Year for a Ropeway Project Accountant</h1>
+  <p class="intro-lead">You are <strong>Elena Vance</strong>, Project Accountant at <strong>Vektor Ropeways International</strong>, a global manufacturer of cable cars, gondolas, and ski lifts. New high-altitude projects are under construction, supply chains are under pressure, and management needs accurate financial controls. Your decisions will protect the company's profitability and cash flow.</p>
+
+  <div class="intro-sec">
+    <div class="intro-facts">
+      <div class="fact"><b>12</b><span>accounting decisions</span></div>
+      <div class="fact"><b>2</b><span>industry crises</span></div>
+      <div class="fact"><b>40</b><span>points available</span></div>
+    </div>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">What you will practise</div>
+    <p style="font-size:14px;line-height:1.7;color:var(--text2)">Industrial accounting vocabulary, cost control, revenue recognition, contract management, and professional decision-making in English. Three discussion questions appear during the game: pause and discuss them with a colleague or trainer. (Duration: 20&ndash;25 minutes.)</p>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">How to play</div>
+    <ol class="intro-steps">
+      <li><span>Read each scenario and the key financial vocabulary above it.</span></li>
+      <li><span>Select the best professional action. Options shuffle automatically on each attempt.</span></li>
+      <li><span>Read the instant feedback to learn why an option is strong, weak, or risky.</span></li>
+    </ol>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">Scoring System</div>
+    <div class="legend">
+      <div class="lg r3"><span>Excellent &mdash; best professional accounting action</span><span class="ptag r3">+3</span></div>
+      <div class="lg r2"><span>Good &mdash; acceptable, but missing key controls</span><span class="ptag r2">+2</span></div>
+      <div class="lg r1"><span>Weak &mdash; flawed accounting logic</span><span class="ptag r1">+1</span></div>
+      <div class="lg r0"><span>Poor &mdash; lose 1 point and choose again</span><span class="ptag r0">&minus;1</span></div>
+    </div>
+    <div class="intro-warn"><strong>Industry Emergencies:</strong> Emergency situations offer only three choices. A critical mistake causes immediate project failure (Game Over). The best response earns +2 points.</div>
+  </div>
+
+  <div class="intro-sec">
+    <div class="intro-h">Key vocabulary tested</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px"><span class="vpill">variance analysis</span><span class="vpill">percentage-of-completion</span><span class="vpill">CAPEX vs. OPEX</span><span class="vpill">WIP valuation</span><span class="vpill">price escalation clause</span><span class="vpill">retention money</span><span class="vpill">liquidated damages</span><span class="vpill">EBITDA forecast</span><span class="vpill">operating margin</span><span class="vpill">depreciation</span><span class="vpill">break-even analysis</span><span class="vpill">due diligence</span></div>
+  </div>
+
+  <button class="start" id="start" type="button">Start the simulation &rarr;</button>
+</div>
+
+<div class="card" id="gc" hidden>
+  <div class="card-header">
+    <div><div class="char-name">Elena Vance</div><div class="char-role">Project Accountant — Vektor Ropeways International</div></div>
+    <div class="header-right">
+      <div class="step-track" id="dots" role="img" aria-label="Progress"></div>
+      <div class="score-pill" id="score">0 pts</div>
+    </div>
+  </div>
+  <div class="time-label" id="lbl"></div>
+  <div class="scenario" id="scene"></div>
+  <div class="options" id="opts" role="group" aria-label="Answer options"></div>
+  <div class="fbox" id="fb" role="status" aria-live="polite"></div>
+  <button class="nxt" id="nxt">Next →</button>
+</div>
+
+<script>
+/* ── STATE ── */
+const S = { score:0, answered:false, maxScore:40, tally:{r3:0,r2:0,r1:0,r0:0,rf:0} };
+const GAME_HTML = document.getElementById('gc').innerHTML;
+let curId = null, curShuffled = [];
+
+/* ── SCENARIO TREE ── */
+const N = {
+d1:{
+  label:"Decision 1: Budget Variance Analysis",
+  scene:`During your Q1 cost review for the new high-altitude gondola line in the Alps, you notice concrete foundation costs for tower 4 and 5 are <strong>18% over budget</strong> due to unexpected hard rock drilling.`,
+  vocab:["variance analysis","cost drivers","contingency budget","re-forecasting"],
+  opts:[
+    {t:"Analyze the variance by cost driver (labor, specialized drilling machinery, concrete), compare with remaining tower budgets, and update the re-forecast.", pts:3, fb:"Excellent accounting control! Categorizing variance drivers allows you to adjust future tower estimates accurately and manage project contingencies."},
+    {t:"Report the 18% cost overrun directly to the site manager and instruct them to cut spending on station building finishes.", pts:2, fb:"Reasonable, but cutting station finishes without analyzing foundation cost drivers might compromise build quality or miss underlying equipment rental costs."},
+    {t:"Absorb the extra expenditure into the general project contingency fund without recording the specific causes.", pts:1, fb:"Flawed practice. Covering overruns with contingency funds hides operational problems and prevents accurate cost tracking for future ropeway projects."},
+    {t:"Ignore the overspend for now, assuming high winter ticket sales will compensate for construction budget overruns.", pts:-1, fb:"Incorrect logic! Construction cost overruns cannot be offset by future operational revenues. Unmanaged variances destroy project gross margins."}
+  ],
+  next:"d2"
+},
+d2:{
+  label:"Decision 2: Revenue Recognition (Percentage-of-Completion)",
+  scene:`It is Q2 month-end. On a major urban cable car project (€12M contract value), civil works are 70% complete, but mechanical station equipment installation is delayed at 30%. You must calculate revenue recognition under the <strong>percentage-of-completion method</strong>.`,
+  vocab:["percentage-of-completion","revenue recognition","progress billing","milestones"],
+  opts:[
+    {t:"Calculate percentage of completion based on total incurred costs against total estimated project costs, documenting verified completion certificates.", pts:3, fb:"Perfect accounting practice! Revenue recognition under IFRS/GAAP based on audited cost-to-cost progress ensures compliant financial reporting."},
+    {t:"Recognize 50% of total contract revenue as a simple average between civil works (70%) and mechanical installation (30%).", pts:2, fb:"Inaccurate method. Simple averages ignore actual cost weighting between heavy civil engineering and mechanical components."},
+    {t:"Delay recognizing revenue until the mechanical equipment installation reaches 70% to match civil works progress.", pts:1, fb:"Overly conservative. Holding back earned revenue distorts quarterly income statements when work has already been performed and verified."},
+    {t:"Recognize 70% of total revenue immediately to show strong quarterly performance to senior executive board members.", pts:-1, fb:"Unethical and dangerous! Over-recognizing revenue before earning it violates accounting standards and leads to restatements."}
+  ],
+  next:"d3"
+},
+d3:{
+  label:"Decision 3: Equipment CAPEX vs. OPEX",
+  scene:`The site operations team wants to acquire a specialized heavy-duty mobile crane (€120,000) for three upcoming alpine chairlift installations. You must evaluate whether to <strong>buy (CAPEX)</strong> or <strong>rent (OPEX)</strong>.`,
+  vocab:["CAPEX vs. OPEX","Return on Investment (ROI)","payback period","lease analysis"],
+  opts:[
+    {t:"Perform a payback period and Net Present Value (NPV) analysis comparing purchase price, maintenance costs, and resale value against long-term rental rates.", pts:3, fb:"Outstanding financial evaluation! Comparing total cost of ownership against cumulative lease fees provides a clear quantitative basis for CAPEX sign-off."},
+    {t:"Calculate basic ROI by dividing total estimated rental savings by the €120,000 purchase price, ignoring ongoing maintenance fees.", pts:2, fb:"Basic calculation. It provides a quick estimate, but omitting maintenance, transport, and depreciation creates an incomplete financial picture."},
+    {t:"Approve the purchase immediately because owning specialized machinery increases company asset value on paper.", pts:1, fb:"Weak justification. Purchasing equipment without usage frequency analysis ties up cash in idle assets that depreciate over time."},
+    {t:"Reject the proposal immediately because all equipment expenditures over €50,000 must automatically be classified as rental expense.", pts:-1, fb:"Rigid thinking! Financial policies should permit capital investments when long-term ROI and operational savings justify buying over leasing."}
+  ],
+  next:"d4"
+},
+d4:{
+  label:"Decision 4: Work in Progress (WIP) Valuation",
+  scene:`At month-end, 12 luxury 10-passenger gondola cabins are 60% assembled in the factory. You must determine the correct <strong>Work in Progress (WIP)</strong> balance sheet valuation.`,
+  vocab:["Work in Progress (WIP)","balance sheet","direct labor","direct materials"],
+  opts:[
+    {t:"Capitalize direct raw materials, component parts, and direct assembly labor costs incurred so far, adding factory overhead allocation.", pts:3, fb:"Accurate cost accounting! Direct material, direct labor, and absorbed overhead reflect true work-in-progress inventory values on the balance sheet."},
+    {t:"Record raw materials in WIP inventory, but expense factory labor hours immediately in the current month profit and loss account.", pts:2, fb:"Inconsistent treatment. Direct labor used in manufacturing assets should be capitalized into WIP rather than expensed immediately."},
+    {t:"Estimate the cabin WIP value based on an informal visual estimate by the factory floor supervisor.", pts:1, fb:"Unprofessional method. Inventory accounting requires documented job cost sheets and time-tracking records, not casual visual estimates."},
+    {t:"Write off all cabin assembly costs as immediate expenses until the completed cabins are shipped to the mountain site.", pts:-1, fb:"Incorrect accounting! Expensing WIP manufacturing costs understates current inventory assets and distorts current-period profit margins."}
+  ],
+  next:"d5"
+},
+d5:{
+  label:"Decision 5: Price Escalation & Contract Terms",
+  scene:`<em>Discussion Question 1: How does inaccurate WIP inventory valuation impact an industrial equipment manufacturer's cash flow during long production cycles?</em><br><br>Global steel prices for galvanized haul ropes rise by 25%. You must review client contracts to protect project gross margins.`,
+  vocab:["price escalation clause","gross margin","contract terms","cost pass-through"],
+  opts:[
+    {t:"Review contract price escalation clauses, calculate exact steel cost impacts, and issue formal price adjustment notifications to clients where permitted.", pts:3, fb:"Excellent contract management! Enforcing price escalation clauses protects project profitability against unhedged raw material inflation."},
+    {t:"Absorb the 25% steel price increase completely within the existing project margin to avoid difficult commercial discussions with clients.", pts:2, fb:"Sub-optimal strategy. Absorbing major material price spikes severely erodes gross margin when valid contractual escalation terms exist."},
+    {t:"Immediately increase total project contract prices by 25% across all clients, regardless of original contract terms.", pts:1, fb:"Contractually invalid. Raising prices without contractual backing leads to legal disputes and client refusal to pay invoices."},
+    {t:"Delay purchasing required steel haul ropes for 6 months, hoping global commodities prices return to historic baseline levels.", pts:-1, fb:"High-risk operational gamble! Speculating on steel prices delays cable car manufacturing and risks severe project delay penalties."}
+  ],
+  next:"d6"
+},
+d6:{
+  label:"Decision 6: Working Capital & Retainage",
+  scene:`A municipal client is holding <strong>10% retainage (€90,000)</strong> past the agreed 30-day testing period, claiming minor paint scuffs on the valley station building. Your working capital is tight.`,
+  vocab:["retainage","working capital","liquidity","cash flow forecast"],
+  opts:[
+    {t:"Negotiate release of 90% of the retainage immediately while placing €9,000 in an escrow account dedicated to minor cosmetic punch-list items.", pts:3, fb:"Pragmatic liquidity management! Securing main funds while isolating minor dispute values protects working capital and maintains client goodwill."},
+    {t:"Refuse to carry out final cosmetic touch-ups until the client releases the entire €90,000 retainage balance.", pts:2, fb:"Confrontational. Withholding minor repairs risks formal contract breach and further delays final project acceptance sign-off."},
+    {t:"Write off the entire €90,000 retainage amount as bad debt expense to clean up the aged accounts receivable ledger.", pts:1, fb:"Premature write-off. Retainage disputed over minor items is collectible and should be pursued through normal commercial resolution."},
+    {t:"Issue an immediate formal notice of legal action to enforce cash payment within 5 business days.", pts:-1, fb:"Aggressive overreaction. Legal threats over minor punch-list disputes damage commercial relationships and incur expensive legal fees."}
+  ],
+  next:"e1"
+},
+e1:{
+  label:"EMERGENCY 1: Key Rope Supplier Administration",
+  isEmergency:true,
+  scene:`<strong>CRITICAL INDUSTRY ALERT:</strong> The certified manufacturer of specialized steel wire ropes goes into insolvency administration mid-project. Your main haul rope order is locked in their factory. High-season commissioning is in 8 weeks!`,
+  vocab:["insolvency","liquidated damages","supply chain disruption","crisis management"],
+  opts:[
+    {t:"Immediately halt payments, issue formal default notices, assess delay penalty risks (liquidated damages), and secure emergency supply from a certified backup supplier.", pts:2, fb:"Decisive crisis leadership! Stopping cash outflow, evaluating contractual penalty liabilities, and securing replacement ropes protects the company's financial survival."},
+    {t:"Wait 4 weeks for insolvency administrators to clarify if factory production line orders will eventually be completed.", pts:1, fb:"Passive approach. Administrators prioritize secured debt holders, not customer timelines. Waiting guarantees missing winter season opening deadlines."},
+    {t:"Send an immediate full cash prepayment to the insolvent supplier's bank account to persuade workers to release your rope shipment first.", pts:0, isGameOver:true, fb:"<strong>GAME OVER.</strong> Cash paid to an insolvent company is absorbed by insolvency administrators. You lose €150,000 in cash, receive no rope, and Enigma Ropeways faces insolvency."}
+  ],
+  next:"d7"
+},
+d7:{
+  label:"Decision 7: EBITDA Re-Forecasting",
+  scene:`Following the supplier crisis, you must present a revised <strong>annual EBITDA forecast</strong> to executive management. Rope replacement costs and minor installation delays will affect Q4 financial results.`,
+  vocab:["EBITDA","re-forecasting","cost mitigation","operating profit"],
+  opts:[
+    {t:"Present a revised EBITDA model reflecting emergency procurement costs alongside specific administrative cost-mitigation measures.", pts:3, fb:"Transparent executive reporting! Combining realistic delay cost impacts with actionable overhead savings gives board members clear financial visibility."},
+    {t:"Drastically cut annual EBITDA projections to create a large financial buffer, ensuring actual performance beats the lowered baseline.", pts:2, fb:"Excessive sandbagging. Artificially low forecasts distort financial guidance, lowering shareholder confidence unnecessarily."},
+    {t:"Maintain original EBITDA targets by eliminating planned safety and technical training budgets across all alpine sites.", pts:1, fb:"Dangerous trade-off. Cutting essential safety training risks operational accidents, regulatory fines, and massive long-term financial liabilities."},
+    {t:"Keep original EBITDA forecasts unchanged, assuming winter spare parts sales will magically offset all supply crisis expenses.", pts:-1, fb:"Misleading reporting. Unfounded revenue optimism masks real cost increases and undermines financial management credibility."}
+  ],
+  next:"d8"
+},
+d8:{
+  label:"Decision 8: Service Division Operating Margins",
+  scene:`Financial analysis reveals that the <strong>After-Sales & Maintenance Division</strong> generates high gross revenue, but its <strong>operating margin is 12% lower</strong> than company targets due to unbilled emergency technician travel hours.`,
+  vocab:["operating margin","cost-driver analysis","unbilled labor","billable hours"],
+  opts:[
+    {t:"Implement a digital technician tracking log to capture all emergency call-out travel hours and enforce contractual billable rates.", pts:3, fb:"Targeted operational fix! Identifying unbilled labor leakage addresses the root cause of margin compression without losing clients."},
+    {t:"Increase standard annual maintenance contract fees by 15% across all existing ropeway operator clients.", pts:2, fb:"Blunt pricing fix. Raising flat fees hides internal labor inefficiency and risks losing service contracts to local independent contractors."},
+    {t:"Shut down the emergency call-out service completely to remove low-margin technician travel expenses.", pts:1, fb:"Short-sighted action. Emergency response is a key selling point for high-value cable car systems; closing it harms equipment sales."},
+    {t:"Ignore margin compression because high after-sales gross revenue helps cover central administrative overhead costs.", pts:-1, fb:"Flawed management perspective! High volume with poor operating margins erodes overall corporate profitability."}
+  ],
+  next:"d9"
+},
+d9:{
+  label:"Decision 9: Asset Depreciation Method",
+  scene:`<em>Discussion Question 2: Why is granular cost-driver analysis better than blanket price hikes when fixing service margin leakage?</em><br><br>Vektor Ropeways purchases a €180,000 heavy mountain transport winch. It will experience heavy wear in its first 3 years of alpine tower construction. Choose the best <strong>depreciation method</strong>.`,
+  vocab:["depreciation","reducing-balance method","straight-line method","asset useful life"],
+  opts:[
+    {t:"Apply a reducing-balance (accelerated) depreciation method to align higher early depreciation expense with the winch's intensive initial usage.", pts:3, fb:"Superior financial matching! Accelerated depreciation aligns higher asset expense with heavy initial revenue generation and physical wear."},
+    {t:"Use straight-line depreciation over 10 years to maintain small, uniform annual depreciation expenses on internal accounts.", pts:2, fb:"Acceptable, but ignores heavy early usage. Straight-line method understates asset wear during high-intensity initial construction years."},
+    {t:"Write off the entire €180,000 asset cost as a direct operational expense in month 1 to minimize current taxable profit.", pts:1, fb:"Non-compliant tax/accounting treatment. Capital assets with multi-year useful lives must be capitalized and depreciated over time."},
+    {t:"Do not record depreciation on the winch, arguing that proper maintenance keeps its market value constant indefinitely.", pts:-1, fb:"Incorrect accounting! Industrial machinery suffers inevitable physical wear and technological obsolescence regardless of maintenance."}
+  ],
+  next:"d10"
+},
+d10:{
+  label:"Decision 10: Break-Even Analysis for Modular Stations",
+  scene:`R&D proposes investing €200,000 in standardized, modular station framework designs. This will increase fixed R&D costs but reduce variable manufacturing labor by €15,000 per station.`,
+  vocab:["break-even analysis","fixed costs","variable costs","economies of scale"],
+  opts:[
+    {t:"Calculate the break-even volume (13.3 stations) using contribution margin analysis, comparing it against 3-year sales projections.", pts:3, fb:"Rigorous financial analysis! Calculating exact break-even units against market demand forecasts provides clear investment criteria."},
+    {t:"Approve R&D expenditure immediately because modular designs sound modern and align with industrial engineering trends.", pts:2, fb:"Lacks financial rigor. Engineering benefits must be supported by quantitative contribution margin and break-even calculations."},
+    {t:"Reject the proposal because increasing fixed overhead costs by €200,000 is always bad for financial stability.", pts:1, fb:"Overly cautious. Increasing fixed costs is profitable if unit volume exceeds break-even point and substantially lowers variable costs."},
+    {t:"Assume break-even will occur within 1 year without reviewing past annual station sales figures.", pts:-1, fb:"Careless financial management. Relying on assumptions without historical sales data review creates unvalidated investment risk."}
+  ],
+  next:"e2"
+},
+e2:{
+  label:"EMERGENCY 2: Severe Weather & Penalty Clauses",
+  isEmergency:true,
+  scene:`<strong>CRITICAL INDUSTRY ALERT:</strong> Extreme early winter blizzards halt mountain tower assembly for 4 weeks. The contract specifies <strong>€10,000 per day in liquidated damages</strong> for late delivery. Opening day is in 3 weeks!`,
+  vocab:["liquidated damages","force majeure","contractual notice","risk mitigation"],
+  opts:[
+    {t:"Issue formal Force Majeure weather notices immediately under contract terms, compile official meteorological data, and reallocate team members to valley pre-assembly.", pts:2, fb:"Outstanding legal and financial defense! Formal force majeure filings protect against liquidated damages penalties while pre-assembly maintains project momentum."},
+    {t:"Offer double overtime pay for night shifts in severe storm conditions to finish tower erection regardless of weather safety risks.", pts:1, fb:"High operational risk. Forcing work during blizzards risks fatal accidents, regulatory site closure, and extreme liability costs."},
+    {t:"Ignore formal contract notice clauses and assume municipal clients will excuse delays out of goodwill.", pts:0, isGameOver:true, fb:"<strong>GAME OVER.</strong> Failing to submit timely Force Majeure notices invalidates delay protection. The client deducts €210,000 in liquidated damages, destroying project cash flow."}
+  ],
+  next:"d11"
+},
+d11:{
+  label:"Decision 11: M&A Financial Due Diligence",
+  scene:`Vektor Ropeways considers acquiring a specialized alpine civil engineering contractor. Reviewing their balance sheet, you find <strong>high short-term liabilities</strong> and significant unbilled claims against third parties.`,
+  vocab:["due diligence","balance sheet","liquidity ratios","short-term liabilities"],
+  opts:[
+    {t:"Conduct thorough financial due diligence: evaluate the quick ratio, audit disputed claims, and recommend an escrow retentions structure in the purchase contract.", pts:3, fb:"Comprehensive M&A control! Scrutinizing liquidity ratios and hedging unbilled claims via purchase price escrow protects company capital."},
+    {t:"Recommend lowering the acquisition offer price by 10% based on short-term debt without auditing unbilled claims.", pts:2, fb:"Partial analysis. Arbitrary price cuts do not address underlying legal risks associated with unverified receivables."},
+    {t:"Ignore balance sheet debt because acquiring specialized mountain civil engineering capability is urgently needed.", pts:1, fb:"Dangerous strategy. Acquiring a company with severe liquidity issues exposes Vektor Ropeways to unexpected creditor claims."},
+    {t:"Value the target company solely as a multiple of reported EBITDA, ignoring balance sheet working capital deficits.", pts:-1, fb:"Flawed valuation methodology. Strong EBITDA cannot offset severe balance sheet insolvency or uncollectible receivables."}
+  ],
+  next:"d12"
+},
+d12:{
+  label:"Decision 12: Board Financial Presentation",
+  scene:`At the annual board meeting, you must present project performance. Annual revenue rose 14% to €45M, but project net profit margins compressed by 2.5% due to material inflation and logistics costs.`,
+  vocab:["executive summary","top-line growth","margin compression","cost containment"],
+  opts:[
+    {t:"Present a balanced financial synthesis highlighting strong top-line revenue growth while presenting specific cost containment controls for future projects.", pts:3, fb:"Masterful executive communication! Transparently balancing top-line growth with margin compression strategies demonstrates strong strategic leadership."},
+    {t:"Focus entirely on celebrating 14% revenue growth, downplaying margin compression as an industry-wide temporary issue.", pts:2, fb:"Selective reporting. Board members require complete financial transparency regarding margin trends to set strategic policy."},
+    {t:"Distribute a 60-page detailed ledger printout without providing an executive summary or key variance analysis.", pts:1, fb:"Poor presentation approach. Executives require strategic financial summaries and actionable insights, not raw accounting transactional data."},
+    {t:"Argue that net profit margin compression does not matter as long as overall revenue growth outpaces competitors.", pts:-1, fb:"Fundamentally incorrect logic! Uncontrolled margin shrinkage leads to unprofitable growth and long-term business distress."}
+  ],
+  next:"final"
+}
+};
+
+/* ── SHUFFLE FUNCTION ── */
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+/* ── BUILD PROGRESS DOTS ── */
+function buildDots(id){
+  const stageMap={d1:0,d2:1,d3:2,d4:3,d5:4,d6:5,e1:6,d7:7,d8:8,d9:9,d10:10,e2:11,d11:12,d12:13};
+  const cur = stageMap[id] ?? 14;
+  const el = document.getElementById('dots');
+  el.innerHTML='';
+  el.setAttribute('aria-label','Step '+(cur+1)+' of 14');
+  for(let i=0;i<14;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i<cur?' done':i===cur?(N[id]?.isEmergency?' emg':' active'):'');
+    el.appendChild(d);
+  }
+}
+
+/* ── RATING HELPER ── */
+function rate(opt,node){
+  if(opt.isGameOver) return {cls:'rf', label:'Project Failure', tag:'Fatal'};
+  if(opt.pts===3)  return {cls:'r3', label:'Excellent', tag:'+3'};
+  if(opt.pts===2)  return {cls:'r2', label:node.isEmergency?'Best Action':'Good', tag:'+2'};
+  if(opt.pts===1)  return {cls:'r1', label:'Weak', tag:'+1'};
+  return {cls:'r0', label:'Poor', tag:'−1'};
+}
+
+function setScore(delta){
+  S.score+=delta;
+  const el=document.getElementById('score');
+  el.textContent=S.score+' pts';
+  el.classList.toggle('neg',S.score<0);
+}
+
+/* ── SHOW SCENARIO NODE ── */
+function show(id){
+  curId=id;
+  const node=N[id];
+  S.answered=false;
+  document.getElementById('fb').className='fbox';
+  const nb=document.getElementById('nxt');
+  nb.className='nxt'; nb.onclick=null;
+  buildDots(id);
+  document.getElementById('lbl').textContent=node.label;
+
+  let html='';
+  if(node.isEmergency) html+=`<div class="emg-alert"><span aria-hidden="true">&#9888;</span> Emergency — critical management action required.</div>`;
+  if(node.vocab) html+=`<div class="vocab-row">Key vocabulary: ${node.vocab.map(v=>`<span class="vpill">${v}</span>`).join('')}</div>`;
+  document.getElementById('scene').innerHTML=html+node.scene;
+
+  curShuffled = shuffle(node.opts.slice());
+
+  const el=document.getElementById('opts');
+  el.innerHTML='';
+  curShuffled.forEach((opt,i)=>{
+    const r=rate(opt,node);
+    const btn=document.createElement('button');
+    btn.type='button';
+    btn.className='opt-btn';
+    btn.dataset.rating=r.cls;
+    const txt=document.createElement('span'); txt.textContent=opt.t;
+    const tag=document.createElement('span'); tag.className='ptag '+r.cls; tag.textContent=r.tag;
+    btn.append(txt,tag);
+    btn.addEventListener('click',()=>pick(i,btn));
+    el.appendChild(btn);
+  });
+}
+
+/* ── OPTION SELECTION ── */
+function pick(di, btn){
+  if(S.answered || btn.disabled) return;
+  const node=N[curId];
+  const opt=curShuffled[di];
+  const r=rate(opt,node);
+  const btns=[...document.querySelectorAll('.opt-btn')];
+  const fb=document.getElementById('fb');
+  const nb=document.getElementById('nxt');
+  const badge=`<span class="fb-rate">${r.label}${opt.isGameOver?'':' · '+r.tag}</span><br>`;
+
+  if(!node.isEmergency && opt.pts===-1){
+    setScore(-1);
+    S.tally.r0++;
+    btn.disabled=true;
+    btn.classList.add(r.cls,'picked');
+    btn.querySelector('.ptag').classList.add('show');
+    fb.className='fbox fb-r0 show';
+    fb.innerHTML=badge+opt.fb+"<br><br><strong>Penalty: &minus;1 point. Please evaluate remaining options.</strong>";
+    return;
+  }
+
+  S.answered=true;
+  if(!opt.isGameOver) setScore(opt.pts);
+  S.tally[r.cls]++;
+
+  btns.forEach(b=>{
+    b.disabled=true;
+    b.classList.add(b.dataset.rating);
+    b.querySelector('.ptag').classList.add('show');
+    if(b===btn || b.classList.contains('picked')) b.classList.add('picked');
+    else b.classList.add('dim');
+  });
+
+  fb.className='fbox fb-'+r.cls+' show';
+  fb.innerHTML=badge+opt.fb;
+  if(window.matchMedia && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+    fb.scrollIntoView({block:'nearest',behavior:'smooth'});
+
+  nb.className='nxt show';
+  if(opt.isGameOver){
+    nb.textContent='See Final Summary'; nb.onclick=()=>showFinal(true);
+  } else if(node.next==='final'){
+    nb.textContent='See Final Summary'; nb.onclick=()=>showFinal(false);
+  } else if(N[node.next] && N[node.next].isEmergency){
+    nb.textContent='Proceed to Industry Emergency →'; nb.onclick=()=>show(node.next);
+  } else {
+    nb.textContent='Next Scenario →'; nb.onclick=()=>show(node.next);
+  }
+  nb.focus({preventScroll:true});
+}
+
+/* ── FINAL SCORE DISPLAY ── */
+function showFinal(gameOver){
+  const s=S.score, max=S.maxScore, pct=Math.max(0, Math.min(100, Math.round(s/max*100)));
+  let grade;
+  if(gameOver)      grade="Project Terminated Early.";
+  else if(s>=36)    grade="Chief Financial Officer Level Acumen.";
+  else if(s>=28)    grade="Senior Project Accountant Standard.";
+  else if(s>=20)    grade="Developing Industrial Financial Analyst.";
+  else              grade="Requires Further Financial Review.";
+
+  const barColor = gameOver ? 'var(--rf-bd)' : pct>=90 ? 'var(--r3-bd)' : pct>=70 ? '#84B64A' : pct>=50 ? 'var(--r1-bd)' : 'var(--rf-bd)';
+
+  const discussion = " Discussion Question 3: How can project accountants balance strict cost controls with unpredictable weather and mountain logistics risks?";
+  const summary = gameOver
+    ? "A critical decision during an industry crisis terminated the simulation early. In industrial engineering, contractual oversight and supply risk management are essential for financial survival." + discussion
+    : "You navigated complex project accounting decisions in high-altitude engineering construction. From WIP inventory valuation to revenue recognition and contractual risk management, your financial controls directly protected project profitability." + discussion;
+
+  const labels={r3:'Excellent',r2:'Good',r1:'Weak',r0:'Poor',rf:'Fatal'};
+  const tally=Object.keys(labels).filter(k=>S.tally[k]>0)
+    .map(k=>`<span class="tchip ${k}">${labels[k]} × ${S.tally[k]}</span>`).join('');
+
+  document.getElementById('gc').innerHTML=`
+    <div class="fin">
+      <div class="fin-lbl">Financial Performance Review &mdash; Vektor Ropeways</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:4px">Your Final Score</div>
+      <div class="fin-num">${s}</div>
+      <div class="fin-max">out of ${max} points</div>
+      <div class="bar-bg"><div class="bar-fill" id="bfill" style="background:${barColor}"></div></div>
+      <div class="tally" aria-label="Score breakdown">${tally}</div>
+      <div class="fin-grade">${grade}</div>
+      <div class="fin-text">${summary}</div>
+      <div class="vfooter">Key Concepts Mastered:
+        ${["variance analysis","percentage-of-completion","CAPEX vs. OPEX","WIP valuation","price escalation","retainage","liquidated damages","EBITDA forecasting","operating margins","depreciation","break-even analysis","due diligence"].map(v=>`<span class="vpill">${v}</span>`).join('')}
+      </div>
+      <button class="replay" type="button" onclick="restartGame()">Restart Simulation</button>
+    </div>`;
+  setTimeout(()=>{const b=document.getElementById('bfill');if(b)b.style.width=pct+'%';},120);
+}
+
+function restartGame(){
+  document.getElementById('gc').innerHTML=GAME_HTML;
+  S.score=0; S.answered=false; S.tally={r3:0,r2:0,r1:0,r0:0,rf:0};
+  show('d1');
+  window.scrollTo({top:0});
+}
+
+document.getElementById('start').addEventListener('click',()=>{
+  document.getElementById('intro').hidden=true;
+  document.getElementById('gc').hidden=false;
+  window.scrollTo({top:0});
+  show('d1');
+});
+</script>
+</body>
+</html>

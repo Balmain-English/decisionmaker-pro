@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en"><head><script data-bard-client-injected="true">(function(firebaseConfig, initialAuthToken, appId) {
+        window.__firebase_config = firebaseConfig;
+        window.__initial_auth_token = initialAuthToken;
+        window.__app_id = appId;
+            })("\n{\n  \"apiKey\": \"AIzaSyCqyCcs2R2e7AegGjvFAwG98wlamtbHvZY\",\n  \"authDomain\": \"bard-frontend.firebaseapp.com\",\n  \"projectId\": \"bard-frontend\",\n  \"storageBucket\": \"bard-frontend.firebasestorage.app\",\n  \"messagingSenderId\": \"175205271074\",\n  \"appId\": \"1:175205271074:web:2b7bd4d34d33bf38e6ec7b\"\n}\n","eyJhbGciOiJSUzI1NiIsImtpZCI6IjExNjRiNzdiNDMzZDdhMDAyMWI4NjE4YjhjYTU3ZTMyZGI5MWUxMTMiLCJ0eXAiOiJKV1QifQ.eyJzdWIiOiJmaXJlYmFzZS1hZG1pbnNkay1mYnN2Y0BiYXJkLWZyb250ZW5kLmlhbS5nc2VydmljZWFjY291bnQuY29tIiwiYXVkIjoiaHR0cHM6Ly9pZGVudGl0eXRvb2xraXQuZ29vZ2xlYXBpcy5jb20vZ29vZ2xlLmlkZW50aXR5LmlkZW50aXR5dG9vbGtpdC52MS5JZGVudGl0eVRvb2xraXQiLCJ1aWQiOiIwOTA4NDA2ODU5NzQ3NDUzNDQzNiIsImlzcyI6ImZpcmViYXNlLWFkbWluc2RrLWZic3ZjQGJhcmQtZnJvbnRlbmQuaWFtLmdzZXJ2aWNlYWNjb3VudC5jb20iLCJjbGFpbXMiOnsiYXBwSWQiOiJjXzQ2NjEwMjljZmU2M2IxMTNfdGVhbXdvcmtfcXVpel9hcHAuaHRtbC03NTMifSwiZXhwIjoxNzkyNDIwNDU0LCJpYXQiOjE3OTI0MTY4NTQsImFsZyI6IlJTMjU2In0.laNlVvGNyBA7bmwJFZWcY3M-PAVEnCKHlNQ361v12SkD5dseTZCWktA1lqMOwfnqHx0ubQ_-Is4QAeDef5KRiyaOZd93srbNEqfuiTTp0ngT4UaGfTYXG2A-TUxB4ahSB_gEgR8eL5aSh7Ue5c5QPBbdNL7l3CaSNOVXjN_SFht6RiO2VPeMUSZGvBEECvmGlrAEJX2BPGIvfdnqRHIh0JHDsaPkPuFxc7ZFn79ORXI21Q62eoaxwgAW9iQe4OUvfq0qCdBpgwrO_gNhUfEUKX7E50jHvq4XgVdHOkpSTNOzLPp8NnHTF8JtZ9dzSkvNEcNjvT2rI7jE2P4aMIaIBQ","c_4661029cfe63b113_teamwork_quiz_app.html-753")</script><script data-bard-client-injected="true">
+  document.addEventListener('input', (event) => {
+    if (event.target && (event.target.isContentEditable || event.target.hasAttribute('contenteditable'))) {
+      const clonedDoc = document.cloneNode(true);
+      const injectedScripts = clonedDoc.querySelectorAll('[data-bard-client-injected="true"]');
+      injectedScripts.forEach(el => el.remove());
+      window.parent.postMessage({
+        type: 'inlineEdit',
+        html: '<!DOCTYPE html>\n' + clonedDoc.documentElement.outerHTML
+      }, '*');
+    }
+  });
+</script><script data-bard-client-injected="true">(function(){'use strict';window.addEventListener("message",a=>{a.data&&a.data.type==="SUPPLEMENTAL_DATA_UPDATE"&&window.dispatchEvent(new CustomEvent("supplementaldataupdate",{detail:a.data.data}))});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const SCROLL_KEYS = new Set([
+    'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+    ' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End',
+  ]);
+  const HORIZONTAL_KEYS = new Set(['ArrowLeft', 'ArrowRight']);
+
+  function isTextEntryTarget(target) {
+    if (!target) return false;
+    const tagName = target.tagName;
+    return tagName === 'INPUT' || tagName === 'TEXTAREA' ||
+        tagName === 'SELECT' || target.isContentEditable === true;
+  }
+
+  // An element absorbs the key only if it both overflows on the axis being
+  // scrolled and is configured to scroll on that axis. The cheap dimension
+  // test runs first because getComputedStyle forces a style recalc, and this
+  // runs on every keypress. Each axis is read from its own longhand: the
+  // 'overflow' shorthand serializes as two values when the axes differ, which
+  // is the common 'overflow-x: hidden; overflow-y: auto' pane.
+  function canScroll(node, horizontal) {
+    const overflows = horizontal ? node.scrollWidth > node.clientWidth
+                                 : node.scrollHeight > node.clientHeight;
+    if (!overflows) return false;
+    const style = window.getComputedStyle(node);
+    const overflow = horizontal ? style.overflowX : style.overflowY;
+    return overflow === 'auto' || overflow === 'scroll';
+  }
+
+  // Walks up from the event target so nested scrollers keep their behavior.
+  // <body> is included because pages that pin the root height make it the
+  // scroll container.
+  function hasScrollableAncestor(target, horizontal) {
+    let node = target;
+    while (node && node !== document.documentElement) {
+      if (canScroll(node, horizontal)) return true;
+      node = node.parentElement;
+    }
+    return false;
+  }
+
+  function rootCanScroll(horizontal) {
+    const scroller = document.scrollingElement || document.documentElement;
+    if (!scroller) return false;
+    // Tolerate a pixel of rounding so subpixel layouts do not look scrollable.
+    return horizontal ? scroller.scrollWidth > window.innerWidth + 1
+                      : scroller.scrollHeight > window.innerHeight + 1;
+  }
+
+  window.addEventListener('keydown', function(event) {
+    if (!SCROLL_KEYS.has(event.key)) return;
+    if (event.defaultPrevented) return;
+    // Alt and Meta turn arrows into browser history navigation, and Ctrl is
+    // reserved for shortcuts, so none of them are scroll intent.
+    if (event.altKey || event.metaKey || event.ctrlKey) return;
+
+    const target = event.target;
+    if (isTextEntryTarget(target)) return;
+
+    // Anything that can still absorb the scroll gets to keep it.
+    const horizontal = HORIZONTAL_KEYS.has(event.key);
+    if (rootCanScroll(horizontal)) return;
+    if (hasScrollableAncestor(target, horizontal)) return;
+
+    event.preventDefault();
+  }, {capture: true, passive: false});
+})();</script><script data-bard-client-injected="true">(function() {
+  // Ensure this script is executed only once
+  if (window.firebaseAuthBridgeScriptLoaded) {
+    return;
+  }
+  window.firebaseAuthBridgeScriptLoaded = true;
+
+  let nextTokenPromiseId = 0;
+
+  // Stores { resolve, reject } for ongoing token requests
+  const pendingTokenPromises = {};
+
+  // Listen for messages from the Host Application
+  window.addEventListener('message', function(event) {
+
+    const messageData = event.data;
+
+  if (messageData && messageData.type === 'RESOLVE_NEW_FIREBASE_TOKEN') {
+      const { success, token, error, promiseId } = messageData ?? {};
+      if (pendingTokenPromises[promiseId]) {
+        if (success) {
+          pendingTokenPromises[promiseId].resolve(token);
+        } else {
+          pendingTokenPromises[promiseId].reject(new Error(error || 'Token refresh failed from host.'));
+        }
+        delete pendingTokenPromises[promiseId];
+      }
+    }
+  });
+
+  // Expose a function for the Generated App to request a new Firebase token
+  window.requestNewFirebaseToken = function() {
+    const currentPromiseId = nextTokenPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingTokenPromises[currentPromiseId] = { resolve, reject };
+    });
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage({
+        type: 'REQUEST_NEW_FIREBASE_TOKEN',
+        promiseId: currentPromiseId
+      }, '*');
+    } else {
+      pendingTokenPromises[currentPromiseId].reject(new Error('No parent window to request token from.'));
+      delete pendingTokenPromises[currentPromiseId];
+    }
+    return promise;
+  };
+})();</script><script data-bard-client-injected="true">
+let realOriginalGetUserMedia = null;
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  realOriginalGetUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+}
+
+(function() {
+  if (navigator.mediaDevices && navigator.mediaDevices.__proto__) {
+    try {
+      Object.defineProperty(navigator.mediaDevices.__proto__, 'getUserMedia', {
+        get: function() {
+          return undefined; // Or throw an error
+        },
+        configurable: false
+      });
+    } catch (error) {
+      console.error("Error defining prototype getter:", error);
+    }
+  }
+})();
+
+(function() {
+  const pendingMediaResolvers = {};
+  let nextMediaPromiseId = 0;
+
+  function requestMediaPermissions(constraints) {
+    const mediaPromiseId = nextMediaPromiseId++;
+    const promise = new Promise((resolve, reject) => {
+      pendingMediaResolvers[mediaPromiseId] = (granted) => {
+        delete pendingMediaResolvers[mediaPromiseId];
+        resolve(granted);
+      };
+    });
+
+    window.parent.postMessage({
+      type: 'requestMediaPermission',
+      constraints: constraints,
+      promiseId: mediaPromiseId,
+    }, '*');
+
+    return promise;
+  }
+
+  let originalGetUserMedia = realOriginalGetUserMedia;
+
+  function interceptGetUserMedia() {
+    if (navigator.mediaDevices) {
+      Object.defineProperty(navigator.mediaDevices, 'getUserMedia', {
+        value: function(constraints) {
+          return requestMediaPermissions(constraints).then((granted) => {
+            if (granted) {
+              if (originalGetUserMedia) {
+                return originalGetUserMedia(constraints);
+              } else {
+                throw new Error("Original getUserMedia not available.");
+              }
+            } else {
+              throw new DOMException('Permission denied', 'NotAllowedError');
+            }
+          });
+        },
+        writable: false,
+        configurable: false
+      });
+    }
+  }
+
+  interceptGetUserMedia();
+
+  const observer = new MutationObserver(function(mutationsList, observer) {
+    for (const mutation of mutationsList) {
+      if (mutation.type === 'reconfigured' && mutation.name === 'getUserMedia' && mutation.object === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'attributes' && mutation.attributeName === 'getUserMedia' && mutation.target === navigator.mediaDevices) {
+        interceptGetUserMedia();
+      } else if (mutation.type === 'childList' && mutation.addedNodes) {
+        mutation.addedNodes.forEach(node => {
+          if (node === navigator.mediaDevices) {
+            interceptGetUserMedia();
+          }
+        });
+      }
+    }
+  });
+
+  function interceptSpeechRecognition() {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      return;
+    }
+
+    const OriginalSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    const SpeechRecognitionWrapper = function(...args) {
+      const recognizer = new OriginalSpeechRecognition(...args);
+      const originalStart = recognizer.start.bind(recognizer);
+
+      recognizer.start = function() {
+        requestMediaPermissions({ audio: true }).then(granted => {
+          if (granted) {
+            originalStart();
+          } else {
+            const errorEvent = new SpeechRecognitionErrorEvent('error');
+            errorEvent.error = 'not-allowed'; // This is the standard error for permission denial.
+            recognizer.dispatchEvent(errorEvent);
+          }
+        });
+      };
+
+      return recognizer;
+    };
+
+    SpeechRecognitionWrapper.prototype = OriginalSpeechRecognition.prototype;
+    SpeechRecognitionWrapper.prototype.constructor = SpeechRecognitionWrapper;
+
+    if (window.SpeechRecognition) {
+      window.SpeechRecognition = SpeechRecognitionWrapper;
+    }
+    if (window.webkitSpeechRecognition) {
+      window.webkitSpeechRecognition = SpeechRecognitionWrapper;
+    }
+  }
+
+  interceptSpeechRecognition();
+
+  window.addEventListener('message', function(event) {
+    if (event.data) {
+      if (event.data.type === 'resolveMediaPermission') {
+        const { promiseId, granted } = event.data;
+        if (pendingMediaResolvers[promiseId]) {
+          pendingMediaResolvers[promiseId](granted);
+        }
+      }
+    }
+  });
+
+})();</script><script ws-interception-config="{&quot;parentOrigin&quot;:&quot;https://gemini.google.com&quot;,&quot;proxiedDomains&quot;:[]}" data-bard-client-injected="true">(function(){'use strict';var u=typeof Object.defineProperties=="function"?Object.defineProperty:function(b,d,e){if(b==Array.prototype||b==Object.prototype)return b;b[d]=e.value;return b};function v(b){b=["object"==typeof globalThis&&globalThis,b,"object"==typeof window&&window,"object"==typeof self&&self,"object"==typeof global&&global];for(var d=0;d<b.length;++d){var e=b[d];if(e&&e.Math==Math)return e}throw Error("Cannot find global object");}var w=v(this);
+function y(b,d){if(d)a:{var e=w;b=b.split(".");for(var h=0;h<b.length-1;h++){var k=b[h];if(!(k in e))break a;e=e[k]}b=b[b.length-1];h=e[b];d=d(h);d!=h&&d!=null&&u(e,b,{configurable:!0,writable:!0,value:d})}}function z(b){function d(h){return b.next(h)}function e(h){return b.throw(h)}return new Promise(function(h,k){function m(n){n.done?h(n.value):Promise.resolve(n.value).then(d,e).then(m,k)}m(b.next())})}y("globalThis",function(b){return b||w});/*
+
+ Copyright The Closure Library Authors.
+ SPDX-License-Identifier: Apache-2.0
+*/
+function A(b,d){function e(){}e.prototype=d.prototype;b.j=d.prototype;b.prototype=new e;b.prototype.constructor=b;b.h=function(h,k,m){for(var n=Array(arguments.length-2),p=2;p<arguments.length;p++)n[p-2]=arguments[p];return d.prototype[k].apply(h,n)}};function B(b,d,e="*"){function h(a){if(typeof a==="string")return F.encode(a).buffer;if(a instanceof ArrayBuffer)return a.slice(0);if(ArrayBuffer.isView(a))return a.buffer.slice(a.byteOffset,a.byteOffset+a.byteLength);throw Error("Invalid data type");}function k(a){a=h(a);var f={type:"send",data:new Uint8Array(a)},g;(g=r)==null||g.postMessage(f,[a])}function m(){if(!r)throw Error("Data port not captured yet.");r.onmessage=a=>{if(a.data.type==="message"){a=new MessageEvent("message",{data:G.decode(a.data.data)});
+let f;(f=c.onmessage)==null||f.call(c,a);c.dispatchEvent(a)}}}function n(){if(!t)throw Error("Control port not captured yet.");t.onmessage=a=>{switch(a.data.type){case "open":l=1;var f=new Event("open"),g;(g=c.onopen)==null||g.call(c,f);c.dispatchEvent(f);q.forEach(H=>{k(H)});q=[];break;case "close":g=a.data;l=3;g=new CloseEvent("close",{code:g.code,reason:g.reason,wasClean:g.wasClean});(f=c.onclose)==null||f.call(c,g);c.dispatchEvent(g);break;case "error":l=3;f=new Event("error");let x;(x=c.onerror)==
+null||x.call(c,f);c.dispatchEvent(f)}}}function p(a){return z(function*(){var f=new MessageChannel;t=f.port1;var g=new MessageChannel;r=g.port1;n();m();window.parent.postMessage({type:"websocket_open",portOrdering:["control","data"],url:b,protocols:a||[],connectionId:I},e,[f.port2,g.port2])}())}var c=Reflect.construct(EventTarget,[],new.target);c.CONNECTING=0;c.OPEN=1;c.CLOSING=2;c.CLOSED=3;c.url=b;c.binaryType="arraybuffer";c.protocol="";c.i="";var l=0,t=null,r=null,q=[],F=new TextEncoder,G=new TextDecoder;
+c.onopen=null;c.onmessage=null;c.onclose=null;c.onerror=null;Object.defineProperty(c,"readyState",{get:()=>l,enumerable:!0,configurable:!0});Object.defineProperty(c,"bufferedAmount",{get:()=>{var a=0;q.forEach(f=>{a+=typeof f==="string"?f.length:f.byteLength});return a},enumerable:!0,configurable:!0});var I=function(){var a;return((a=globalThis.crypto)==null?0:a.randomUUID)?globalThis.crypto.randomUUID():"xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,f=>{var g=Math.random()*16|0;return(f===
+"x"?g:g&3|8).toString(16)})}();c.send=a=>{if(l===1)a instanceof Blob?a.arrayBuffer().then(f=>{k(f)}):k(a);else if(l===0)if(typeof a==="string")q.push(a);else if(a instanceof ArrayBuffer||ArrayBuffer.isView(a))q.push(h(a));else throw Error("Sending Blob is not supported before the connection is open.");else console.debug("WebSocket send called in CLOSING or CLOSED state; ignored.")};c.close=(a=1E3,f="")=>{if(l!==2&&l!==3){l=2;a={type:"close",code:a,reason:f,wasClean:a===1E3};var g;(g=t)==null||g.postMessage(a)}};
+Promise.resolve().then(()=>p(d));return c}A(B,EventTarget);var C=document.currentScript,D=C==null?void 0:C.getAttribute("ws-interception-config");if(!D)throw Error("WebSocket Interceptor: Missing ws-interception-config attribute in the script tag.");var E=JSON.parse(D);if(!E.parentOrigin||typeof E.parentOrigin!=="string")throw Error("WebSocket Interceptor: Invalid parentOrigin in ws-interception-config");
+(function(b){var d=Object.getOwnPropertyDescriptor(window,"WebSocket");if(!d||d.writable||d.configurable)d=Object.assign(function(e,h){try{let k=(new URL(e)).hostname;if(b.proxiedDomains.some(m=>k===m||k.endsWith(`.${m}`)))return new B(e,h,b.parentOrigin)}catch(k){throw window.parent.postMessage({type:"websocket_blocked",url:e,reason:"blocked_invalid_url"},b.parentOrigin),new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");}window.parent.postMessage({type:"websocket_blocked",
+url:e,reason:"blocked_domain_not_allowlisted"},b.parentOrigin);throw new DOMException(`WebSocket connection to '${e}' is not allowed in Canvas.`,"SecurityError");},{CONNECTING:0,OPEN:1,CLOSING:2,CLOSED:3}),Object.defineProperty(window,"WebSocket",{value:d,writable:!1,configurable:!1})})({proxiedDomains:E.proxiedDomains||[],parentOrigin:E.parentOrigin});}).call(this);
+</script><script data-bard-client-injected="true">((function(modelInformation) {
+  const originalFetch = window.fetch;
+  // TODO: b/421908508 - Move these out of the script and match all generative AI model calls.
+  let googleLlmBaseApiUrls = [
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':streamGenerateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.textModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageEditModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.imageTransformModelName + ':generateContent',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predict',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.videoModelName + ':predictLongRunning',
+    'https://generativelanguage.googleapis.com/v1beta/models/' + modelInformation.ttsModelName + ':generateContent',
+  ];
+  modelInformation.deprecatedTextModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+    );
+  });
+  modelInformation.deprecatedImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predict',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':predictLongRunning',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedGenerateImageModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+  modelInformation.deprecatedImageTransformModelNames.forEach((modelName) => {
+    googleLlmBaseApiUrls.push(
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':generateContent',
+      'https://generativelanguage.googleapis.com/v1beta/models/' + modelName + ':streamGenerateContent',
+    );
+  });
+
+  const pendingFetchResolvers = {};
+  let nextPromiseId = 0;
+
+  function handleStringInput(input, optionsArgument) {
+    const actualUrl = input;
+    const fetchCallArgs = [actualUrl, optionsArgument];
+    const effectiveOptions = optionsArgument || {};
+    const bodyForApiKeyCheck = effectiveOptions.body;
+    const bodyForPostMessage = effectiveOptions.body;
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  function handleRequestInput(input, optionsArgument) {
+    const actualUrl = input.url;
+    const fetchCallArgs = [input, optionsArgument];
+    const effectiveOptions = { method: input.method, headers: new Headers(input.headers) };
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (optionsArgument) {
+      if (optionsArgument.method) effectiveOptions.method = optionsArgument.method;
+      if (optionsArgument.headers) effectiveOptions.headers = new Headers(optionsArgument.headers);
+      if ('body' in optionsArgument) {
+        bodyForApiKeyCheck = optionsArgument.body;
+        bodyForPostMessage = optionsArgument.body;
+      } else {
+        bodyForApiKeyCheck = undefined;
+        bodyForPostMessage = input.body;
+      }
+    } else {
+      bodyForApiKeyCheck = undefined;
+      bodyForPostMessage = input.body;
+    }
+    return { actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage };
+  }
+
+  window.fetch = function(input, optionsArgument) {
+    let actualUrl;
+    let fetchCallArgs;
+    let effectiveOptions = {};
+    let bodyForApiKeyCheck;
+    let bodyForPostMessage;
+
+    if (typeof input === 'string') {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleStringInput(input, optionsArgument));
+    } else if (input instanceof Request) {
+      ({actualUrl, fetchCallArgs, effectiveOptions, bodyForApiKeyCheck, bodyForPostMessage} = handleRequestInput(input, optionsArgument));
+    } else {
+      return originalFetch.apply(window, [input, optionsArgument]);
+    }
+
+    effectiveOptions.method = effectiveOptions.method || 'GET';
+    if (!effectiveOptions.headers) {
+      effectiveOptions.headers = new Headers();
+    }
+
+
+    if (typeof actualUrl === 'string' && googleLlmBaseApiUrls.some((url) => actualUrl.startsWith(url))) {
+      let apiKeyIsNull = true;
+
+      const regex = new RegExp("models/([^:]+)");
+      const modelNameMatch = actualUrl.match(regex);
+      const modelName = modelNameMatch ? modelNameMatch[1] : 'unspecified';
+
+
+      try {
+        const urlObject = new URL(actualUrl);  // Use URL object for robust parsing
+        const apiKeyParam = urlObject.searchParams.get('key');
+        if (apiKeyParam) {
+          apiKeyIsNull = false;
+        }
+      } catch (e) {
+        // Continue checks even if URL parsing fails
+      }
+
+      if (apiKeyIsNull && effectiveOptions.headers) {
+        const h = new Headers(effectiveOptions.headers);
+        const apiKeyHeaderValue = h.get('X-API-Key') || h.get('x-api-key');
+        if (apiKeyHeaderValue) {
+          apiKeyIsNull = false;
+          return originalFetch.apply(window, fetchCallArgs);
+        }
+      }
+
+      if (apiKeyIsNull && effectiveOptions.method && ['POST', 'PUT', 'PATCH'].includes(effectiveOptions.method.toUpperCase()) && typeof bodyForApiKeyCheck === 'string') {
+        try {
+          const bodyData = JSON.parse(bodyForApiKeyCheck);
+          if (bodyData && bodyData.apiKey) {
+            apiKeyIsNull = false;
+            return originalFetch.apply(window, fetchCallArgs);
+          }
+        } catch (e) {
+          // Ignore JSON parsing errors
+        }
+      }
+
+      if(apiKeyIsNull) {
+        const promiseId = nextPromiseId++;
+        const promise = new Promise((resolve) => {
+          pendingFetchResolvers[promiseId] = (resolvedResponse) => {
+            delete pendingFetchResolvers[promiseId];
+            resolve(resolvedResponse);
+          };
+        });
+
+        let serializedBodyForPostMessage;
+        if (typeof bodyForPostMessage === 'string' || bodyForPostMessage == null) {
+            serializedBodyForPostMessage = bodyForPostMessage;
+        } else if (bodyForPostMessage instanceof ReadableStream) {
+            serializedBodyForPostMessage = null;
+        } else {
+            try {
+                serializedBodyForPostMessage = JSON.stringify(bodyForPostMessage);
+            } catch (e) {
+                serializedBodyForPostMessage = null;
+            }
+        }
+
+        const messageOptions = {
+            method: effectiveOptions.method,
+            headers: Object.fromEntries(new Headers(effectiveOptions.headers).entries()),
+            body: serializedBodyForPostMessage
+        };
+
+        window.parent.postMessage({
+          type: 'requestFetch',
+          url: actualUrl,
+          modelName: modelName,
+          options: messageOptions,
+          promiseId: promiseId,
+        }, '*');
+
+        return promise;
+      }
+      return originalFetch.apply(window, fetchCallArgs);
+    }
+    return originalFetch.apply(window, fetchCallArgs);
+  };
+
+  window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'resolveFetch') {
+      const { promiseId, response } = event.data;
+      if (pendingFetchResolvers[promiseId]) {
+        try {
+          const reconstructedResponse = new Response(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: new Headers(response.headers),
+          });
+          pendingFetchResolvers[promiseId](reconstructedResponse);
+        } catch (error) {
+          pendingFetchResolvers[promiseId](new Response(null, { status: 500, statusText: "Interceptor Response Reconstruction Error" }));
+        }
+      }
+    }
+  });
+
+}))({"textModelName":"gemini-3-flash-preview","imageModelName":"imagen-4.0-generate-001","imageEditModelName":"gemini-3.1-flash-image","imageTransformModelName":"gemini-3-pro-image","videoModelName":"veo-2.0-generate-001","ttsModelName":"gemini-2.5-flash-preview-tts","deprecatedTextModelNames":["gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-preview-04-17","gemini-2.5-flash-preview-05-20","gemini-2.5-flash-preview-09-2025"],"deprecatedImageModelNames":["imagen-3.0-generate-001","imagen-3.0-generate-002"],"deprecatedGenerateImageModelNames":["gemini-2.5-flash-image-preview","gemini-2.5-flash-image","gemini-3.1-flash-image-preview"],"deprecatedImageTransformModelNames":["gemini-3-pro-image-preview-11-2025"]})</script><script data-bard-client-injected="true">(function(){'use strict';function a(){window.parent.postMessage({type:"interaction"},"*")}window.addEventListener("click",a,{capture:!0,passive:!0});window.addEventListener("touchstart",a,{capture:!0,passive:!0});window.addEventListener("keydown",a,{capture:!0,passive:!0});}).call(this);
+</script><script data-bard-client-injected="true">(function() {
+  const originalConsoleLog = console.log;
+  const originalConsoleError = console.error;
+
+    /**
+   * Normalizes an error event or a promise rejection reason into a structured error object.
+   * @param {*} errorEventOrReason The error object or reason.
+   * @return {object} Structured error data { message, name, stack }.
+   */
+  function getErrorObject(errorEventOrReason) {
+    if (errorEventOrReason instanceof Error) {
+      return {
+        message: errorEventOrReason.message,
+        name: errorEventOrReason.name,
+        stack: errorEventOrReason.stack,
+      };
+    }
+    // Fallback for non-Error objects.
+    try {
+      return {
+        message: JSON.stringify(errorEventOrReason),
+        name: 'UnknownErrorType',
+        stack: null,
+      };
+    } catch (e) {
+      return {
+        message: String(errorEventOrReason),
+        name: 'UnknownErrorTypeNonStringifiable',
+        stack: null,
+      };
+    }
+  }
+
+  /**
+   * Converts an array of arguments (from log/error) into a single string.
+   * Handles Error objects specially to include their message and stack.
+   * @param {Array<*>} args - Arguments passed to console methods.
+   * @return {string} A string representation of the arguments.
+   */
+  function stringifyArgs(args) {
+    return args
+      .map((arg) => {
+        if (arg instanceof Error) {
+          const {message, stack} = arg;
+          return `Error: ${message}${stack ? ('\nStack: ' + stack) : ''}`;
+        }
+        if (typeof arg === 'object' && arg !== null) {
+          try {
+            return JSON.stringify(arg);
+          } catch (error) {
+            return '[Circular Object]';
+          }
+        } else {
+          return String(arg);
+        }
+      })
+      .join(' ');
+  }
+
+  console.log = function(...args) {
+    const logString = stringifyArgs(args);
+    window.parent.postMessage({ type: 'log', message: logString }, '*');
+    originalConsoleLog.apply(console, args);
+  };
+
+  console.error = function(...args) {
+    let errorData;
+    if (args.length > 0 && args[0] instanceof Error) {
+      const err = args[0];
+      // If the first arg is an Error, capture its details.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        ...getErrorObject(err),
+        rawArgsString: stringifyArgs(args.slice(1)),
+        timestamp: new Date().toISOString(),
+      };
+    } else {
+      // If not an Error object, treat all args as a general error message.
+      errorData = {
+        type: 'error',
+        source: 'CONSOLE_ERROR',
+        message: stringifyArgs(args),
+        name: 'ConsoleLoggedError',
+        stack: null,
+        timestamp: new Date().toISOString(),
+      };
+    }
+    window.parent.postMessage(errorData, '*');
+    originalConsoleError.apply(console, args);
+  };
+
+  // Listen for global unhandled synchronous errors.
+  window.addEventListener('error', function(event) {
+    const errorDetails = event.error ? getErrorObject(event.error) : {
+      message: event.message,
+      name: 'GlobalError',
+      stack: null,
+      filename: event.filename,
+      lineno: event.lineno,
+      colno: event.colno,
+    };
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'global',
+      ...errorDetails,
+      message: errorDetails.message || event.message,
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+  // Listen for unhandled promise rejections (asynchronous errors).
+  window.addEventListener('unhandledrejection', function(event) {
+    const errorDetails = getErrorObject(event.reason);
+
+    window.parent.postMessage({
+      type: 'error',
+      source: 'unhandledrejection',
+      ...errorDetails,
+      message: errorDetails.message || 'Unhandled Promise Rejection',
+      timestamp: new Date().toISOString(),
+    }, '*');
+  });
+
+})();</script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Are You a Teamworker? - Health Garments Sector</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        teal: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        },
+                        slate: {
+                            700: '#334155',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .meter-transition {
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+<style>*, ::before, ::after{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / 0.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/* ! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com */*,::after,::before{box-sizing:border-box;border-width:0;border-style:solid;border-color:#e5e7eb}::after,::before{--tw-content:''}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;tab-size:4;font-family:Inter, sans-serif;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0;padding:0}legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.sticky{position:sticky}.top-0{top:0px}.top-\[60px\]{top:60px}.z-40{z-index:40}.z-50{z-index:50}.mx-auto{margin-left:auto;margin-right:auto}.my-4{margin-top:1rem;margin-bottom:1rem}.mb-1{margin-bottom:0.25rem}.mb-2{margin-bottom:0.5rem}.mb-3{margin-bottom:0.75rem}.mb-4{margin-bottom:1rem}.mb-6{margin-bottom:1.5rem}.mt-1{margin-top:0.25rem}.mt-2{margin-top:0.5rem}.mt-4{margin-top:1rem}.mt-auto{margin-top:auto}.inline-block{display:inline-block}.flex{display:flex}.grid{display:grid}.hidden{display:none}.h-4{height:1rem}.h-5{height:1.25rem}.h-full{height:100%}.min-h-screen{min-height:100vh}.w-4{width:1rem}.w-full{width:100%}.max-w-2xl{max-width:42rem}.max-w-4xl{max-width:56rem}.max-w-5xl{max-width:64rem}.max-w-md{max-width:28rem}.flex-grow{flex-grow:1}.transform{transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.cursor-pointer{cursor:pointer}.list-inside{list-style-position:inside}.list-disc{list-style-type:disc}.grid-cols-1{grid-template-columns:repeat(1, minmax(0, 1fr))}.flex-col{flex-direction:column}.flex-wrap{flex-wrap:wrap}.items-center{align-items:center}.justify-end{justify-content:flex-end}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.gap-2{gap:0.5rem}.gap-4{gap:1rem}.space-x-1 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.25rem * var(--tw-space-x-reverse));margin-left:calc(0.25rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-2 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.5rem * var(--tw-space-x-reverse));margin-left:calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))}.space-x-3 > :not([hidden]) ~ :not([hidden]){--tw-space-x-reverse:0;margin-right:calc(0.75rem * var(--tw-space-x-reverse));margin-left:calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))}.space-y-1 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.25rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.25rem * var(--tw-space-y-reverse))}.space-y-2 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.5rem * var(--tw-space-y-reverse))}.space-y-2\.5 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.625rem * var(--tw-space-y-reverse))}.space-y-3 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(0.75rem * var(--tw-space-y-reverse))}.space-y-4 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1rem * var(--tw-space-y-reverse))}.space-y-6 > :not([hidden]) ~ :not([hidden]){--tw-space-y-reverse:0;margin-top:calc(1.5rem * calc(1 - var(--tw-space-y-reverse)));margin-bottom:calc(1.5rem * var(--tw-space-y-reverse))}.overflow-hidden{overflow:hidden}.rounded-2xl{border-radius:1rem}.rounded-full{border-radius:9999px}.rounded-lg{border-radius:0.5rem}.rounded-md{border-radius:0.375rem}.rounded-xl{border-radius:0.75rem}.border{border-width:1px}.border-b{border-bottom-width:1px}.border-t{border-top-width:1px}.border-slate-100{--tw-border-opacity:1;border-color:rgb(241 245 249 / var(--tw-border-opacity, 1))}.border-slate-200{--tw-border-opacity:1;border-color:rgb(226 232 240 / var(--tw-border-opacity, 1))}.border-slate-300{--tw-border-opacity:1;border-color:rgb(203 213 225 / var(--tw-border-opacity, 1))}.border-slate-800{--tw-border-opacity:1;border-color:rgb(30 41 59 / var(--tw-border-opacity, 1))}.border-teal-100{--tw-border-opacity:1;border-color:rgb(204 251 241 / var(--tw-border-opacity, 1))}.border-teal-200{--tw-border-opacity:1;border-color:rgb(153 246 228 / var(--tw-border-opacity, 1))}.bg-slate-100{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.bg-slate-200{--tw-bg-opacity:1;background-color:rgb(226 232 240 / var(--tw-bg-opacity, 1))}.bg-slate-50{--tw-bg-opacity:1;background-color:rgb(248 250 252 / var(--tw-bg-opacity, 1))}.bg-slate-800{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.bg-slate-900{--tw-bg-opacity:1;background-color:rgb(15 23 42 / var(--tw-bg-opacity, 1))}.bg-teal-100{--tw-bg-opacity:1;background-color:rgb(204 251 241 / var(--tw-bg-opacity, 1))}.bg-teal-50{--tw-bg-opacity:1;background-color:rgb(240 253 250 / var(--tw-bg-opacity, 1))}.bg-teal-50\/60{background-color:rgb(240 253 250 / 0.6)}.bg-teal-600{--tw-bg-opacity:1;background-color:rgb(13 148 136 / var(--tw-bg-opacity, 1))}.bg-teal-700{--tw-bg-opacity:1;background-color:rgb(15 118 110 / var(--tw-bg-opacity, 1))}.bg-teal-800{--tw-bg-opacity:1;background-color:rgb(17 94 89 / var(--tw-bg-opacity, 1))}.bg-white{--tw-bg-opacity:1;background-color:rgb(255 255 255 / var(--tw-bg-opacity, 1))}.bg-gradient-to-r{background-image:linear-gradient(to right, var(--tw-gradient-stops))}.from-amber-500{--tw-gradient-from:#f59e0b var(--tw-gradient-from-position);--tw-gradient-to:rgb(245 158 11 / 0) var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), var(--tw-gradient-to)}.via-teal-500{--tw-gradient-to:rgb(20 184 166 / 0)  var(--tw-gradient-to-position);--tw-gradient-stops:var(--tw-gradient-from), #14b8a6 var(--tw-gradient-via-position), var(--tw-gradient-to)}.to-emerald-600{--tw-gradient-to:#059669 var(--tw-gradient-to-position)}.p-0\.5{padding:0.125rem}.p-2{padding:0.5rem}.p-2\.5{padding:0.625rem}.p-3{padding:0.75rem}.p-4{padding:1rem}.p-5{padding:1.25rem}.p-6{padding:1.5rem}.px-1{padding-left:0.25rem;padding-right:0.25rem}.px-2\.5{padding-left:0.625rem;padding-right:0.625rem}.px-3{padding-left:0.75rem;padding-right:0.75rem}.px-4{padding-left:1rem;padding-right:1rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-8{padding-left:2rem;padding-right:2rem}.py-0\.5{padding-top:0.125rem;padding-bottom:0.125rem}.py-1{padding-top:0.25rem;padding-bottom:0.25rem}.py-2{padding-top:0.5rem;padding-bottom:0.5rem}.py-2\.5{padding-top:0.625rem;padding-bottom:0.625rem}.py-3{padding-top:0.75rem;padding-bottom:0.75rem}.py-3\.5{padding-top:0.875rem;padding-bottom:0.875rem}.py-4{padding-top:1rem;padding-bottom:1rem}.pb-4{padding-bottom:1rem}.pt-2{padding-top:0.5rem}.text-center{text-align:center}.font-sans{font-family:Inter, sans-serif}.text-2xl{font-size:1.5rem;line-height:2rem}.text-\[10px\]{font-size:10px}.text-base{font-size:1rem;line-height:1.5rem}.text-lg{font-size:1.125rem;line-height:1.75rem}.text-sm{font-size:0.875rem;line-height:1.25rem}.text-xl{font-size:1.25rem;line-height:1.75rem}.text-xs{font-size:0.75rem;line-height:1rem}.font-bold{font-weight:700}.font-medium{font-weight:500}.font-semibold{font-weight:600}.uppercase{text-transform:uppercase}.italic{font-style:italic}.leading-relaxed{line-height:1.625}.leading-tight{line-height:1.25}.tracking-wider{letter-spacing:0.05em}.text-slate-400{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}.text-slate-500{--tw-text-opacity:1;color:rgb(100 116 139 / var(--tw-text-opacity, 1))}.text-slate-600{--tw-text-opacity:1;color:rgb(71 85 105 / var(--tw-text-opacity, 1))}.text-slate-700{--tw-text-opacity:1;color:rgb(51 65 85 / var(--tw-text-opacity, 1))}.text-slate-800{--tw-text-opacity:1;color:rgb(30 41 59 / var(--tw-text-opacity, 1))}.text-slate-900{--tw-text-opacity:1;color:rgb(15 23 42 / var(--tw-text-opacity, 1))}.text-teal-200{--tw-text-opacity:1;color:rgb(153 246 228 / var(--tw-text-opacity, 1))}.text-teal-600{--tw-text-opacity:1;color:rgb(13 148 136 / var(--tw-text-opacity, 1))}.text-teal-700{--tw-text-opacity:1;color:rgb(15 118 110 / var(--tw-text-opacity, 1))}.text-teal-800{--tw-text-opacity:1;color:rgb(17 94 89 / var(--tw-text-opacity, 1))}.text-teal-900{--tw-text-opacity:1;color:rgb(19 78 74 / var(--tw-text-opacity, 1))}.text-white{--tw-text-opacity:1;color:rgb(255 255 255 / var(--tw-text-opacity, 1))}.antialiased{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.shadow{--tw-shadow:0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-lg{--tw-shadow:0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 10px 15px -3px var(--tw-shadow-color), 0 4px 6px -4px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-md{--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shadow-sm{--tw-shadow:0 1px 2px 0 rgb(0 0 0 / 0.05);--tw-shadow-colored:0 1px 2px 0 var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.transition{transition-property:color, background-color, border-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;transition-property:color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-text-decoration-color, -webkit-backdrop-filter;transition-timing-function:cubic-bezier(0.4, 0, 0.2, 1);transition-duration:150ms}.hover\:-translate-y-0\.5:hover{--tw-translate-y:-0.125rem;transform:translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.hover\:bg-slate-700:hover{--tw-bg-opacity:1;background-color:rgb(51 65 85 / var(--tw-bg-opacity, 1))}.hover\:bg-slate-800:hover{--tw-bg-opacity:1;background-color:rgb(30 41 59 / var(--tw-bg-opacity, 1))}.hover\:bg-teal-500:hover{--tw-bg-opacity:1;background-color:rgb(20 184 166 / var(--tw-bg-opacity, 1))}.hover\:bg-teal-800:hover{--tw-bg-opacity:1;background-color:rgb(17 94 89 / var(--tw-bg-opacity, 1))}.focus\:outline-none:focus{outline:2px solid transparent;outline-offset:2px}.focus\:ring-2:focus{--tw-ring-offset-shadow:var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);--tw-ring-shadow:var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);box-shadow:var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)}.focus\:ring-teal-500:focus{--tw-ring-opacity:1;--tw-ring-color:rgb(20 184 166 / var(--tw-ring-opacity, 1))}.disabled\:bg-slate-100:disabled{--tw-bg-opacity:1;background-color:rgb(241 245 249 / var(--tw-bg-opacity, 1))}.disabled\:text-slate-400:disabled{--tw-text-opacity:1;color:rgb(148 163 184 / var(--tw-text-opacity, 1))}@media (min-width: 640px){.sm\:w-auto{width:auto}.sm\:grid-cols-2{grid-template-columns:repeat(2, minmax(0, 1fr))}.sm\:flex-row{flex-direction:row}.sm\:p-6{padding:1.5rem}.sm\:p-8{padding:2rem}.sm\:px-4{padding-left:1rem;padding-right:1rem}.sm\:text-3xl{font-size:1.875rem;line-height:2.25rem}.sm\:text-base{font-size:1rem;line-height:1.5rem}.sm\:text-sm{font-size:0.875rem;line-height:1.25rem}.sm\:text-xl{font-size:1.25rem;line-height:1.75rem}}</style></head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- HEADER / NAVBAR -->
+    <header class="bg-teal-800 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-teal-600 p-2 rounded-lg text-white font-bold text-xl">
+                    🩺🧵
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight">Teamwork in Health Garments</h1>
+                    <p class="text-xs text-teal-200">Multidisciplinary Professional Training (B1 English)</p>
+                </div>
+            </div>
+            <button id="downloadBtn" onclick="downloadApp()" class="bg-teal-600 hover:bg-teal-500 text-white text-xs sm:text-sm font-semibold py-2 px-3 sm:px-4 rounded-lg shadow transition flex items-center space-x-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span>Download App</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-4xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- ================= SCREEN 1: WELCOME & WARM-UP ================= -->
+        <section id="screen-intro" class="space-y-6 fade-in">
+            <!-- Welcome Header Card -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <span class="inline-block px-3 py-1 bg-teal-100 text-teal-800 font-semibold text-xs rounded-full mb-3">Module 1: Introductory Warm-up</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Are You a Teamworker?</h2>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
+                    Welcome! Designing and manufacturing health garments (such as adaptive clothing, compression socks, and post-surgery wear) requires close collaboration between <strong>designers, textile engineers, occupational therapists, stitchers, and quality inspectors</strong>.
+                </p>
+                <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                    Before taking the 12-situation quiz, test your key terminology and discuss core teamwork principles with a colleague.
+                </p>
+            </div>
+
+            <!-- Vocabulary Exercise Card -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-2 flex items-center space-x-2">
+                    <span>📚</span>
+                    <span>Exercise A: Key Workplace Vocabulary</span>
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 mb-4">Match the correct term from the list to each definition below.</p>
+
+                <!-- Term Bank -->
+                <div class="flex flex-wrap gap-2 mb-6 p-3 bg-slate-100 rounded-xl text-xs sm:text-sm font-medium text-teal-800" id="vocabBank">
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border">Multidisciplinary</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border">Adaptive Clothing</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border">Prototype</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border">Clinical Need</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border">Constructive Feedback</span>
+                    <span class="bg-white px-2.5 py-1 rounded-md shadow-sm border">Compromise</span>
+                </div>
+
+                <!-- Vocabulary Questions -->
+                <div class="space-y-4" id="vocabQuestions">
+                    <!-- Q1 -->
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700">1. A medical requirement or physical limitation that a patient has.</p>
+                        <select data-correct="Clinical Need" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct word --</option>
+                            <option value="Multidisciplinary">Multidisciplinary</option>
+                            <option value="Adaptive Clothing">Adaptive Clothing</option>
+                            <option value="Prototype">Prototype</option>
+                            <option value="Clinical Need">Clinical Need</option>
+                            <option value="Constructive Feedback">Constructive Feedback</option>
+                            <option value="Compromise">Compromise</option>
+                        </select>
+                    </div>
+                    <!-- Q2 -->
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700">2. Involving specialists from different professional fields (e.g. nurses + designers).</p>
+                        <select data-correct="Multidisciplinary" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct word --</option>
+                            <option value="Multidisciplinary">Multidisciplinary</option>
+                            <option value="Adaptive Clothing">Adaptive Clothing</option>
+                            <option value="Prototype">Prototype</option>
+                            <option value="Clinical Need">Clinical Need</option>
+                            <option value="Constructive Feedback">Constructive Feedback</option>
+                            <option value="Compromise">Compromise</option>
+                        </select>
+                    </div>
+                    <!-- Q3 -->
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700">3. Garments designed specially for people with disabilities or health conditions.</p>
+                        <select data-correct="Adaptive Clothing" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct word --</option>
+                            <option value="Multidisciplinary">Multidisciplinary</option>
+                            <option value="Adaptive Clothing">Adaptive Clothing</option>
+                            <option value="Prototype">Prototype</option>
+                            <option value="Clinical Need">Clinical Need</option>
+                            <option value="Constructive Feedback">Constructive Feedback</option>
+                            <option value="Compromise">Compromise</option>
+                        </select>
+                    </div>
+                    <!-- Q4 -->
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700">4. An early sample or test model of a garment built to test a design concept.</p>
+                        <select data-correct="Prototype" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct word --</option>
+                            <option value="Multidisciplinary">Multidisciplinary</option>
+                            <option value="Adaptive Clothing">Adaptive Clothing</option>
+                            <option value="Prototype">Prototype</option>
+                            <option value="Clinical Need">Clinical Need</option>
+                            <option value="Constructive Feedback">Constructive Feedback</option>
+                            <option value="Compromise">Compromise</option>
+                        </select>
+                    </div>
+                    <!-- Q5 -->
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700">5. Helpful opinions or advice given to improve a product or performance.</p>
+                        <select data-correct="Constructive Feedback" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct word --</option>
+                            <option value="Multidisciplinary">Multidisciplinary</option>
+                            <option value="Adaptive Clothing">Adaptive Clothing</option>
+                            <option value="Prototype">Prototype</option>
+                            <option value="Clinical Need">Clinical Need</option>
+                            <option value="Constructive Feedback">Constructive Feedback</option>
+                            <option value="Compromise">Compromise</option>
+                        </select>
+                    </div>
+                    <!-- Q6 -->
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs sm:text-sm space-y-2">
+                        <p class="text-slate-700">6. An agreement where both sides give up a small demand to reach a solution.</p>
+                        <select data-correct="Compromise" class="vocab-select w-full p-2 bg-white border border-slate-300 rounded-lg text-slate-800 font-medium">
+                            <option value="">-- Choose correct word --</option>
+                            <option value="Multidisciplinary">Multidisciplinary</option>
+                            <option value="Adaptive Clothing">Adaptive Clothing</option>
+                            <option value="Prototype">Prototype</option>
+                            <option value="Clinical Need">Clinical Need</option>
+                            <option value="Constructive Feedback">Constructive Feedback</option>
+                            <option value="Compromise">Compromise</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex items-center justify-between">
+                    <button onclick="checkVocab()" class="bg-teal-700 hover:bg-teal-800 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
+                        Check Vocabulary Answers
+                    </button>
+                    <span id="vocabResult" class="text-sm font-bold"></span>
+                </div>
+            </div>
+
+            <!-- Warm-up Discussion Questions -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <span>💬</span>
+                    <span>Exercise B: Warm-up Discussion Starters</span>
+                </h3>
+                <p class="text-xs sm:text-sm text-slate-500 mb-4">Discuss these two questions with a partner or think about your experience before starting:</p>
+                <div class="space-y-4">
+                    <div class="p-4 bg-teal-50/60 rounded-xl border border-teal-100">
+                        <p class="font-semibold text-teal-900 text-sm">Discussion Question 1:</p>
+                        <p class="text-slate-700 text-xs sm:text-sm mt-1">Why is communication between a health clinician (e.g. a physiotherapist) and a clothing machinist so important when making adaptive garments?</p>
+                    </div>
+                    <div class="p-4 bg-teal-50/60 rounded-xl border border-teal-100">
+                        <p class="font-semibold text-teal-900 text-sm">Discussion Question 2:</p>
+                        <p class="text-slate-700 text-xs sm:text-sm mt-1">What usually happens in a factory when someone notices a small technical error but decides not to tell anyone?</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Quiz Button -->
+            <div class="text-center py-4">
+                <button onclick="startQuiz()" class="bg-teal-600 hover:bg-teal-500 text-white font-bold py-3.5 px-8 rounded-xl text-base shadow-lg transition transform hover:-translate-y-0.5">
+                    Start Interactive Quiz (12 Situations) →
+                </button>
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 2: 12-SITUATION QUIZ ================= -->
+        <section id="screen-quiz" class="hidden space-y-6">
+
+            <!-- STICKY TEAMWORK METER BAR -->
+            <div class="sticky top-[60px] z-40 bg-white p-4 rounded-2xl shadow-md border border-slate-200 space-y-2">
+                <div class="flex justify-between items-center text-xs sm:text-sm font-semibold text-slate-700">
+                    <span class="flex items-center space-x-1">
+                        <span>⚠️ Isolated / Individual</span>
+                    </span>
+                    <span id="meterLabel" class="text-teal-700 font-bold">Teamwork Meter: Neutral (50%)</span>
+                    <span class="flex items-center space-x-1">
+                        <span>Collaborative Teamworker 🤝</span>
+                    </span>
+                </div>
+                <!-- Dynamic Progress Bar -->
+                <div class="w-full bg-slate-200 rounded-full h-4 overflow-hidden p-0.5 border border-slate-300">
+                    <div id="meterBar" class="bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-600 h-full rounded-full meter-transition" style="width: 50%;"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 font-medium px-1">
+                    <span>0%</span>
+                    <span>25%</span>
+                    <span>50% (Start)</span>
+                    <span>75%</span>
+                    <span>100%</span>
+                </div>
+            </div>
+
+            <!-- QUESTION CONTAINER CARD -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 space-y-6 fade-in">
+                
+                <!-- Question Counter Header -->
+                <div class="flex justify-between items-center border-b pb-4 border-slate-100">
+                    <span id="questionNum" class="text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-3 py-1 rounded-full border border-teal-200">
+                        Situation 1 of 12
+                    </span>
+                    <span id="roleTag" class="text-xs font-medium text-slate-500 italic">
+                        Context: Prototype Testing
+                    </span>
+                </div>
+
+                <!-- Scenario Description -->
+                <div>
+                    <h3 id="scenarioTitle" class="text-lg sm:text-xl font-bold text-slate-900 mb-2">
+                        <!-- Loaded dynamically -->
+                    </h3>
+                    <p id="scenarioText" class="text-slate-600 text-sm sm:text-base leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <!-- Loaded dynamically -->
+                    </p>
+                </div>
+
+                <!-- Answer Choices (Radio Group) -->
+                <div id="optionsContainer" class="space-y-3">
+                    <!-- Dynamically populated options -->
+                </div>
+
+                <!-- Option 5: Open 'Something Else' Text Field -->
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <label class="flex items-center space-x-3 cursor-pointer">
+                        <input type="radio" name="quizOption" value="custom" class="w-4 h-4 text-teal-600 focus:ring-teal-500" onchange="toggleCustomInput(true)">
+                        <span class="font-semibold text-sm text-slate-800">E) Something else (Write your own practical idea for discussion):</span>
+                    </label>
+                    <textarea id="customIdeaText" disabled="" placeholder="Type your alternative solution here... (This can be shared during teacher/group debriefing)" class="w-full mt-2 p-2.5 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:outline-none disabled:bg-slate-100 disabled:text-slate-400" rows="2"></textarea>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="pt-2">
+                    <button id="submitAnswerBtn" onclick="submitAnswer()" class="w-full bg-teal-700 hover:bg-teal-800 text-white font-bold py-3 px-6 rounded-xl text-sm sm:text-base shadow-md transition">
+                        Submit Choice &amp; See Teamwork Feedback
+                    </button>
+                </div>
+
+                <!-- FEEDBACK CARD (Initially Hidden) -->
+                <div id="feedbackCard" class="hidden p-5 rounded-xl border fade-in space-y-3">
+                    <div class="flex items-center space-x-2">
+                        <span id="feedbackBadge" class="px-2.5 py-0.5 text-xs font-bold rounded-full"></span>
+                        <h4 id="feedbackTitle" class="font-bold text-sm sm:text-base"></h4>
+                    </div>
+                    <p id="feedbackText" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        <!-- 20-30 words B1 feedback -->
+                    </p>
+                    <div class="pt-2 flex justify-end">
+                        <button id="nextQuestionBtn" onclick="nextQuestion()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 px-6 rounded-lg text-sm shadow transition flex items-center space-x-2">
+                            <span>Next Situation</span>
+                            <span>→</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= SCREEN 3: DEBRIEFING & RESULTS ================= -->
+        <section id="screen-results" class="hidden space-y-6 fade-in">
+            <!-- Overall Score Card -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 text-center space-y-4">
+                <span class="px-3 py-1 bg-teal-100 text-teal-800 font-semibold text-xs rounded-full">Quiz Complete</span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Your Teamwork Profile Assessment</h2>
+                
+                <!-- Final Gauge -->
+                <div class="max-w-md mx-auto space-y-2 my-4">
+                    <div class="flex justify-between text-xs font-semibold text-slate-600">
+                        <span>0% (Isolated)</span>
+                        <span id="finalScorePercent" class="text-teal-700 text-base font-bold">50%</span>
+                        <span>100% (Collaborative)</span>
+                    </div>
+                    <div class="w-full bg-slate-200 rounded-full h-5 overflow-hidden p-0.5 border border-slate-300">
+                        <div id="finalMeterBar" class="bg-gradient-to-r from-amber-500 via-teal-500 to-emerald-600 h-full rounded-full meter-transition" style="width: 50%;"></div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-xl bg-teal-50 border border-teal-200 max-w-2xl mx-auto">
+                    <h3 id="resultTitle" class="text-lg font-bold text-teal-900 mb-1"></h3>
+                    <p id="resultEducativeText" class="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                        <!-- 60-80 words feedback dynamically loaded -->
+                    </p>
+                </div>
+            </div>
+
+            <!-- Competency Breakdown -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
+                    <span>📊</span>
+                    <span>Key Teamwork Competencies in Health Garments</span>
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">1. Cross-Disciplinary Communication</p>
+                        <p class="text-slate-600">Explaining technical fabric or sewing constraints clearly to medical staff and listening to clinical needs without judgment.</p>
+                    </div>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">2. Empathy for Patient Needs</p>
+                        <p class="text-slate-600">Prioritizing user comfort, skin sensitivity, and independence when making manufacturing or design adjustments.</p>
+                    </div>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">3. Early Error Transparency</p>
+                        <p class="text-slate-600">Reporting pattern errors or stitch defects immediately to protect batch quality and save team time.</p>
+                    </div>
+                    <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
+                        <p class="font-bold text-slate-800">4. Constructive Compromise</p>
+                        <p class="text-slate-600">Finding balanced solutions between strict production deadlines and custom clinical modifications.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Group Debriefing & Reflection Questions -->
+            <div class="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200">
+                <h3 class="text-lg font-bold text-slate-900 mb-3 flex items-center space-x-2">
+                    <span>💡</span>
+                    <span>Post-Quiz Group Reflection Questions</span>
+                </h3>
+                <ul class="space-y-2.5 text-xs sm:text-sm text-slate-700 list-disc list-inside">
+                    <li>Which situation was the hardest for you to make a decision on, and why?</li>
+                    <li>If you wrote a custom <em>"Something else"</em> response, share it with your trainer or group. How does it improve the workflow?</li>
+                    <li>How can you improve your daily communication with colleagues from different departments (e.g. stitching vs. quality control vs. clinical trial reps)?</li>
+                </ul>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 py-4">
+                <button onclick="window.print()" class="w-full sm:w-auto bg-slate-800 hover:bg-slate-700 text-white font-semibold py-3 px-6 rounded-xl text-sm transition shadow flex items-center justify-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                    <span>Print / Save Results Summary</span>
+                </button>
+                <button onclick="resetQuiz()" class="w-full sm:w-auto bg-teal-600 hover:bg-teal-500 text-white font-bold py-3 px-6 rounded-xl text-sm transition shadow">
+                    Restart Quiz 🔄
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-4 border-t border-slate-800 mt-auto">
+        <div class="max-w-5xl mx-auto px-4 text-center space-y-1">
+            <p>Multidisciplinary Health Garment Sector Training Program • English for Professional Purposes (B1 Level)</p>
+            <p class="text-slate-500">Interactive standalone application. Designed for healthcare textile teams and vocational language training.</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ================= 12 QUIZ SITUATIONS DATA =================
+        const situations = [
+            {
+                role: "Pattern Designer & Occupational Therapist",
+                title: "1. Pressure Garment Seam Adjustment",
+                scenario: "An occupational therapist requests moving a seam on a burn-rehabilitation sleeve because it irritates patient skin. However, moving it makes pattern cutting slower for factory stitchers.",
+                options: [
+                    {
+                        text: "Talk with the machinist and therapist to find a seam position that protects skin and maintains good sewing speed.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Excellent collaboration! You balanced patient comfort with manufacturing efficiency by bringing both key specialists together early."
+                    },
+                    {
+                        text: "Change the pattern immediately as requested by the therapist without consulting the production sewing team.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Good patient empathy, but ignoring the production team could create manufacturing delays later. Communication with both sides is essential."
+                    },
+                    {
+                        text: "Tell the therapist that factory patterns cannot be changed once approved by engineering.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "This answer avoids conflict, but it fails to address clinical patient comfort, which is vital in medical garment production."
+                    },
+                    {
+                        text: "Ignore the therapist's message and send the standard pattern to the factory cutting room.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Poor response. Working in isolation hurts patient care and damages trust between clinical and manufacturing teams."
+                    }
+                ]
+            },
+            {
+                role: "Textile Engineer & Quality Inspector",
+                title: "2. Stretch Fabric Quality Delay",
+                scenario: "You discover that a new batch of compression fabric stretches 10% less than required by medical safety standards. The production manager wants to cut it today to meet a deadline.",
+                options: [
+                    {
+                        text: "Explain the safety risk to the manager and work together to reschedule cutting while contacting the fabric supplier.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Great team decision! You protected medical product standards while actively collaborating on a solution for the deadline."
+                    },
+                    {
+                        text: "Report the defect in writing to Quality Control and leave the final decision entirely to them.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Responsible action, but standard administrative reporting without direct conversation can slow down practical problem solving."
+                    },
+                    {
+                        text: "Allow production to start cutting half the batch while waiting for senior management advice.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Ambiguous action. Cutting non-compliant fabric risks wasted materials and potential danger for end-use patients."
+                    },
+                    {
+                        text: "Agree to use the fabric this time to avoid argument with the production manager.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Poor choice. Patient medical safety must never be compromised to avoid brief workplace uncomfortable discussions."
+                    }
+                ]
+            },
+            {
+                role: "Sample Machinist & Product Designer",
+                title: "3. Difficult Fastener on Adaptive Jacket",
+                scenario: "While sewing a prototype adaptive coat for arthritis patients, you notice the magnetic zipper is very difficult to line up with one hand.",
+                options: [
+                    {
+                        text: "Invite the designer to the workshop, demonstrate the issue, and suggest a alternative magnetic closure.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Proactive and constructive! Showing real practical sewing issues directly to designers builds stronger adaptive garments."
+                    },
+                    {
+                        text: "Finish sewing the prototype and write a note on the feedback sheet about the zipper problem.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Clear feedback provided, though discussing it face-to-face earlier might save prototype rebuilding time."
+                    },
+                    {
+                        text: "Sew the zipper as drawn on the technical specification without making any comment.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "You followed instructions, but as a skilled team member, your practical practical insight is valuable for solving user problems."
+                    },
+                    {
+                        text: "Replace the magnetic zipper with standard buttons without asking or telling the design team.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Unilateral changes disrupt team standards. Arthritis patients often cannot use standard buttons, making the product unusable."
+                    }
+                ]
+            },
+            {
+                role: "Production Stitcher & Team Leader",
+                title: "4. New Automated Sewing Machinery",
+                scenario: "Your factory introduces automated elastic bonding machines. A older colleague is struggling to use the machine and is falling behind schedule.",
+                options: [
+                    {
+                        text: "Offer to pair up during quiet hours to share practical tips and help them build confidence.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Outstanding teamwork! Supporting peer learning strengthens whole-team productivity and maintains high morale."
+                    },
+                    {
+                        text: "Inform the team supervisor that your colleague needs additional official training.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Helpful, but combining supervisor reporting with personal peer support makes team integration much faster."
+                    },
+                    {
+                        text: "Focus strictly on your own workstation to ensure your own daily target is reached.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Focusing on your own work is understandable, but ignoring struggling teammates lowers overall team output."
+                    },
+                    {
+                        text: "Complain to other stitchers about the slow pace of your team member.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Negative behavior. Gossip harms trust and creates an unsupportive environment in production teams."
+                    }
+                ]
+            },
+            {
+                role: "Clinical Liaison & Garment Fitter",
+                title: "5. Patient Measurement Discrepancy",
+                scenario: "A patient with post-surgery lymphedema arrives for a fitting. The garment sewn is 3cm smaller than clinical measurements taken last week.",
+                options: [
+                    {
+                        text: "Apologize for the delay, re-measure with the patient calmly, and speak with cutting team to understand the error.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Professional and empathetic! You prioritized patient comfort while investigating the root cause constructively with colleagues."
+                    },
+                    {
+                        text: "Adjust the garment manually on the spot if possible and inform the team leader later.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Quick problem solving, but ensuring the original team understands why the error happened prevents future mistakes."
+                    },
+                    {
+                        text: "Tell the patient that swelling changes frequently and ask them to try wearing it anyway.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Risky choice. Forcing incorrect compression garments can cause severe medical pain or tissue damage."
+                    },
+                    {
+                        text: "Blame the measurement clinic in front of the patient for sending incorrect data.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Blaming colleagues openly damages professional reputation and creates unnecessary patient anxiety."
+                    }
+                ]
+            },
+            {
+                role: "Cross-Functional Project Team",
+                title: "6. Miscommunication in Technical File",
+                scenario: "During team meeting, you realize the clinical team and garment developers used different technical words for 'elastic tension', causing confusion.",
+                options: [
+                    {
+                        text: "Propose creating a simple shared vocabulary chart with diagrams for medical and textile terms.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Brilliant initiative! Creating shared communication tools bridges multidisciplinary gaps permanently."
+                    },
+                    {
+                        text: "Clarify the difference verbally during the meeting so everyone understands today's topic.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Clear immediate clarification. Writing it down as shared reference material makes it even more effective long-term."
+                    },
+                    {
+                        text: "Let the meeting continue and ask your direct supervisor for clarification afterwards.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Passive choice. If you are confused, others are likely confused too. Speaking up helps the whole group."
+                    },
+                    {
+                        text: "Criticize the clinical staff for not knowing standard textile manufacturing vocabulary.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Unhelpful attitude. Multidisciplinary success requires respect for different professional backgrounds."
+                    }
+                ]
+            },
+            {
+                role: "Quality Control & Packaging",
+                title: "7. Minor Aesthetic Flaw on Medical Hose",
+                scenario: "You notice slight color variation on a batch of anti-embolism stockings. The medical function is 100% fine, but aesthetics look uneven.",
+                options: [
+                    {
+                        text: "Consult Quality Assurance and the sales liaison to decide if it can be sold with a discount or re-dyed.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Balanced decision-making! Involving appropriate team members respects quality standards while protecting business efficiency."
+                    },
+                    {
+                        text: "Mark the whole batch as rejected waste immediately without consulting anyone.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Strict quality control, but discussing with the team first might save expensive medical materials from unnecessary disposal."
+                    },
+                    {
+                        text: "Pass the batch without notes since medical compression function is unaffected.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Borderline choice. While medical function comes first, unannounced visual flaws can reduce hospital client trust."
+                    },
+                    {
+                        text: "Hide the discolored stockings in the middle of shipping boxes to pass inspection.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Dishonest action. Hiding defects destroys team integrity and customer confidence."
+                    }
+                ]
+            },
+            {
+                role: "R&D & Production Line",
+                title: "8. Last-Minute Design Change Request",
+                scenario: "An orthopedist asks for an extra hook-and-loop strap on a hip brace three days before mass manufacturing starts.",
+                options: [
+                    {
+                        text: "Hold a quick 10-minute meeting with production, sourcing, and clinical leads to evaluate cost and timeline impact.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Excellent agile teamwork! Rapid cross-functional evaluation keeps projects realistic without rejecting innovation."
+                    },
+                    {
+                        text: "Accept the change and ask factory stitchers to work overtime to accommodate the addition.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Customer focused, but imposing overtime without consulting production leads damages team goodwill."
+                    },
+                    {
+                        text: "Reject the request immediately, stating production plans are locked.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Rigid stance. While deadlines matter, exploring quick feasibility with the team is a more collaborative approach."
+                    },
+                    {
+                        text: "Promise the orthopedist the change is easy without checking material stock or machine capacity.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Unrealistic commitments create chaos and stress for factory technicians and stitchers down the line."
+                    }
+                ]
+            },
+            {
+                role: "Junior Designer & Senior Engineer",
+                title: "9. Disagreement Over Seam Reinforcement",
+                scenario: "You (junior designer) believe soft ultrasound bonding is best for a pediatric neck collar, but a senior engineer prefers traditional stitching.",
+                options: [
+                    {
+                        text: "Suggest making two small test samples to test comfort and tensile strength together in the lab.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Data-driven teamwork! Testing options objectively replaces personal opinion with evidence everyone can agree on."
+                    },
+                    {
+                        text: "Accept the senior engineer's opinion without discussion because they have more experience.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Respectful, but polite professional discussion based on pediatric patient comfort could lead to better innovation."
+                    },
+                    {
+                        text: "Argue strongly for your idea in front of the whole team during the project review.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Passion is good, but public confrontation without practical comparative test data rarely succeeds."
+                    },
+                    {
+                        text: "Complain to the project head that senior staff refuse to try modern fabric technology.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Escalating conflict before trying direct professional collaboration harms workplace relationships."
+                    }
+                ]
+            },
+            {
+                role: "Sustainability & Materials Sourcing",
+                title: "10. Eco-Friendly Fabric Alternative",
+                scenario: "Your sourcing team finds a recycled yarn for wheelchair cushion covers. It is eco-friendly but slightly rougher to touch.",
+                options: [
+                    {
+                        text: "Organize a skin-friction evaluation with occupational therapists before choosing where to use this yarn.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Smart multidisciplinary approach! Protecting fragile patient skin while pursuing sustainability requires joint testing."
+                    },
+                    {
+                        text: "Order a small batch for non-skin contact garment parts (e.g. outer bag straps) first.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Practical compromise, though checking with clinical leads might reveal safe skin applications too."
+                    },
+                    {
+                        text: "Approve the yarn for all wheelchair garments to meet company sustainability targets.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Risky. Rough fabric against sensitive skin can cause pressure sores in wheelchair users."
+                    },
+                    {
+                        text: "Reject eco-friendly yarns completely because healthcare textiles are too complicated.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Negative attitude. Innovation requires teamwork and creative problem-solving across departments."
+                    }
+                ]
+            },
+            {
+                role: "Shift Handover & Operations",
+                title: "11. End-of-Shift Production Issue",
+                scenario: "At the end of your shift on a sensory-friendly compression shirt line, you notice thread tension is becoming uneven.",
+                options: [
+                    {
+                        text: "Stay 5 minutes to document the issue in the shift log and inform the incoming shift leader personally.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Outstanding responsibility! Smooth handovers prevent defect propagation and show great respect for colleagues."
+                    },
+                    {
+                        text: "Leave a quick sticky note on the machine for the next operator.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Basic communication provided, though verbal handovers ensure critical quality details aren't missed."
+                    },
+                    {
+                        text: "Turn off the machine and leave, assuming maintenance will check it tomorrow morning.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Passive response. The next shift operator will waste time discovering the issue themselves."
+                    },
+                    {
+                        text: "Log off immediately without mentioning it because your shift time has officially ended.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Uncooperative behavior. Leaving known technical defects for teammates creates frustration and lost production."
+                    }
+                ]
+            },
+            {
+                role: "Customer Feedback & Technical Support",
+                title: "12. Hospital User Feedback Review",
+                scenario: "A hospital reports that velcro tabs on pediatric posture vests wear out after 5 wash cycles. The team is deciding how to respond.",
+                options: [
+                    {
+                        text: "Propose a joint review with washing technicians, suppliers, and clinical reps to test higher-grade closures.",
+                        score: 2,
+                        type: "very_good",
+                        feedback: "Perfect collaborative mindset! Resolving quality complaints together creates long-term product solutions and team learning."
+                    },
+                    {
+                        text: "Suggest sending replacement velcro components to the hospital immediately.",
+                        score: 1,
+                        type: "good",
+                        feedback: "Good customer service, but fixing the root technical design fault with your team is essential."
+                    },
+                    {
+                        text: "Blame hospital laundry services for using high washing temperatures.",
+                        score: 0,
+                        type: "neutral",
+                        feedback: "Defensive position. Even if true, medical garments must withstand standard hospital sanitization cycles."
+                    },
+                    {
+                        text: "Ignore the feedback, claiming velcro lifespan is not guaranteed in user contracts.",
+                        score: -1,
+                        type: "poor",
+                        feedback: "Poor commitment to quality and user satisfaction. Listening to user feedback is vital for health garment innovation."
+                    }
+                ]
+            }
+        ];
+
+        // ================= STATE VARIABLES =================
+        let currentQuestionIndex = 0;
+        let meterScore = 50; // Starts exact middle (0% to 100%)
+        let userAnswers = [];
+
+        // ================= APP INITIALIZATION & NAVIGATION =================
+        function checkVocab() {
+            const selects = document.querySelectorAll('.vocab-select');
+            let correctCount = 0;
+            selects.forEach(select => {
+                const target = select.getAttribute('data-correct');
+                if (select.value === target) {
+                    select.classList.remove('border-slate-300', 'border-red-500');
+                    select.classList.add('border-emerald-500', 'bg-emerald-50');
+                    correctCount++;
+                } else {
+                    select.classList.remove('border-slate-300', 'border-emerald-500');
+                    select.classList.add('border-red-500', 'bg-red-50');
+                }
+            });
+
+            const resultEl = document.getElementById('vocabResult');
+            if (correctCount === 6) {
+                resultEl.className = "text-sm font-bold text-emerald-600";
+                resultEl.textContent = "Perfect! 6/6 Correct!";
+            } else {
+                resultEl.className = "text-sm font-bold text-amber-600";
+                resultEl.textContent = `Score: ${correctCount}/6. Review highlighted items!`;
+            }
+        }
+
+        function startQuiz() {
+            document.getElementById('screen-intro').classList.add('hidden');
+            document.getElementById('screen-quiz').classList.remove('hidden');
+            currentQuestionIndex = 0;
+            meterScore = 50;
+            userAnswers = [];
+            updateMeterUI(0, "Quiz Started");
+            loadQuestion(currentQuestionIndex);
+        }
+
+        // ================= QUESTION LOADING & UI =================
+        function loadQuestion(index) {
+            const q = situations[index];
+            
+            // Header info
+            document.getElementById('questionNum').textContent = `Situation ${index + 1} of 12`;
+            document.getElementById('roleTag').textContent = `Context: ${q.role}`;
+            document.getElementById('scenarioTitle').textContent = q.title;
+            document.getElementById('scenarioText').textContent = q.scenario;
+
+            // Reset Feedback & Textarea
+            const feedbackCard = document.getElementById('feedbackCard');
+            feedbackCard.classList.add('hidden');
+            
+            const customText = document.getElementById('customIdeaText');
+            customText.value = '';
+            customText.disabled = true;
+
+            // Render Options (Randomize display order but preserve point values)
+            const optionsContainer = document.getElementById('optionsContainer');
+            optionsContainer.innerHTML = '';
+
+            // Shuffle copy of options
+            const shuffledOptions = shuffleArray([...q.options]);
+
+            shuffledOptions.forEach((opt, idx) => {
+                const optId = `option_${idx}`;
+                const optionHtml = `
+                    <label class="flex items-start space-x-3 p-3.5 bg-slate-50 hover:bg-teal-50/50 rounded-xl border border-slate-200 cursor-pointer transition">
+                        <input type="radio" name="quizOption" value="${opt.score}" data-feedback="${encodeURIComponent(opt.feedback)}" data-type="${opt.type}" class="mt-1 w-4 h-4 text-teal-600 focus:ring-teal-500" onchange="toggleCustomInput(false)">
+                        <span class="text-xs sm:text-sm text-slate-800 leading-relaxed">${opt.text}</span>
+                    </label>
+                `;
+                optionsContainer.insertAdjacentHTML('beforeend', optionHtml);
+            });
+
+            // Enable submit button
+            document.getElementById('submitAnswerBtn').disabled = false;
+            document.getElementById('submitAnswerBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+        }
+
+        function toggleCustomInput(isCustom) {
+            const customText = document.getElementById('customIdeaText');
+            if (isCustom) {
+                customText.disabled = false;
+                customText.focus();
+            } else {
+                customText.disabled = true;
+            }
+        }
+
+        // Utility: Array shuffle
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ================= SUBMIT & SCORING LOGIC =================
+        function submitAnswer() {
+            const selectedRadio = document.querySelector('input[name="quizOption"]:checked');
+            if (!selectedRadio) {
+                alert("Please select an option or choose 'Something else' before submitting.");
+                return;
+            }
+
+            let pointChange = 0;
+            let feedback = "";
+            let badgeClass = "";
+            let badgeText = "";
+            let cardBorder = "";
+
+            if (selectedRadio.value === 'custom') {
+                const customIdea = document.getElementById('customIdeaText').value.trim();
+                if (customIdea.length < 5) {
+                    alert("Please write a short explanation for your 'Something else' idea.");
+                    return;
+                }
+                pointChange = 0; // Neutral score change for open discussion
+                feedback = `Your practical idea ("${customIdea.substring(0, 40)}...") is a great topic for group debriefing! Custom workplace ideas show creative initiative.`;
+                badgeClass = "bg-blue-100 text-blue-800";
+                badgeText = "Discussion Idea (Neutral 0%)";
+                cardBorder = "border-blue-300 bg-blue-50/50";
+            } else {
+                const scoreVal = parseInt(selectedRadio.value, 10);
+                feedback = decodeURIComponent(selectedRadio.getAttribute('data-feedback'));
+                const type = selectedRadio.getAttribute('data-type');
+
+                if (scoreVal === 2) { // Very good: +2 notches (+16%)
+                    pointChange = 16;
+                    badgeClass = "bg-emerald-100 text-emerald-800";
+                    badgeText = "Very Good (+2 Notches / +16%)";
+                    cardBorder = "border-emerald-300 bg-emerald-50/50";
+                } else if (scoreVal === 1) { // Good: +1 notch (+8%)
+                    pointChange = 8;
+                    badgeClass = "bg-teal-100 text-teal-800";
+                    badgeText = "Good (+1 Notch / +8%)";
+                    cardBorder = "border-teal-300 bg-teal-50/50";
+                } else if (scoreVal === 0) { // Neutral: 0 notches (0%)
+                    pointChange = 0;
+                    badgeClass = "bg-amber-100 text-amber-800";
+                    badgeText = "Neutral / Ambiguous (0%)";
+                    cardBorder = "border-amber-300 bg-amber-50/50";
+                } else if (scoreVal === -1) { // Poor: -1 notch (-8%)
+                    pointChange = -8;
+                    badgeClass = "bg-rose-100 text-rose-800";
+                    badgeText = "Poor (-1 Notch / -8%)";
+                    cardBorder = "border-rose-300 bg-rose-50/50";
+                }
+            }
+
+            // Update score bounds (0 to 100)
+            meterScore = Math.max(0, Math.min(100, meterScore + pointChange));
+            updateMeterUI(pointChange, badgeText);
+
+            // Record user response
+            userAnswers.push({
+                question: currentQuestionIndex + 1,
+                pointChange: pointChange
+            });
+
+            // Display Feedback Card
+            const feedbackCard = document.getElementById('feedbackCard');
+            const feedbackBadge = document.getElementById('feedbackBadge');
+            const feedbackTitle = document.getElementById('feedbackTitle');
+            const feedbackText = document.getElementById('feedbackText');
+
+            feedbackCard.className = `p-5 rounded-xl border fade-in space-y-2 ${cardBorder}`;
+            feedbackBadge.className = `px-2.5 py-0.5 text-xs font-bold rounded-full ${badgeClass}`;
+            feedbackBadge.textContent = badgeText;
+            feedbackTitle.textContent = "Teamwork Impact Analysis:";
+            feedbackText.textContent = feedback;
+
+            feedbackCard.classList.remove('hidden');
+
+            // Disable submit button after response
+            document.getElementById('submitAnswerBtn').disabled = true;
+            document.getElementById('submitAnswerBtn').classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        function updateMeterUI(change, label) {
+            const meterBar = document.getElementById('meterBar');
+            const meterLabel = document.getElementById('meterLabel');
+
+            meterBar.style.width = `${meterScore}%`;
+
+            let stateText = "Neutral";
+            if (meterScore >= 80) stateText = "Highly Collaborative 🌟";
+            else if (meterScore >= 60) stateText = "Cooperative Teamworker 👍";
+            else if (meterScore >= 40) stateText = "Moderate / Balanced ⚖️";
+            else stateText = "Isolated / Needs Collaboration ⚠️";
+
+            meterLabel.textContent = `Teamwork Meter: ${stateText} (${meterScore}%)`;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < situations.length) {
+                loadQuestion(currentQuestionIndex);
+            } else {
+                showResults();
+            }
+        }
+
+        // ================= RESULTS & DEBRIEFING PAGE =================
+        function showResults() {
+            document.getElementById('screen-quiz').classList.add('hidden');
+            document.getElementById('screen-results').classList.remove('hidden');
+
+            const finalMeterBar = document.getElementById('finalMeterBar');
+            const finalScorePercent = document.getElementById('finalScorePercent');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultEducativeText = document.getElementById('resultEducativeText');
+
+            finalMeterBar.style.width = `${meterScore}%`;
+            finalScorePercent.textContent = `${meterScore}%`;
+
+            // 60-80 words educative & encouraging feedback
+            if (meterScore >= 75) {
+                resultTitle.textContent = "🏆 Exceptional Collaborative Specialist";
+                resultEducativeText.textContent = "You demonstrate excellent teamwork skills essential for the healthcare garment sector! You naturally bridge gaps between clinical staff, designers, and factory stitchers. By seeking early feedback, respecting patient safety, and solving technical problems transparently with colleagues, you help build high-quality adaptive garments while maintaining a positive workplace environment. Keep leading by example and mentoring others in cross-departmental communication.";
+            } else if (meterScore >= 50) {
+                resultTitle.textContent = "🤝 Solid & Reliable Team Contributor";
+                resultEducativeText.textContent = "You show a good understanding of teamwork in a healthcare textile environment! You make constructive decisions and respect quality standards. To reach the next level, focus on involving cross-functional colleagues—such as clinical liaisons and machine technicians—even earlier when technical or design challenges appear. Active communication before manufacturing begins saves valuable time and ensures the best outcomes for health garment users.";
+            } else {
+                resultTitle.textContent = "🌱 Developing Teamworker (Focus on Open Collaboration)";
+                resultEducativeText.textContent = "You have good individual professional awareness, but your responses show a tendency to work in isolation or defer team communication. In health garment manufacturing, technical decisions directly impact patient comfort and factory efficiency. Try to share production issues earlier with teammates, listen actively to clinical feedback, and embrace joint problem-solving. Small improvements in everyday communication will greatly boost your teamwork confidence!";
+            }
+        }
+
+        function resetQuiz() {
+            document.getElementById('screen-results').classList.add('hidden');
+            document.getElementById('screen-intro').classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // ================= APP DOWNLOAD UTILITY =================
+        function downloadApp() {
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Teamwork_Quiz_Health_Garments.html';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+
+</body></html>

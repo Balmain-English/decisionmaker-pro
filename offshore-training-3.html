@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Offshore Training Lead - Interactive Scenario</title>
+<style>
+:root{--bg:#0F172A;--sf:#1E293B;--hv:#334155;--tx:#F8FAFC;--mu:#A8B5C7;--ac:#EAB308;--ah:#CA8A04;
+--gb:#064E3B;--gd:#10B981;--gt:#A7F3D0;--wb:#78350F;--wd:#F59E0B;--wt:#FDE68A;
+--rb:#7F1D1D;--rd:#EF4444;--rt:#FECACA;--ib:#1E3A8A;--id:#3B82F6;--it:#BFDBFE;--r:8px;
+--f:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;--m:ui-monospace,Consolas,"Courier New",monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--f);background:var(--bg);color:var(--tx);line-height:1.6;padding:2rem 1rem}
+main{max-width:800px;margin:0 auto;background:var(--sf);border:1px solid var(--hv);border-radius:var(--r);overflow:hidden}
+header{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:space-between;align-items:center;padding:1rem 1.5rem;background:#0B0F19;border-bottom:2px solid var(--ac)}
+header[hidden]{display:none}
+.title{font-weight:700}
+.st{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.dots{display:flex;flex-wrap:wrap;gap:5px}
+.dot{width:12px;height:12px;background:var(--hv);border-radius:2px}
+.dot.done{background:var(--ac);opacity:.5}.dot.act{background:var(--ac)}.dot.emg{background:var(--rd)}
+.sc{font-family:var(--m);font-size:.85rem;color:var(--ac);padding:4px 10px;border:1px solid var(--ac);border-radius:4px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#app{padding:2rem}
+h1{font-size:2rem;color:var(--ac);margin-bottom:.5rem}
+h2{font-size:.9rem;font-family:var(--m);color:var(--ac);margin-bottom:1rem}
+h2:focus{outline:none}
+.scene{font-size:1.1rem;margin-bottom:1.25rem;font-weight:300}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:1.5rem}
+.tag{font-family:var(--m);font-size:.8rem;background:#0B0F19;color:var(--mu);padding:3px 8px;border-radius:4px;border:1px solid var(--hv)}
+.opts{display:flex;flex-direction:column;gap:12px}
+.btn{background:transparent;border:1px solid #475569;color:var(--tx);padding:1rem;text-align:left;border-radius:var(--r);font:inherit;font-size:.95rem;cursor:pointer;width:100%}
+.btn:hover:not(:disabled){background:var(--hv);border-color:var(--mu)}
+.btn:disabled{cursor:default;color:var(--tx)}
+.btn.best{border:2px solid var(--gd)}
+.btn.mine{outline:2px dashed var(--ac);outline-offset:2px}
+.badge{display:block;font-family:var(--m);font-size:.8rem;margin-top:.5rem;font-weight:700}
+.note{display:block;margin-top:.35rem;font-size:.9rem;color:var(--mu)}
+.fb,.disc{margin-top:1.25rem;padding:1rem;border-radius:var(--r);border-left:4px solid}
+.fb.good{background:var(--gb);border-color:var(--gd);color:var(--gt)}
+.fb.warn{background:var(--wb);border-color:var(--wd);color:var(--wt)}
+.fb.bad{background:var(--rb);border-color:var(--rd);color:var(--rt)}
+.disc{background:var(--ib);border-color:var(--id);color:var(--it);font-style:italic}
+.nx{margin-top:1.5rem;background:var(--ac);color:#000;border:none;padding:.8rem 1.5rem;font:inherit;font-weight:700;border-radius:var(--r);cursor:pointer}
+.nx:hover{background:var(--ah)}
+.nx.bad{background:var(--rd)}
+.right{text-align:right}
+.intro{text-align:center}.intro p{margin:1rem 0;color:var(--mu)}
+.intro ul{text-align:left;background:#0B0F19;padding:1.5rem 2.5rem;border-radius:var(--r);margin:1rem 0 1.5rem}
+.band{text-align:left;padding:1.5rem;border-radius:var(--r);border-left:5px solid;margin:1.5rem 0}
+.b1{background:var(--gb);border-color:var(--gd);color:var(--gt)}
+.b2{background:var(--ib);border-color:var(--id);color:var(--it)}
+.b3{background:var(--wb);border-color:var(--wd);color:var(--wt)}
+.b4{background:var(--rb);border-color:var(--rd);color:var(--rt)}
+.recap{text-align:left;margin:1rem 0;padding-left:1.5rem}.recap li{margin-bottom:.4rem;font-size:.9rem}
+:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media (prefers-reduced-motion:no-preference){.fb,.disc{animation:fi .3s ease-in-out}@keyframes fi{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}}
+</style>
+</head>
+<body>
+<main>
+  <header id="hdr" hidden>
+    <div class="title">Offshore Training Lead Simulator</div>
+    <div class="st">
+      <div class="dots" id="dots" aria-hidden="true"></div>
+      <div class="sc" id="score" role="status" aria-live="polite"></div>
+    </div>
+  </header>
+  <div id="app"></div>
+</main>
+<script>
+"use strict";
+/* Data format: o = [text, points, feedback, gameOverFlag]. Bonus stages use points 2 / 1 / 0. */
+var S = [
+{k:"d",l:"Day 1: Office Preparation",s:"Reviewing the syllabus for the upcoming offshore maintenance training, you notice the latest manufacturer updates on high-pressure valves are missing from the official documentation.",v:["syllabus","documentation","high-pressure","manufacturer"],o:[
+["Integrate the updates and send the revised syllabus for management approval.",3,"Updating the controlled document keeps training compliant and traceable."],
+["Prepare a supplementary handout and distribute it during the offshore session.",2,"Practical, but the official syllabus stays out of date."],
+["Mention the updates verbally during the practical training.",1,"Verbal-only safety details are easily forgotten or misunderstood."],
+["Skip the updates because the crew is only assessed on the older curriculum.",-1,"Ignoring known equipment changes compromises safety and professional integrity."]]},
+{k:"d",l:"Day 1: Instructor Coordination",s:"A junior colleague asks how to handle senior technicians who often disrupt safety briefings with cynical comments about corporate protocols.",v:["uncooperative","disrupt","cynical","protocols"],o:[
+["Acknowledge their field experience and ask them to share practical insights with the group.",3,"This validates their expertise and channels it into the learning."],
+["Keep to the agenda and firmly manage interruptions.",2,"Keeps control, but can alienate experienced staff if applied rigidly."],
+["Let them stay passive in the background as long as they do not disrupt.",1,"Their operational knowledge is lost to the group."],
+["Threaten to report them to their line managers.",-1,"Threats damage psychological safety and invite hostility."]]},
+{k:"d",l:"Day 2: Logistical Shift",s:"The logistics coordinator says your offshore departure has moved forward a full day because of a severe incoming weather system.",v:["logistics","departure","severe","maritime"],o:[
+["Re-prioritise your schedule, notify stakeholders, and consolidate your training materials.",3,"Flexible planning plus clear communication keeps training on track."],
+["Accept the change and finish administrative preparation during the helicopter transit.",2,"You travel safely, but work quality in transit will suffer."],
+["Ask for a short delay in case the forecast improves.",1,"Offshore forecasts are usually reliable; delay risks being grounded."],
+["Refuse the earlier departure because your schedule is fixed.",-1,"Aviation safety outranks administrative schedules."]],
+d:"How does flexible logistical planning contribute to operational safety offshore?"},
+{k:"d",l:"Day 3: Arrival and Induction",s:"On arrival at the rig, the Offshore Installation Manager (OIM) is very busy and suggests you do a self-guided safety induction tour to save time.",v:["induction","self-guided","protocols","hazards"],o:[
+["Decline politely and ask for the formal, supervised induction that platform protocol requires.",3,"Verified inductions make sure everyone knows the active hazards."],
+["Study the written induction material and have a safety officer sign off later.",2,"Saves the OIM time, but you miss the physical walk-through of escape routes."],
+["Tour only the accommodation areas on your own.",1,"Lower risk, but the induction is still not formally cleared."],
+["Explore the process areas alone to learn the equipment quickly.",-1,"Entering process zones without induction is a serious violation."]]},
+{k:"d",l:"Day 3: Practical Session",s:"During a hands-on gas compressor maintenance session, you see an experienced technician using a modified, unapproved calibration tool.",v:["compressor","calibration","modified","unapproved"],o:[
+["Stop the exercise, explain the risks of improvised tools, and demonstrate with the correct equipment.",3,"Immediate correction with a clear rationale builds a compliance culture."],
+["Let them finish, then review proper tooling with the whole group.",2,"Avoids embarrassment, but allows a non-compliant action to continue."],
+["Quietly swap the tool for the correct one.",1,"Fixes the tool but wastes the chance to teach the hazard."],
+["Say nothing; they know the equipment and time is short.",-1,"This is normalisation of deviance, which safety training exists to prevent."]]},
+{k:"d",l:"Day 3: Equipment Anomaly",s:"You notice an unusual high-frequency vibration in a nearby centrifugal pump during your session. The local operators do not seem concerned.",v:["high-frequency","vibration","centrifugal","unconcerned"],o:[
+["Halt the training, notify the control room, and move everyone out of the area.",3,"Treat unexplained anomalies as hazards until proven otherwise."],
+["Move trainees back and inspect the vibration readings yourself.",2,"Protects trainees, but you gather data near a pump that may fail."],
+["Continue the session and report it at the end.",1,"Delayed reporting lets the condition deteriorate."],
+["Trust the operators and touch the casing to show it is fine.",-1,"Touching abnormal rotating equipment is dangerous and sets a poor example."]],
+d:"Why is 'normalisation of deviance' (ignoring warning signs because nothing has gone wrong yet) so dangerous in high-pressure facilities?"},
+{k:"e",l:"EMERGENCY: Seal Failure",s:"The vibration escalates into a mechanical seal failure, releasing a high-pressure hydrocarbon gas cloud into your training area.",v:["catastrophic","hydrocarbon","escalates","containment"],o:[
+["Raise the platform alarm, have trainees don breathing apparatus, and go to the muster point.",2,"Alarm, protection, then structured evacuation is the correct sequence."],
+["Send trainees running to the nearest exit without breathing apparatus.",1,"Fast, but unprotected exposure is dangerous if the cloud shifts."],
+["Search inside the gas cloud for the shut-off valve and isolate the leak yourself.",0,"Entering a toxic, explosive cloud without isolation gear is fatal.",1]]},
+{k:"b",l:"BONUS: Technical Assessment",s:"The control room asks for your assessment of the pump before it failed.",v:["stabilise","assessment","observation","rupture"],o:[
+["Give a concise, factual summary of the vibration characteristics you observed before the failure.",2,"Facts you observed are what investigators can use."],
+["Speculate about likely causes based on your past experience.",1,"Speculation is less reliable than observation."],
+["Decline to comment because investigations are not a trainer's job.",0,"Withholding first-hand observations hinders the investigation."]]},
+{k:"d",l:"Day 4: Session Resumption",s:"After the gas leak is contained, morale is low and the trainees are distracted and anxious.",v:["containment","morale","anxious","distracted"],o:[
+["Hold a structured debrief about the incident before resuming the curriculum.",3,"Processing the event first improves focus afterwards."],
+["Acknowledge the tension, then move to an engaging hands-on activity.",2,"Practical work refocuses attention, but the event is left unprocessed."],
+["Offer a long coffee break, then continue with the theory slides.",1,"Dense theory straight after an incident means poor retention."],
+["Press on and remind them that offshore work is dangerous and needs toughness.",-1,"Dismissing their concerns costs you credibility."]]},
+{k:"d",l:"Day 4: Diagnostic Software",s:"A trainee is struggling with the diagnostic software used to calibrate the new electronic control valves.",v:["diagnostic","calibrating","electronic","interface"],o:[
+["Pair them with an experienced local colleague for structured peer mentoring.",3,"Peer support gives relatable help and builds team links."],
+["Sit with them and walk through the interface step by step.",2,"Effective for one person, but the rest of the class waits."],
+["Give them the manual to read off shift.",1,"This shifts the whole learning burden onto the trainee."],
+["Criticise their preparation in front of the group.",-1,"Public humiliation breeds resentment and stops learning."]]},
+{k:"d",l:"Day 4: Supervisor Conflict",s:"A maintenance supervisor interrupts and demands that two trainees leave now to fix an urgent but non-critical pipeline issue.",v:["interrupts","non-critical","pipeline","compliance"],o:[
+["Explain that the training is mandatory, and offer to release them early.",3,"Protects compliance while respecting operational pressure."],
+["Refuse outright, citing the rule that safety training is never interrupted.",2,"Correct on paper, but damages the relationship with local supervisors."],
+["Let them go now and set a written assignment to make up the time.",1,"Self-study rarely matches supervised instruction."],
+["Agree that reactive maintenance always comes before classroom learning.",-1,"This signals that safety training is optional."]],
+d:"How can training coordinators manage scheduling conflicts without undermining local supervisors' authority?"},
+{k:"d",l:"Day 4: Departure Delay",s:"Your return helicopter is due, but a query arises about the correct reassembly procedure for the repaired pump.",v:["helicopter","reassembly","procedure","query"],o:[
+["Write a clear engineering handover of the procedure before boarding.",3,"Written instructions support accurate reassembly and keep your flight."],
+["Brief the lead engineer verbally and send documents from the mainland.",2,"Useful now, but delayed written confirmation raises error risk."],
+["Tell them to consult the manufacturer's manual.",1,"Correct, but it leaves the team unsupported when you could help."],
+["Stay behind to oversee the repair and miss your flight.",-1,"Missing scheduled transport disrupts logistics for several crews."]]},
+{k:"e",l:"EMERGENCY: Helicopter Turbulence",s:"On the flight to the mainland, the helicopter hits severe turbulence and an engine warning light comes on.",v:["transit","atmospheric","warning","turbulence"],o:[
+["Check your harness, adopt the brace position, and follow the pilot's instructions.",2,"Following aviation emergency protocol is the safest response."],
+["Loosen your harness to look out and find the fault.",1,"Unbuckling in turbulence risks serious injury and distracts the crew."],
+["Shout landing suggestions at the pilot and try to assist physically.",0,"Interfering with the crew during an emergency can be fatal.",1]]},
+{k:"b",l:"BONUS: Incident Statement",s:"After a safe landing, the aviation authority asks for a preliminary witness statement.",v:["aviation","preliminary","witness","turbulent"],o:[
+["Write a precise, objective timeline of the events and warning signs you observed.",2,"Objective timelines are the most useful evidence."],
+["Give a brief verbal account focused on how you felt.",1,"Emotions matter, but investigators need the sequence of events."],
+["Decline because you are not an aviation expert.",0,"Passenger observations are valuable to investigators."]]},
+{k:"d",l:"Day 5: Office Reporting",s:"Back at headquarters, management wants a report on both training effectiveness and the offshore pump incident.",v:["headquarters","comprehensive","effectiveness","incident"],o:[
+["Write one integrated report linking training metrics to root-cause observations.",3,"Integration shows how training standards connect to equipment reliability."],
+["Write two documents: a training summary and a confidential incident report.",2,"Well organised, but management must connect the themes themselves."],
+["Submit the training matrix and mention the incident briefly at the end.",1,"Minimising a major failure withholds actionable safety information."],
+["Report only on the incident and skip the training metrics.",-1,"You have not delivered the requested training outcomes."]]},
+{k:"d",l:"Day 5: Curriculum Update",s:"The global training director proposes updating the company-wide safety syllabus based on your firsthand offshore experience.",v:["syllabus","firsthand","proposes","scenario-based"],o:[
+["Work with engineering to draft scenario-based modules reflecting the incident.",3,"Turning real events into scenarios raises competence across the company."],
+["Give your field notes to the curriculum team to interpret.",2,"Helpful, but technical nuance may be lost without you."],
+["Suggest buying a generic off-the-shelf safety package.",1,"Generic packages miss your company's specific risks."],
+["Argue the syllabus is fine and the incident was a statistical fluke.",-1,"Refusing to adapt after a near miss shows weak safety leadership."]],
+d:"Why is real incident data essential in standardised training for continuous learning and risk reduction?"}
+];
+
+var LAST = S.length - 1;
+var MAX = S.reduce(function (a, s) { return a + Math.max.apply(null, s.o.map(function (o) { return o[1]; })); }, 0);
+var CORE = S.filter(function (s) { return s.k === "d"; }).length;
+var EMG = S.filter(function (s) { return s.k === "e"; }).length;
+var score = 0, log = [];
+var app = document.getElementById("app");
+
+function el(tag, cls, txt) {
+  var e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (txt != null) e.textContent = txt;
+  return e;
+}
+function shuffle(a) {
+  a = a.slice();
+  for (var i = a.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+  }
+  return a;
+}
+function setScore() { document.getElementById("score").textContent = "Score: " + score + " / " + MAX; }
+
+function intro() {
+  document.getElementById("hdr").hidden = true;
+  app.replaceChildren();
+  var w = el("div", "intro");
+  var h = el("h1", null, "Offshore Training Lead");
+  h.tabIndex = -1;
+  w.appendChild(h);
+  w.appendChild(el("p", null, "You are an International Training Engineer for high-pressure energy equipment. Make decisions across a week at headquarters and on an offshore rig."));
+  var ul = el("ul");
+  [CORE + " core decisions: pick the best response. Every choice shows why each option is better or worse.",
+   EMG + " emergencies: the wrong move ends the run, and you will see the correct action.",
+   "2 bonus questions: extra points for factual, useful input.",
+   "Final score out of " + MAX + " decides your performance band."].forEach(function (t) { ul.appendChild(el("li", null, t)); });
+  w.appendChild(ul);
+  var b = el("button", "nx", "Start deployment");
+  b.onclick = function () { score = 0; log = []; show(0); };
+  w.appendChild(b);
+  app.appendChild(w);
+}
+
+function dots(n) {
+  var d = document.getElementById("dots");
+  d.replaceChildren();
+  S.forEach(function (s, i) {
+    var x = el("div", "dot");
+    if (i < n) x.classList.add("done");
+    if (i === n) x.classList.add(s.k === "e" ? "emg" : "act");
+    d.appendChild(x);
+  });
+}
+
+function show(n) {
+  var st = S[n];
+  document.getElementById("hdr").hidden = false;
+  dots(n); setScore();
+  app.replaceChildren();
+  var h = el("h2", null, "Event " + (n + 1) + " of " + S.length + " - " + st.l);
+  h.tabIndex = -1;
+  app.appendChild(h);
+  app.appendChild(el("p", "scene", st.s));
+  var tags = el("div", "tags");
+  st.v.forEach(function (v) { tags.appendChild(el("span", "tag", v)); });
+  app.appendChild(tags);
+
+  var box = el("div", "opts");
+  box.setAttribute("role", "group");
+  box.setAttribute("aria-label", "Response options");
+  var fb = el("div");
+  fb.setAttribute("role", "status");
+  fb.setAttribute("aria-live", "polite");
+  var best = Math.max.apply(null, st.o.map(function (o) { return o[1]; }));
+
+  shuffle(st.o).forEach(function (o) {
+    var b = el("button", "btn", o[0]);
+    b.type = "button";
+    b.onclick = function () { pick(n, st, o, best, box, fb); };
+    b.dataset.pts = o[1];
+    b._o = o;
+    box.appendChild(b);
+  });
+  app.appendChild(box);
+  app.appendChild(fb);
+  h.focus();
+}
+
+function pick(n, st, o, best, box, fb) {
+  var over = !!o[3];
+  Array.prototype.forEach.call(box.children, function (b) {
+    b.disabled = true;
+    var isBest = b._o[1] === best;
+    if (b._o === o) { b.classList.add("mine"); b.appendChild(el("span", "badge", "Your choice")); }
+    if (isBest) { b.classList.add("best"); b.appendChild(el("span", "badge", "Best answer")); }
+    b.appendChild(el("span", "note", (b._o[3] ? "Game over: " : "") + b._o[2]));
+  });
+
+  if (!over) score += o[1];
+  setScore();
+  log.push({ l: st.l, got: over ? 0 : o[1], best: best, over: over });
+
+  var cls = over || o[1] < 0 ? "bad" : o[1] === best ? "good" : "warn";
+  var msg = over ? "GAME OVER. " + o[2] : o[1] === best ? "Best answer. " + o[2] : "Not the best answer. " + o[2];
+  fb.appendChild(el("div", "fb " + cls, msg));
+  if (st.d && !over) fb.appendChild(el("div", "disc", "Discussion point: " + st.d));
+
+  var row = el("div", "right");
+  var nx = el("button", "nx" + (over ? " bad" : ""), over ? "See incident review" : n === LAST ? "See results" : "Next event");
+  nx.type = "button";
+  nx.onclick = function () { over ? finish(true) : n === LAST ? finish(false) : show(n + 1); };
+  row.appendChild(nx);
+  fb.appendChild(row);
+  nx.focus();
+}
+
+function finish(over) {
+  document.getElementById("hdr").hidden = true;
+  app.replaceChildren();
+  var pct = score / MAX, c, t, x;
+  if (over) { c = "b4"; t = "Band 4: Operational Fatality (Game Over)"; x = "A wrong move in an emergency ended the run. Review the correct action below and try again."; }
+  else if (pct >= 0.9) { c = "b1"; t = "Band 1: Outstanding Training Lead"; x = "You balanced logistics, compliance and human factors very well."; }
+  else if (pct >= 0.7) { c = "b2"; t = "Band 2: Competent Senior Trainer"; x = "Strong management with minor compromises on procedure."; }
+  else if (pct >= 0.5) { c = "b3"; t = "Band 3: Developing Technical Instructor"; x = "You got through the rotation, but too many decisions were reactive or cut corners on compliance."; }
+  else { c = "b4"; t = "Band 4: Procedural Review Required"; x = "Repeated protocol and hazard-recognition failures. Retraining is advised."; }
+
+  var w = el("div", "intro");
+  var h = el("h1", null, "Deployment complete");
+  h.tabIndex = -1;
+  w.appendChild(h);
+  w.appendChild(el("p", null, "Final score: " + score + " / " + MAX + (over ? " (run ended early)" : "")));
+  var b = el("div", "band " + c);
+  b.appendChild(el("h2", null, t));
+  b.appendChild(el("p", null, x));
+  w.appendChild(b);
+  w.appendChild(el("p", null, "Your decisions (points earned / best possible):"));
+  var ol = el("ol", "recap");
+  log.forEach(function (r) {
+    ol.appendChild(el("li", null, r.l + ": " + r.got + " / " + r.best + (r.over ? " - fatal error" : r.got < r.best ? " - review" : "")));
+  });
+  w.appendChild(ol);
+  var rb = el("button", "nx", "Restart scenario");
+  rb.type = "button";
+  rb.onclick = intro;
+  w.appendChild(rb);
+  app.appendChild(w);
+  h.focus();
+}
+
+intro();
+</script>
+</body>
+</html>

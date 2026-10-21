@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Project Manager: B1 English Challenge</title>
+    <!-- CSS structure adapted from the original game engine[cite: 1] -->
+    <style>
+        :root {
+            --bg-tech: #0f172a;
+            --card-bg: #ffffff;
+            --tech-blue: #0284c7;
+            --tech-blue-hover: #0369a1;
+            --warning-amber: #d97706;
+            --success-green: #16a34a;
+            --info-blue: #2563eb;
+            --text-dark: #0f172a;
+            --border-color: #cbd5e1;
+            --error-red: #dc2626;
+            --speak-purple: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-tech);
+            background-image: radial-gradient(#334155 1.5px, transparent 0);
+            background-size: 24px 24px;
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 820px;
+            border-radius: 12px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border: 3px solid var(--tech-blue);
+        }
+
+        header {
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        h1 {
+            color: var(--tech-blue);
+            font-size: 1.6rem;
+        }
+
+        .status-bar {
+            display: flex;
+            gap: 15px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            background: #f1f5f9;
+            padding: 8px 14px;
+            border-radius: 20px;
+            color: var(--text-dark);
+        }
+
+        .scenario-box {
+            margin-bottom: 20px;
+        }
+
+        .scenario-text {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .speaking-prompt {
+            background-color: #f3e8ff;
+            border: 2px dashed var(--speak-purple);
+            color: #581c87;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.98rem;
+            line-height: 1.4;
+        }
+
+        .feedback-banner {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.98rem;
+            line-height: 1.5;
+            display: none;
+            border-left: 5px solid;
+        }
+
+        .feedback-banner.success {
+            background-color: #f0fdf4;
+            color: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        .feedback-banner.info-blue {
+            background-color: #f0f9ff;
+            color: var(--info-blue);
+            border-color: var(--info-blue);
+        }
+
+        .feedback-banner.warning {
+            background-color: #fffbeb;
+            color: var(--warning-amber);
+            border-color: var(--warning-amber);
+        }
+
+        .feedback-banner.error {
+            background-color: #fef2f2;
+            color: var(--error-red);
+            border-color: var(--error-red);
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .btn-option {
+            background-color: #ffffff;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px 18px;
+            text-align: left;
+            font-size: 1rem;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        .btn-option:hover:not(:disabled) {
+            border-color: var(--tech-blue);
+            background-color: #f8fafc;
+            transform: translateY(-2px);
+        }
+
+        .btn-action {
+            background-color: var(--tech-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            display: inline-block;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-action:hover {
+            background-color: var(--tech-blue-hover);
+            transform: scale(1.02);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .final-score {
+            font-size: 2.2rem;
+            color: var(--tech-blue);
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--tech-blue);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .landing-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .landing-card h2 {
+            color: var(--tech-blue);
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+        }
+
+        .landing-card p {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        @media (max-width: 500px) {
+            .game-container {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <header id="game-header" class="hidden">
+        <h1>Payment Network Project Manager</h1>
+        <div class="status-bar">
+            <span>Situation: <span id="decision-count">0</span> / 14</span>
+            <span>Score: <span id="score-display">0</span></span>
+        </div>
+    </header>
+
+    <main id="game-body">
+        <!-- LANDING PAGE -->
+        <div id="landing-screen" class="landing-card">
+            <h2>Welcome to Your Payment Project Week!</h2>
+            <p>You are an <strong>IT Project Manager</strong> leading a global launch for a major payment system[cite: 1]. Over a 14-stage work week, you will manage payment speeds, technical problems, and communicate with international banks in business English![cite: 1]</p>
+            
+            <p>This game tests your <strong>English reading, decision-making, and speaking skills</strong>[cite: 1]. Read each situation carefully, think about the options, and <strong>speak your response out loud</strong> before clicking[cite: 1].</p>
+
+            <p style="text-align: center; font-weight: bold; color: var(--tech-blue);">Open your laptop, check your calendar, and let's start Monday morning!</p>
+
+            <button class="btn-action" onclick="startGame()">Start Week</button>
+        </div>
+
+        <!-- GAMEPLAY & FINAL SCREEN -->
+        <div id="gameplay-screen" class="hidden">
+            <div id="feedback" class="feedback-banner"></div>
+            
+            <div class="scenario-box">
+                <span class="badge" id="location-badge">Day: Monday Morning</span>
+                <div class="scenario-text" id="scenario-text">Loading scenario...</div>
+                <div class="speaking-prompt" id="speaking-prompt">🗣️ <strong>Speaking Task:</strong> Read your chosen answer out loud before clicking![cite: 1]</div>
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Option buttons injected dynamically -->
+            </div>
+
+            <button id="restart-btn" class="btn-action hidden" onclick="resetToLanding()">Play Again</button>
+        </div>
+    </main>
+</div>
+
+<script>
+const gameData = {
+    // 1. MONDAY MORNING: KICK-OFF
+    sit_1: {
+        location: "Situation 1/14: Monday - 09:00 AM (Online Kick-off)",
+        text: "You are starting the project with a group of international banks. Several people have their cameras off. How do you say hello and explain the meeting plan?",
+        prompt: "🗣️ Practice out loud: Welcome the team and explain the project plan.",
+        options: [
+            { 
+                text: "'Good morning everyone! Can you hear me clearly? Today we will look at the project plan for the new payment system and agree on our technical goals.'", 
+                score: 3, 
+                next: "sit_2",
+                feedback: "Excellent! Very professional and clear. You checked their audio and started the meeting well."
+            },
+            { 
+                text: "'Hello. I will share my screen and read the slides to show you how the software works.'", 
+                score: 2, 
+                next: "sit_2",
+                feedback: "Clear, but a bit direct. Checking if they can hear you makes clients feel more welcome."
+            },
+            { 
+                text: "'Hi all. Sorry, my English is not perfect, but we must start looking at this presentation right now.'", 
+                score: 1, 
+                next: "sit_2",
+                feedback: "Do not say sorry for your English. Speak simply and be confident."
+            },
+            { 
+                text: "'Okay, quiet please. I am recording this and starting immediately. Pay attention to the details.'", 
+                score: -1, 
+                next: "sit_2",
+                feedback: "Too aggressive! Always ask if everyone is ready before you start a remote meeting."
+            }
+        ]
+    },
+
+    // 2. MONDAY MIDDAY: TRANSACTION LATENCY
+    sit_2: {
+        location: "Situation 2/14: Monday - 13:30 PM (System Speed)",
+        text: "The client suddenly asks for very fast transaction times (under 50 milliseconds), but the contract only promises 100 milliseconds. What do you say?",
+        prompt: "🗣️ Practice out loud: Remind them of the contract politely.",
+        options: [
+            { 
+                text: "'Our contract promises 100 milliseconds, which keeps the system stable. Getting under 50 milliseconds requires special equipment. Should I make a request for this extra cost?'", 
+                score: 3, 
+                next: "sit_3",
+                feedback: "Perfect! You explained the technical rule and offered a professional way to change it."
+            },
+            { 
+                text: "'We can try to make the code faster, but 100 milliseconds is normal for cloud-based payments.'", 
+                score: 2, 
+                next: "sit_3",
+                feedback: "A fair answer, but offering an official change request is better for project management."
+            },
+            { 
+                text: "'Yes, we will rewrite the software this week to make it that fast for free.'", 
+                score: 1, 
+                next: "sit_3",
+                feedback: "Dangerous promise! Doing complex work for free will ruin your project budget."
+            },
+            { 
+                text: "'No, that is impossible. You clearly did not read the contract before you signed it.'", 
+                score: -1, 
+                next: "sit_3",
+                feedback: "Hostile! Never insult the client."
+            }
+        ]
+    },
+
+    // 3. TUESDAY MORNING: INTEGRATION
+    sit_3: {
+        location: "Situation 3/14: Tuesday - 09:30 AM (Data Connection)",
+        text: "Your main developer says: 'The client's old data system does not match our new API.' How do you explain this to the client?",
+        prompt: "🗣️ Practice out loud: Explain the technical problem simply and suggest a meeting.",
+        options: [
+            { 
+                text: "'We found a data matching problem between your old system and our API. Can we plan a short meeting with your engineers to fix it?'", 
+                score: 3, 
+                next: "sit_4",
+                feedback: "Great teamwork! You explained the problem clearly and suggested a good way to solve it."
+            },
+            { 
+                text: "'Our developers found a problem with your data format. Please send us new technical documents by tomorrow.'", 
+                score: 2, 
+                next: "sit_4",
+                feedback: "Clear, but asking the client to fix it alone can cause delays. Working together is faster."
+            },
+            { 
+                text: "'Your old systems are terrible. We cannot connect to you until you buy new computers.'", 
+                score: 1, 
+                next: "sit_4",
+                feedback: "Very unprofessional! Payment companies often work with old data systems."
+            },
+            { 
+                text: "'I will ask my developers to guess how the data matches so we don't bother you.'", 
+                score: -1, 
+                next: "sit_4",
+                feedback: "Terrible idea! Guessing payment data will create huge financial mistakes."
+            }
+        ]
+    },
+
+    // 4. TUESDAY AFTERNOON: EMERGENCY 1
+    sit_4: {
+        isEmergency: true,
+        location: "Situation 4/14: Tuesday - 14:00 PM (EMERGENCY: Server Crash)",
+        text: "CRITICAL INCIDENT: A system test goes wrong. It overloads the test server and crashes it during a live client meeting! (Choose 1 of 3)",
+        prompt: "🗣️ Practice out loud: Manage the system crash calmly and quickly.",
+        options: [
+            { 
+                text: "Immediately stop the bad test, move the demo to the backup server, and tell the client it was a one-time testing error.", 
+                score: 2, 
+                next: "sit_5", 
+                survive: true,
+                feedback: "Crisis stopped! Quick technical action and honest communication saved the meeting."
+            },
+            { 
+                text: "Send an email to the test team asking them to stop, and ask the client to wait 20 minutes while you restart the computer.", 
+                score: 0, 
+                next: "sit_5", 
+                survive: true,
+                feedback: "You survived, but an email is too slow for a live crash. The client was not happy."
+            },
+            { 
+                text: "Panic, blame the client's internet connection for the crash, and hang up the call.", 
+                score: 0, 
+                survive: false, 
+                failReason: "GAME OVER: Blaming the client when your system breaks destroys trust. They cancel the project!"
+            }
+        ]
+    },
+
+    // 5. WEDNESDAY MORNING: SCOPE CREEP
+    sit_5: {
+        location: "Situation 5/14: Wednesday - 10:00 AM (New Features)",
+        text: "The client asks: 'Can we add cryptocurrency payments to the standard credit card system before we launch next month?'",
+        prompt: "🗣️ Practice out loud: Keep the project on schedule by saying no politely.",
+        options: [
+            { 
+                text: "'That is an interesting idea, but it is outside our current plan. I suggest we focus on normal money for the launch and look at crypto next year.'", 
+                score: 3, 
+                next: "sit_6",
+                feedback: "Perfect project management! You said their idea was good but protected the current deadline."
+            },
+            { 
+                text: "'We can think about it, but it is very difficult. Let us just stick to normal credit cards for now.'", 
+                score: 2, 
+                next: "sit_6",
+                feedback: "Good answer, but explaining it as a 'Phase 2' project sounds more professional."
+            },
+            { 
+                text: "'Of course! Our team will build the crypto payment system by next week.'", 
+                score: 1, 
+                next: "sit_6",
+                feedback: "Very bad promise! Adding cryptocurrency is a huge technical and legal job."
+            },
+            { 
+                text: "'That is a crazy request. Crypto is a bad idea and our software will never use it.'", 
+                score: -1, 
+                next: "sit_6",
+                feedback: "Rude! Keep your personal opinions out of business discussions."
+            }
+        ]
+    },
+
+    // 6. WEDNESDAY MIDDAY: SECURITY
+    sit_6: {
+        location: "Situation 6/14: Wednesday - 13:00 PM (Security Check)",
+        text: "A security expert warns you that customer credit card numbers are visible in the system records. What do you do?",
+        prompt: "🗣️ Practice out loud: Make security and rules your top priority.",
+        options: [
+            { 
+                text: "'Thank you for warning me about this critical problem. I will tell the developers to hide the card numbers immediately to follow strict security rules.'", 
+                score: 3, 
+                next: "sit_7",
+                feedback: "Outstanding! Hiding credit card numbers is a very strict rule in finance, and you fixed it fast."
+            },
+            { 
+                text: "'We will delete the old records and try to fix this before the next big security check.'", 
+                score: 2, 
+                next: "sit_7",
+                feedback: "Acceptable, but exposed credit card numbers must be treated as an immediate emergency."
+            },
+            { 
+                text: "'It is only in the testing system, so we will leave it as normal text to make our work easier.'", 
+                score: 1, 
+                next: "sit_7",
+                feedback: "Major rule broken! Card numbers must always be hidden, even in testing."
+            },
+            { 
+                text: "'Ignore the security expert. Following rules just slows down our software work.'", 
+                score: -1, 
+                next: "sit_7",
+                feedback: "Terrible idea! Ignoring payment security rules can cost millions in fines."
+            }
+        ]
+    },
+
+    // 7. WEDNESDAY AFTERNOON: BUG TRIAGE
+    sit_7: {
+        location: "Situation 7/14: Wednesday - 16:00 PM (Bug Reporting)",
+        text: "End-of-day testing shows a difference of 3 cents per payment because of money conversion errors. How do you write this bug report?",
+        prompt: "🗣️ Practice out loud: Describe money-related bugs clearly and exactly.",
+        options: [
+            { 
+                text: "'Bug #805: Money conversion error. The system cuts off the numbers instead of rounding them, causing a 3-cent difference. Steps to test this are attached.'", 
+                score: 3, 
+                next: "sit_8",
+                feedback: "Great bug report! Giving the exact math problem helps developers fix it faster."
+            },
+            { 
+                text: "'The payment module has a conversion bug. Money is missing at the end of the day. Please check the math.'", 
+                score: 2, 
+                next: "sit_8",
+                feedback: "Clear, but developers need to know exactly *why* (rounding vs cutting off) it happens."
+            },
+            { 
+                text: "'The financial software is completely broken. All the data is wrong and we are losing a lot of money.'", 
+                score: 1, 
+                next: "sit_8",
+                feedback: "Too dramatic! A 3-cent error is specific; do not say everything is 'completely broken'."
+            },
+            { 
+                text: "'It is only 3 cents. Close the bug report because nobody will care about such a small difference.'", 
+                score: -1, 
+                next: "sit_8",
+                feedback: "Big mistake! If there are a million payments a day, 3 cents becomes a lot of lost money."
+            }
+        ]
+    },
+
+    // 8. THURSDAY MORNING: USER TRAINING
+    sit_8: {
+        location: "Situation 8/14: Thursday - 09:00 AM (Staff Training)",
+        text: "During training, a bank worker complains: 'This new refund process has too many security steps! Our old system was much faster.'",
+        prompt: "🗣️ Practice out loud: Show you understand their frustration but explain why it is needed.",
+        options: [
+            { 
+                text: "'I understand the extra clicks take time. But these checks make sure we follow the rules and stop expensive mistakes.'", 
+                score: 3, 
+                next: "sit_9",
+                feedback: "Great empathy! You understood their feelings but explained why security is important."
+            },
+            { 
+                text: "'Please be patient. After you practice for a few weeks, you will become much faster at doing the extra steps.'", 
+                score: 2, 
+                next: "sit_9",
+                feedback: "Nice tone, but explaining *why* the steps exist helps them accept the new software."
+            },
+            { 
+                text: "'The bosses want these security checks, so you must do them even if it takes a long time.'", 
+                score: 1, 
+                next: "sit_9",
+                feedback: "Too bossy! Saying 'the bosses want it' makes users dislike the new system."
+            },
+            { 
+                text: "'If you don't like the software, you should find a different job.'", 
+                score: -1, 
+                next: "sit_9",
+                feedback: "Completely wrong! A project manager must help people use the new tools, not insult them."
+            }
+        ]
+    },
+
+    // 9. THURSDAY MIDDAY: EMERGENCY 2
+    sit_9: {
+        isEmergency: true,
+        location: "Situation 9/14: Thursday - 11:30 AM (EMERGENCY: Security Rules)",
+        text: "CRITICAL RISK: A new security rule is added by mistake. It blocks 95% of good test payments, calling them 'Fraud'. (Choose 1 of 3)",
+        prompt: "🗣️ Practice out loud: Fix the critical system error quickly.",
+        options: [
+            { 
+                text: "Remove the new rule immediately, study what went wrong, and write a report for the testing team.", 
+                score: 2, 
+                next: "sit_10", 
+                survive: true,
+                feedback: "Problem solved! Taking away the bad rule brings the system back to normal quickly."
+            },
+            { 
+                text: "Tell the testing team to look at every payment by hand and approve them one by one.", 
+                score: 0, 
+                next: "sit_10", 
+                survive: true,
+                feedback: "You survived, but checking 95% of payments by hand wastes everyone's time."
+            },
+            { 
+                text: "Turn off all security checks completely so every payment is allowed through without checking.", 
+                score: 0, 
+                survive: false, 
+                failReason: "GAME OVER: Turning off all security is illegal for payment companies! You lose your job."
+            }
+        ]
+    },
+
+    // 10. THURSDAY AFTERNOON: DELAYS
+    sit_10: {
+        location: "Situation 10/14: Thursday - 14:00 PM (Outside Delays)",
+        text: "Special security equipment you need for PIN testing is two weeks late from the supplier. How do you handle this problem?",
+        prompt: "🗣️ Practice out loud: Find a solution for outside delays.",
+        options: [
+            { 
+                text: "'I will tell the team about the delay, but we will use a cloud-based software copy instead so we can keep working on time.'", 
+                score: 3, 
+                next: "sit_11",
+                feedback: "Excellent problem solving! Using a software copy stops outside delays from slowing down the team."
+            },
+            { 
+                text: "'I will change the project plan to show a two-week delay and tell the client we are waiting for the supplier.'", 
+                score: 2, 
+                next: "sit_11",
+                feedback: "Honest, but a great project manager tries to find a backup plan instead of just accepting the delay."
+            },
+            { 
+                text: "'We will skip the PIN testing completely and just hope it works later.'", 
+                score: 1, 
+                next: "sit_11",
+                feedback: "High risk! Never skip important security testing for payments."
+            },
+            { 
+                text: "'I will call the supplier every ten minutes and shout at them until the equipment arrives.'", 
+                score: -1, 
+                next: "sit_11",
+                feedback: "Very unprofessional! Shouting does not make deliveries arrive faster."
+            }
+        ]
+    },
+
+    // 11. FRIDAY MORNING: BUDGET
+    sit_11: {
+        location: "Situation 11/14: Friday - 09:00 AM (Extra Costs)",
+        text: "The client asks for a huge stress test (10,000 payments per second) before launch. This test needs expensive cloud servers.",
+        prompt: "🗣️ Practice out loud: Explain the extra work and how much it will cost.",
+        options: [
+            { 
+                text: "'A test that big is a great idea for reliability, but it needs extra servers. I will write a formal request showing the extra costs for you to approve.'", 
+                score: 3, 
+                next: "sit_12",
+                feedback: "Very professional! You supported their goal but made sure the money was organized officially."
+            },
+            { 
+                text: "'We can run the test, but please know it will make our monthly server bill much higher.'", 
+                score: 2, 
+                next: "sit_12",
+                feedback: "Clear warning, but an official document showing exact costs is safer."
+            },
+            { 
+                text: "'We will pay for the expensive servers ourselves and run the big test for free as a gift.'", 
+                score: 1, 
+                next: "sit_12",
+                feedback: "Bad financial management! Paying for expensive tests yourself loses money for your company."
+            },
+            { 
+                text: "'You should have asked for this three months ago. We will not do it now.'", 
+                score: -1, 
+                next: "sit_12",
+                feedback: "Blaming the client creates bad feelings. It is better to offer them options."
+            }
+        ]
+    },
+
+    // 12. FRIDAY MIDDAY: TESTING FINISH
+    sit_12: {
+        location: "Situation 12/14: Friday - 11:30 AM (Final Testing)",
+        text: "The client is worried about finishing the testing phase because of three small design bugs. The main payment system works perfectly.",
+        prompt: "🗣️ Practice out loud: Manage the project goals and make the client feel safe.",
+        options: [
+            { 
+                text: "'The main payment system is 100% ready. I suggest we finish testing today to keep our schedule, and we promise to fix these small design bugs next week.'", 
+                score: 3, 
+                next: "sit_13",
+                feedback: "Smart negotiation! Separating small design bugs from important systems keeps the project moving."
+            },
+            { 
+                text: "'We can wait until Monday to finish testing so our developers have time to fix these small problems.'", 
+                score: 2, 
+                next: "sit_13",
+                feedback: "Safe, but it makes the project late for very small reasons."
+            },
+            { 
+                text: "'These bugs do not matter. Just sign the paper so we can get paid.'", 
+                score: 1, 
+                next: "sit_13",
+                feedback: "Rude. All client worries matter, even if they are small."
+            },
+            { 
+                text: "'If you do not say the testing is finished right now, I will stop working on the project.'", 
+                score: -1, 
+                next: "sit_13",
+                feedback: "Never threaten the client! This ruins business relationships."
+            }
+        ]
+    },
+
+    // 13. FRIDAY AFTERNOON: BOSS MEETING
+    sit_13: {
+        location: "Situation 13/14: Friday - 14:00 PM (Directors Meeting)",
+        text: "You give the weekly report to the company directors. How do you finish your speech?",
+        prompt: "🗣️ Practice out loud: Give a clear and professional summary to the bosses.",
+        options: [
+            { 
+                text: "'To summarize, the main systems are checked, the servers are stable, and we followed all rules. Next week, we start getting ready for the final launch.'", 
+                score: 3, 
+                next: "sit_14",
+                feedback: "Great presentation! Summarizing what went well and what happens next shows you are a good leader."
+            },
+            { 
+                text: "'We had server crashes and security bugs this week, but our team fixed everything and we are okay now.'", 
+                score: 2, 
+                next: "sit_14",
+                feedback: "Honest, but bosses prefer to hear about the final success rather than just the problems."
+            },
+            { 
+                text: "'We worked very hard every day. Everyone is tired, but I hope the launch is successful.'", 
+                score: 1, 
+                next: "sit_14",
+                feedback: "Too relaxed for a meeting with directors. Talk about project facts, not just how tired you are."
+            },
+            { 
+                text: "'Hang up the video call quickly without giving a final summary.'", 
+                score: -1, 
+                next: "sit_14",
+                feedback: "Unprofessional! Bosses expect a clear ending to meetings."
+            }
+        ]
+    },
+
+    // 14. FRIDAY END OF DAY: WRAP-UP
+    sit_14: {
+        location: "Situation 14/14: Friday - 16:30 PM (Team Meeting)",
+        text: "The directors meeting goes well. You have a quick 5-minute meeting with your internal team to finish the week. What do you say?",
+        prompt: "🗣️ Practice out loud: Say thank you and be positive about next week.",
+        options: [
+            { 
+                text: "'Great work this week, team! Thank you for fixing the big problems so quickly. Have a good rest this weekend and see you Monday.'", 
+                score: 3, 
+                next: "finish",
+                feedback: "Excellent leadership! Saying thank you and wishing them a good weekend keeps the team happy."
+            },
+            { 
+                text: "'Good job everyone. Please make sure you send me your work hours before you turn off your computers today.'", 
+                score: 2, 
+                next: "finish",
+                feedback: "A useful everyday reminder, but adding some praise for their hard work is even better."
+            },
+            { 
+                text: "'The meeting was okay, but we still have a lot of work to do this weekend.'", 
+                score: 1, 
+                next: "finish",
+                feedback: "A bad end to the week! Say something positive before you give them more work."
+            },
+            { 
+                text: "'Turn off your computer without saying goodbye to anyone.'", 
+                score: -1, 
+                next: "finish",
+                feedback: "Poor communication! Always talk to your team at the end of the week."
+            }
+        ]
+    }
+};
+
+let currentScore = 0;
+let decisionCount = 0;
+let currentNodeKey = "sit_1";
+
+const landingScreenEl = document.getElementById('landing-screen');
+const gameplayScreenEl = document.getElementById('gameplay-screen');
+const gameHeaderEl = document.getElementById('game-header');
+
+const scenarioTextEl = document.getElementById('scenario-text');
+const speakingPromptEl = document.getElementById('speaking-prompt');
+const optionsContainerEl = document.getElementById('options-container');
+const scoreDisplayEl = document.getElementById('score-display');
+const decisionCountEl = document.getElementById('decision-count');
+const locationBadgeEl = document.getElementById('location-badge');
+const feedbackEl = document.getElementById('feedback');
+const restartBtnEl = document.getElementById('restart-btn');
+
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startGame() {
+    landingScreenEl.classList.add('hidden');
+    gameHeaderEl.classList.remove('hidden');
+    gameplayScreenEl.classList.remove('hidden');
+    
+    currentScore = 0;
+    decisionCount = 0;
+    currentNodeKey = "sit_1";
+    
+    scoreDisplayEl.textContent = currentScore;
+    decisionCountEl.textContent = decisionCount;
+    
+    feedbackEl.style.display = 'none';
+    speakingPromptEl.classList.remove('hidden');
+    restartBtnEl.classList.add('hidden');
+    
+    renderNode(currentNodeKey);
+}
+
+function resetToLanding() {
+    gameplayScreenEl.classList.add('hidden');
+    gameHeaderEl.classList.add('hidden');
+    landingScreenEl.classList.remove('hidden');
+}
+
+function renderNode(nodeKey) {
+    if (nodeKey === "finish") {
+        renderFinalResults();
+        return;
+    }
+
+    const node = gameData[nodeKey];
+
+    if (!node) {
+        console.error("Node missing:", nodeKey);
+        return;
+    }
+
+    locationBadgeEl.textContent = node.location;
+    scenarioTextEl.textContent = node.text;
+    speakingPromptEl.innerHTML = node.prompt || "🗣️ <strong>Speaking Task:</strong> Read your chosen option out loud before clicking![cite: 1]";
+    speakingPromptEl.classList.remove('hidden');
+    optionsContainerEl.innerHTML = '';
+
+    // Shuffle options to prevent positional memorization[cite: 1]
+    const shuffledOptions = shuffleArray(node.options);
+
+    shuffledOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'btn-option';
+        btn.textContent = option.text;
+        btn.onclick = (e) => handleChoice(option, node, e.target);
+        optionsContainerEl.appendChild(btn);
+    });
+}
+
+function handleChoice(option, currentNode, targetBtn) {
+    feedbackEl.style.display = 'block';
+    feedbackEl.textContent = option.feedback || option.failReason;
+
+    // Handling negative score penalty[cite: 1]
+    if (option.score === -1) {
+        currentScore -= 1;
+        scoreDisplayEl.textContent = currentScore;
+        feedbackEl.className = 'feedback-banner error';
+        if (targetBtn) {
+            targetBtn.disabled = true;
+            targetBtn.style.opacity = '0.5';
+            targetBtn.style.cursor = 'not-allowed';
+        }
+        return;
+    }
+
+    if (currentNode.isEmergency) {
+        decisionCount++;
+        decisionCountEl.textContent = decisionCount;
+
+        if (!option.survive) {
+            locationBadgeEl.textContent = "CRITICAL SYSTEM FAILURE";
+            scenarioTextEl.textContent = option.failReason;
+            speakingPromptEl.classList.add('hidden');
+            optionsContainerEl.innerHTML = '';
+            
+            feedbackEl.className = 'feedback-banner error';
+            restartBtnEl.classList.remove('hidden');
+            return;
+        } else {
+            currentScore += option.score;
+            scoreDisplayEl.textContent = currentScore;
+            feedbackEl.className = 'feedback-banner success';
+            currentNodeKey = option.next;
+            renderNode(currentNodeKey);
+            return;
+        }
+    }
+
+    currentScore += option.score;
+    decisionCount++;
+
+    scoreDisplayEl.textContent = currentScore;
+    decisionCountEl.textContent = decisionCount;
+
+    if (option.score === 3) {
+        feedbackEl.className = 'feedback-banner success';
+    } else if (option.score === 2) {
+        feedbackEl.className = 'feedback-banner info-blue';
+    } else {
+        feedbackEl.className = 'feedback-banner warning';
+    }
+
+    currentNodeKey = option.next;
+    renderNode(currentNodeKey);
+}
+
+function renderFinalResults() {
+    optionsContainerEl.innerHTML = '';
+    speakingPromptEl.classList.add('hidden');
+    feedbackEl.style.display = 'none';
+    locationBadgeEl.textContent = "Week Completed: Friday Evening";
+    
+    let bandTitle = "";
+    let bandDescription = "";
+
+    // Score adjustments: 12 standard (36 max) + 2 emergencies (4 max) = 40 max points[cite: 1]
+    if (currentScore >= 34) {
+        bandTitle = "Band 1: Senior Payment PM (34–40 Points)";
+        bandDescription = "Excellent work! You managed difficult IT problems, kept your clients happy, fixed system crashes quickly, and used great business English all week!";
+    } else if (currentScore >= 26) {
+        bandTitle = "Band 2: Good IT Project Manager (26–33 Points)";
+        bandDescription = "Good job! You solved most of the problems and kept the project moving. Try practicing how to explain extra costs and big decisions clearly to be even better.";
+    } else if (currentScore >= 16) {
+        bandTitle = "Band 3: Junior IT Consultant (16–25 Points)";
+        bandDescription = "You finished the week, but you had some money issues, security problems, or miscommunications. Read the feedback carefully and practice speaking the answers out loud.";
+    } else {
+        bandTitle = "Band 4: Beginner IT Trainee (Under 16 Points)";
+        bandDescription = "The project had too many big technical mistakes and communication problems. Read the IT words again, practice the professional answers, and try one more time!";
+    }
+
+    scenarioTextEl.innerHTML = `
+        <h2>Project Week Finished!</h2>
+        <div class="final-score">Final Score: ${currentScore} / 40 pts</div>
+        <p style="margin-bottom: 12px;"><strong>${bandTitle}</strong></p>
+        <p style="line-height: 1.6; font-size: 1.05rem;">${bandDescription}</p>
+    `;
+
+    restartBtnEl.classList.remove('hidden');
+}
+</script>
+
+</body>
+</html>
