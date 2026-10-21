@@ -26,7 +26,7 @@
       --badge-b2: #c084fc;
       --badge-c1: #f472b6;
       --badge-default: #94a3b8;
-
+ 
       --radius-lg: 16px;
       --radius-md: 10px;
       --radius-full: 9999px;
@@ -287,10 +287,9 @@
         <input id="filter" class="search" type="search" placeholder="Search exercises (press '/' to focus)" aria-label="Search pages" />
         <div class="filter-tags">
           <button class="filter-btn active" data-level="all">All</button>
-          <button class="filter-btn" data-level="a2-b1">A2-B1</button>
-          <button class="filter-btn" data-level="b1-b2">B1-B2</button>
-          <button class="filter-btn" data-level="b2-c1">B2-C1</button>
-          <button class="filter-btn" data-level="c1">C1</button>
+          <button class="filter-btn" data-level="1">1 · Elementary</button>
+          <button class="filter-btn" data-level="2">2 · Independent</button>
+          <button class="filter-btn" data-level="3">3 · Proficient</button>
         </div>
       </div>
     </header>
@@ -318,17 +317,18 @@
       const filterBtns = document.querySelectorAll('.filter-btn');
 
       let currentLevel = 'all';
-      const repoUrl = 'https://api.github.com/repos/Balmain-English/decicionmaker-pro/contents';
+      const repoUrl = 'https://api.github.com/repos/Balmain-English/decisionmaker-pro/contents';
 
-      // Level replacement lookup
       const levelMap = {
-        'A2': 'A2-B1',
-        'B1': 'B1-B2',
-        'B2': 'B2-C1',
-        'C1': 'C1'
+        'A2': '1',
+        'B1': '2',
+        'B2': '3',
+        'C1': '3',
+        'A2-B1': '1',
+        'B1-B2': '2',
+        'B2-C1': '3'
       };
 
-      // Utility function to convert raw levels in HTML elements instantly
       function rewriteBadgesInDOM() {
         document.querySelectorAll('.tag').forEach(tagEl => {
           const txt = tagEl.textContent.trim().toUpperCase();
@@ -348,18 +348,18 @@
         items.forEach(li => {
           const text = li.textContent.toLowerCase();
           const tag = li.querySelector('.tag');
-          
+
           if (tag) {
             const txt = tag.textContent.trim().toUpperCase();
             if (levelMap[txt]) {
               tag.textContent = levelMap[txt];
             }
           }
-          
+
           const level = tag ? tag.textContent.trim().toLowerCase() : '';
 
           const matchesQuery = query === '' || text.includes(query);
-          const matchesLevel = currentLevel === 'all' || level.includes(currentLevel.toLowerCase());
+          const matchesLevel = currentLevel === 'all' || level === currentLevel.toLowerCase();
 
           if (matchesQuery && matchesLevel) {
             li.style.display = '';
@@ -397,10 +397,8 @@
 
       input.addEventListener('input', debounce(applyFilters, 150));
 
-      // Run immediate badge rewrite on static HTML items if present
       rewriteBadgesInDOM();
 
-      // Fetch repository contents from GitHub API
       fetch(repoUrl + '?ref=main&t=' + Date.now())
         .then(res => {
           if (!res.ok) {
@@ -421,7 +419,6 @@
 
             const levelMatch = base.match(/-(a2|b1\+|b1|b2|c1)$/i);
             const rawLevel = levelMatch ? levelMatch[1].toUpperCase().replace('+','') : null;
-            
             const displayLevel = rawLevel ? (levelMap[rawLevel] || rawLevel) : null;
             const tagClass = rawLevel ? ('tag-' + rawLevel.toLowerCase()) : 'tag-none';
             const tagText = displayLevel || '—';
