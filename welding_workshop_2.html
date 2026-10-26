@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welding Workshop Manager - B1 English Challenge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Chakra+Petch:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+        .font-heading {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        .tab-btn.active {
+            border-bottom-color: #f59e0b;
+            color: #f59e0b;
+            background-color: rgba(245, 158, 11, 0.1);
+        }
+        .choice-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .choice-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+        }
+        .choice-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- TOP HEADER -->
+    <header class="bg-slate-900 border-b border-amber-500/30 sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center font-bold text-slate-950 text-xl shadow-lg shadow-amber-500/20">
+                    ⚡
+                </div>
+                <div>
+                    <h1 class="font-heading text-xl font-bold tracking-wide text-white">WELDING WORKSHOP</h1>
+                    <p class="text-xs text-amber-400 font-medium">B1 CEFR English Simulation & Language Lab</p>
+                </div>
+            </div>
+
+            <!-- SCORE & PROGRESS BADGES -->
+            <div id="simStatsContainer" class="flex items-center space-x-3 bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700">
+                <div class="text-right">
+                    <span class="text-xs text-slate-400 block uppercase tracking-wider font-semibold">Shift Score</span>
+                    <span id="scoreDisplay" class="text-xl font-bold text-amber-400 font-heading">0 pts</span>
+                </div>
+                <div class="h-8 w-px bg-slate-700"></div>
+                <div class="text-left">
+                    <span class="text-xs text-slate-400 block uppercase tracking-wider font-semibold">Timeline</span>
+                    <span id="dayDisplay" class="text-sm font-semibold text-slate-200">Monday AM</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN TABS NAVIGATION -->
+        <nav class="max-w-6xl mx-auto px-4 flex overflow-x-auto space-x-2 border-t border-slate-800 text-sm font-medium">
+            <button onclick="switchTab('tab-sim')" id="btn-tab-sim" class="tab-btn active px-4 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                🎮 <span>Simulation</span>
+            </button>
+            <button onclick="switchTab('tab-warmup')" id="btn-tab-warmup" class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                🗣️ <span>Warmup Speaking</span>
+            </button>
+            <button onclick="switchTab('tab-vocab')" id="btn-tab-vocab" class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                📖 <span>Vocabulary Match</span>
+            </button>
+            <button onclick="switchTab('tab-cloze')" id="btn-tab-cloze" class="tab-btn px-4 py-3 border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 whitespace-nowrap">
+                ✏️ <span>Text Gap-Fill</span>
+            </button>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6">
+
+        <!-- TAB 1: SIMULATION -->
+        <div id="tab-sim" class="tab-content block">
+            
+            <!-- VIEW A: LANDING PAGE -->
+            <div id="sim-landing" class="bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl">
+                <div class="max-w-3xl mx-auto text-center space-y-6">
+                    <span class="inline-block px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold rounded-full uppercase tracking-widest">
+                        Interactive B1 Roleplay
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white font-heading">
+                        Welcome to Apex Fabrication Works!
+                    </h2>
+                    <p class="text-slate-300 text-base leading-relaxed">
+                        You are the new <strong class="text-amber-400">Workshop Manager</strong>. Your goal is to guide your welding team through a busy 5-day week from Monday to Friday. You will make 8 crucial decisions affecting weld quality, safety, team morale, and client deadlines.
+                    </p>
+
+                    <div class="grid sm:grid-cols-3 gap-4 text-left my-6">
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                            <div class="text-amber-400 text-xl font-bold mb-1">🎯 4 Decision Types</div>
+                            <p class="text-xs text-slate-400">Very Good (+2 pts), Good (+1 pt), Acceptable (0 pts), Poor (-1 pt & retry).</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                            <div class="text-rose-400 text-xl font-bold mb-1">⚠️ Emergencies</div>
+                            <p class="text-xs text-slate-400">Two surprise industrial hazards test your quick safety judgment.</p>
+                        </div>
+                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700">
+                            <div class="text-emerald-400 text-xl font-bold mb-1">🌿 Story Branches</div>
+                            <p class="text-xs text-slate-400">Your managerial decisions logically shape the story path each day.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-950/30 border border-amber-500/30 rounded-xl p-4 text-left">
+                        <h4 class="font-bold text-amber-400 text-sm mb-1">📋 Briefing: Monday Morning Scenario</h4>
+                        <p class="text-xs sm:text-sm text-slate-300">
+                            It is 8:00 AM on Monday. The fabrication floor is humming, but Assembly Line 1 reports a failure in the main workshop exhaust ventilation system during heavy flux-cored arc welding. Fumes are beginning to accumulate.
+                        </p>
+                    </div>
+
+                    <button onclick="startSimulation()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-extrabold text-lg rounded-xl shadow-lg shadow-amber-500/20 transition transform hover:scale-105">
+                        Start Shift & Take First Decision →
+                    </button>
+                </div>
+            </div>
+
+            <!-- VIEW B: GAMEPLAY SCREEN -->
+            <div id="sim-game" class="hidden bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl">
+                <!-- SCENARIO HEADER -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-6 border-b border-slate-700">
+                    <div class="flex items-center space-x-2">
+                        <span id="scenarioBadge" class="px-3 py-1 bg-amber-500/20 border border-amber-500/40 text-amber-400 text-xs font-bold rounded-full uppercase">
+                            Scenario 1 of 8
+                        </span>
+                        <span id="emergencyBadge" class="hidden px-3 py-1 bg-rose-500/20 border border-rose-500/40 text-rose-400 text-xs font-bold rounded-full uppercase animate-pulse">
+                            ⚠️ EMERGENCY HAZARD
+                        </span>
+                    </div>
+                    <span id="scenarioTime" class="text-xs text-slate-400 font-semibold uppercase">Monday Morning</span>
+                </div>
+
+                <!-- SCENARIO TITLE & DESCRIPTION -->
+                <div class="mb-6">
+                    <h3 id="scenarioTitle" class="text-2xl font-bold text-white font-heading mb-3"></h3>
+                    <p id="scenarioDesc" class="text-slate-300 text-base leading-relaxed bg-slate-900/50 p-4 rounded-xl border border-slate-700/60"></p>
+                </div>
+
+                <!-- CHOICES CONTAINER -->
+                <div id="choicesContainer" class="grid gap-3 my-6"></div>
+
+                <!-- FEEDBACK BOX -->
+                <div id="feedbackBox" class="hidden rounded-xl p-5 border text-sm leading-relaxed mb-6">
+                    <div class="flex items-center justify-between mb-2">
+                        <span id="feedbackTitle" class="font-bold text-base"></span>
+                        <span id="feedbackPts" class="text-xs font-bold px-2 py-0.5 rounded"></span>
+                    </div>
+                    <p id="feedbackText" class="text-slate-200"></p>
+                    <div id="wordCountNotice" class="text-[10px] text-slate-400 mt-2 text-right italic">Word count verified (20-30 words)</div>
+                </div>
+
+                <!-- NEXT / CONTINUE BUTTON -->
+                <button id="btnContinue" onclick="advanceStory()" class="hidden w-full py-3.5 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition text-center shadow-lg">
+                    Continue Shift →
+                </button>
+            </div>
+
+            <!-- VIEW C: DEBRIEFING PAGE -->
+            <div id="sim-debrief" class="hidden bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-2xl">
+                <div class="max-w-3xl mx-auto space-y-8">
+                    <div class="text-center space-y-2">
+                        <span class="px-3 py-1 bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-xs font-bold rounded-full uppercase">
+                            Shift Complete
+                        </span>
+                        <h2 class="text-3xl font-extrabold text-white font-heading">Manager Performance Debriefing</h2>
+                        <p class="text-slate-400 text-sm">Here is your weekly operational evaluation and score breakdown.</p>
+                    </div>
+
+                    <!-- SCORE SUMMARY CARD -->
+                    <div class="bg-slate-900 rounded-2xl p-6 border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div class="text-center sm:text-left">
+                            <span class="text-xs text-slate-400 uppercase font-semibold">Final Score</span>
+                            <div id="finalScoreVal" class="text-4xl font-extrabold text-amber-400 font-heading">0 / 20</div>
+                        </div>
+                        <div class="text-center sm:text-right">
+                            <span class="text-xs text-slate-400 uppercase font-semibold">Management Rank</span>
+                            <div id="finalRankVal" class="text-xl font-bold text-white font-heading">Apprentice Supervisor</div>
+                        </div>
+                    </div>
+
+                    <!-- BAND FEEDBACK (60-80 words) -->
+                    <div class="bg-slate-900/60 p-6 rounded-2xl border border-amber-500/30 space-y-3">
+                        <h4 class="text-amber-400 font-bold text-base flex items-center gap-2">
+                            <span>📊</span> <span>Manager Evaluation Report</span>
+                        </h4>
+                        <p id="bandFeedbackText" class="text-slate-300 text-sm leading-relaxed"></p>
+                    </div>
+
+                    <!-- 3 POST-GAME DISCUSSION QUESTIONS -->
+                    <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-700 space-y-4">
+                        <h4 class="text-white font-bold text-base flex items-center gap-2 font-heading">
+                            <span>💬</span> <span>Speaking & Discussion Questions</span>
+                        </h4>
+                        <p class="text-xs text-slate-400">Use these questions for classroom debate, speaking practice, or pair discussions:</p>
+                        <ol class="list-decimal list-inside space-y-3 text-sm text-slate-200 font-medium">
+                            <li class="bg-slate-800 p-3 rounded-lg border border-slate-700/50">
+                                Which decision during the week was the most difficult for you to make, and why did you choose that option?
+                            </li>
+                            <li class="bg-slate-800 p-3 rounded-lg border border-slate-700/50">
+                                In real industrial workplaces, how should a supervisor balance strict safety rules against urgent client deadlines?
+                            </li>
+                            <li class="bg-slate-800 p-3 rounded-lg border border-slate-700/50">
+                                How can clear communication between welders and managers prevent costly mistakes and structural weld defects?
+                            </li>
+                        </ol>
+                    </div>
+
+                    <button onclick="resetSimulation()" class="w-full py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-base rounded-xl transition shadow-lg">
+                        🔄 Restart Simulation & Try Different Decisions
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TAB 2: WARMUP DISCUSSION QUESTIONS -->
+        <div id="tab-warmup" class="tab-content hidden">
+            <div class="bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-xl space-y-6">
+                <div>
+                    <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold rounded-full uppercase">
+                        Pre-Game Speaking Activity
+                    </span>
+                    <h2 class="text-2xl font-bold text-white font-heading mt-2">Warmup Speaking & Discussion</h2>
+                    <p class="text-slate-300 text-sm mt-1">Discuss these questions with a partner or teacher before playing the simulation.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700 space-y-3">
+                        <span class="text-amber-400 font-bold text-sm">Question 1</span>
+                        <p class="text-slate-200 text-base font-semibold">Have you ever worked in or visited a factory or technical workshop? What safety precautions did you notice?</p>
+                        <div class="bg-slate-800/80 p-3 rounded-lg text-xs text-slate-400">
+                            <strong class="text-slate-300">Useful phrases:</strong> "I observed that workers wore...", "Safety protocols included...", "It was clear that..."
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700 space-y-3">
+                        <span class="text-amber-400 font-bold text-sm">Question 2</span>
+                        <p class="text-slate-200 text-base font-semibold">What qualities do you think make a great manager when unexpected problems or emergencies happen at work?</p>
+                        <div class="bg-slate-800/80 p-3 rounded-lg text-xs text-slate-400">
+                            <strong class="text-slate-300">Useful phrases:</strong> "In my opinion, a strong leader must...", "Quick decision-making is vital because..."
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700 space-y-3">
+                        <span class="text-amber-400 font-bold text-sm">Question 3</span>
+                        <p class="text-slate-200 text-base font-semibold">Why is it important to follow strict procedures and guidelines instead of taking shortcuts in technical jobs?</p>
+                        <div class="bg-slate-800/80 p-3 rounded-lg text-xs text-slate-400">
+                            <strong class="text-slate-300">Useful phrases:</strong> "Taking shortcuts can lead to...", "Official procedures ensure that quality..."
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900/70 p-5 rounded-xl border border-slate-700 space-y-3">
+                        <span class="text-amber-400 font-bold text-sm">Question 4</span>
+                        <p class="text-slate-200 text-base font-semibold">How do you handle stressful situations when a client demands fast results but quality requires more time?</p>
+                        <div class="bg-slate-800/80 p-3 rounded-lg text-xs text-slate-400">
+                            <strong class="text-slate-300">Useful phrases:</strong> "I prefer to explain that...", "Balancing client expectations with quality requires..."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: VOCABULARY MATCHING EXERCISE -->
+        <div id="tab-vocab" class="tab-content hidden">
+            <div class="bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-xl space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold rounded-full uppercase">
+                            Vocabulary Building
+                        </span>
+                        <h2 class="text-2xl font-bold text-white font-heading mt-2">Technical Terms Matching</h2>
+                        <p class="text-slate-300 text-sm">Match each technical welding term with its correct definition.</p>
+                    </div>
+                    <button onclick="checkVocabAnswers()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition">
+                        Check Answers
+                    </button>
+                </div>
+
+                <div id="vocabContainer" class="space-y-3"></div>
+
+                <div id="vocabResult" class="hidden p-4 rounded-xl text-center font-bold text-sm"></div>
+            </div>
+        </div>
+
+        <!-- TAB 4: COMPLETE THE TEXT (GAP-FILL) -->
+        <div id="tab-cloze" class="tab-content hidden">
+            <div class="bg-slate-800 rounded-2xl p-6 sm:p-8 border border-slate-700 shadow-xl space-y-6">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div>
+                        <span class="px-3 py-1 bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold rounded-full uppercase">
+                            Text Completion
+                        </span>
+                        <h2 class="text-2xl font-bold text-white font-heading mt-2">Workshop Context Gap-Fill</h2>
+                        <p class="text-slate-300 text-sm">Complete the paragraph by choosing the correct target technical vocabulary for each blank.</p>
+                    </div>
+                    <button onclick="checkClozeAnswers()" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition">
+                        Verify Text
+                    </button>
+                </div>
+
+                <div class="bg-slate-900/80 p-6 rounded-2xl border border-slate-700 leading-loose text-base text-slate-200">
+                    Managing a busy fabrication plant requires strict attention to safety and quality. Every morning, the manager checks the workshop 
+                    <select id="gap1" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>
+                    system to ensure toxic fumes are extracted safely. Operators must always wear appropriate 
+                    <select id="gap2" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>
+                    like auto-darkening helmets and leather gloves. Before starting a joint, technicians check their welding machines through careful 
+                    <select id="gap3" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>
+                    to maintain stable electrical parameters. Following the certified 
+                    <select id="gap4" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>
+                    is essential to avoid internal defects such as 
+                    <select id="gap5" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>,
+                    which creates weak gas pockets inside the metal. Welders must also manage heat input carefully to prevent thin sheet metal 
+                    <select id="gap6" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>.
+                    Throughout the shift, supervisors monitor 
+                    <select id="gap7" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>
+                    stock levels like shielding gas and filler wire so production never halts. Finally, every finished assembly undergoes a rigorous quality 
+                    <select id="gap8" class="bg-slate-800 border border-amber-500/50 text-amber-300 rounded px-2 py-1 text-sm font-semibold mx-1 focus:ring-2 focus:ring-amber-500 outline-none">
+                        <option value="">-- select --</option>
+                    </select>
+                    before shipping to the client.
+                </div>
+
+                <div id="clozeResult" class="hidden p-4 rounded-xl text-center font-bold text-sm"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 border-t border-slate-800 py-4 text-center text-xs text-slate-500">
+        Welding Workshop Management Simulation &bull; B1 CEFR Industrial English Lab
+    </footer>
+
+    <!-- JAVASCRIPT GAME ENGINE & EXERCISES -->
+    <script>
+        // --- GAME STATE VARIABLES ---
+        let score = 0;
+        let currentStepKey = "s1";
+        let isEmergencyActive = false;
+        let isBonusActive = false;
+
+        // Path trackers for dynamic story branching
+        let branchS2 = "A"; // default
+        let branchS3 = "A";
+        let branchS4 = "A";
+        let branchS5 = "A";
+        let branchS7 = "A";
+        let branchS8 = "A";
+
+        // --- SCENARIO DATA WITH STRICT 20-30 WORD FEEDBACK STRINGS ---
+        const scenarioDB = {
+            s1: {
+                title: "Exhaust Ventilation Failure",
+                time: "Monday Morning",
+                badge: "Scenario 1 of 8",
+                desc: "At 8:00 AM on Monday, Assembly Line 1 reports that the central workshop exhaust ventilation has failed during heavy welding. Fumes are quickly filling the bay. How do you respond?",
+                choices: [
+                    {
+                        text: "Halt work immediately to inspect and repair the main ventilation exhaust system fan.",
+                        pts: 2, type: "vg",
+                        fb: "You stopped work immediately to repair the exhaust fan. This prevented hazardous fumes from filling the shop, keeping all technicians safe and compliant with health regulations."
+                    },
+                    {
+                        text: "Distribute heavy respirator masks and keep production moving while mechanics inspect the unit.",
+                        pts: 1, type: "g",
+                        fb: "You provided heavy masks while keeping production moving. Workers stayed safe, but invisible fumes slowly accumulated, requiring a short shop cleaning break later this afternoon."
+                    },
+                    {
+                        text: "Open external bay doors to let natural wind currents clear the workshop atmosphere.",
+                        pts: 0, type: "acc",
+                        fb: "You opened exterior doors to clear fumes naturally. Air moved slowly, but sudden wind blew fine dust onto fresh weld joints, causing minor cosmetic surface imperfections."
+                    },
+                    {
+                        text: "Ignore the warning light and tell technicians to finish their current welding batch quickly.",
+                        pts: -1, type: "poor",
+                        fb: "Ignoring the ventilation warning allowed toxic fumes to spread rapidly. Two welders suffered severe headaches, halting production completely. You must make a safer, responsible choice."
+                    }
+                ]
+            },
+
+            s2a: {
+                title: "Stainless Steel Frame Thermal Alignment",
+                time: "Monday Afternoon",
+                badge: "Scenario 2 of 8 (Path A)",
+                desc: "Following your strong ventilation decision, the team begins preparing high-precision stainless steel frames for a major railway contract. Thermal warping is a key concern.",
+                choices: [
+                    {
+                        text: "Implement heavy clamping fixtures and enforce a staggered, balanced welding sequence across joints.",
+                        pts: 2, type: "vg",
+                        fb: "You ordered heavy clamping fixtures and a staggered welding sequence. Heat distributed evenly across the joint, producing perfectly flat structural frames that passed inspector testing easily."
+                    },
+                    {
+                        text: "Use standard clamps and instruct welders to take forced cooling pauses between welding passes.",
+                        pts: 1, type: "g",
+                        fb: "You used standard clamps and allowed cooling pauses between passes. The frames met minimum straightness standards, though minor mechanical adjustments were required before final shipping."
+                    },
+                    {
+                        text: "Allow freehand welding with basic tacking to finish frames faster before evening shift end.",
+                        pts: 0, type: "acc",
+                        fb: "You allowed freehand welding with basic tacking. The metal warped slightly, forcing technicians to spend two extra hours flame-straightening the frames to fit specifications."
+                    },
+                    {
+                        text: "Weld continuously at maximum speed without thermal planning or clamping restraints.",
+                        pts: -1, type: "poor",
+                        fb: "Rushing the welding without thermal planning caused severe warping in three structural frames. The client will reject deformed parts. Please choose a professional fabrication strategy."
+                    }
+                ]
+            },
+
+            s2b: {
+                title: "Power Source Overheating Management",
+                time: "Monday Afternoon",
+                badge: "Scenario 2 of 8 (Path B)",
+                desc: "Following earlier ventilation delays, power units are overheating under continuous operation. How do you manage machine duty cycles?",
+                choices: [
+                    {
+                        text: "Establish a strict work-rest rotation schedule that strictly respects equipment duty cycle limits.",
+                        pts: 2, type: "vg",
+                        fb: "You established strict work-rest rotation schedules respecting machine duty cycles. Equipment temperature dropped to safe levels, protecting electronics while maintaining steady, reliable production output."
+                    },
+                    {
+                        text: "Position portable cooling fans directly behind the power sources to increase air circulation.",
+                        pts: 1, type: "g",
+                        fb: "You positioned portable industrial cooling fans directly behind the power units. Temperatures stabilized, but air turbulence occasionally blew away protective gas shielding from active arcs."
+                    },
+                    {
+                        text: "Reduce arc voltage settings across machines to lower operating heat generated by power units.",
+                        pts: 0, type: "acc",
+                        fb: "You reduced arc voltage settings across all machines. Overheating stopped, but lower heat input caused shallow weld penetration, needing extra inspection checks on thick plates."
+                    },
+                    {
+                        text: "Bypass thermal overload switches so machines operate continuously without automatic shutoffs.",
+                        pts: -1, type: "poor",
+                        fb: "Bypassing internal thermal cut-off switches caused a main transformer to burn out completely. Production stopped and repairs will be expensive. Select a safer operational choice."
+                    }
+                ]
+            },
+
+            s3a: {
+                title: "Consumable Selection for Heavy Girders",
+                time: "Tuesday Morning",
+                badge: "Scenario 3 of 8 (Path A)",
+                desc: "Tuesday morning brings a structural girder contract requiring high strength. You must select consumables and storage protocols.",
+                choices: [
+                    {
+                        text: "Specify low-hydrogen E7018 electrodes stored in heated holding ovens to prevent moisture absorption.",
+                        pts: 2, type: "vg",
+                        fb: "You specified low-hydrogen E7018 electrodes stored in temperature-controlled holding ovens. The welds demonstrated superior toughness and zero moisture-induced hydrogen cracking during laboratory strength testing."
+                    },
+                    {
+                        text: "Order high-purity argon gas mix with standard solid wire for continuous MIG welding processes.",
+                        pts: 1, type: "g",
+                        fb: "You ordered standard MIG solid wire with high-purity argon mix gas. Weld quality was good and strong, though material costs increased slightly beyond original budget projections."
+                    },
+                    {
+                        text: "Use general-purpose welding rods taken from opened, unheated cardboard storage boxes.",
+                        pts: 0, type: "acc",
+                        fb: "You selected general-purpose electrodes from unsealed storage boxes. The welds passed visual check, but minor surface porosity appeared, requiring light surface grinding and touch-up work."
+                    },
+                    {
+                        text: "Use leftover, oxidized filler wire from a previous job to reduce material expenses.",
+                        pts: -1, type: "poor",
+                        fb: "Using rusty, damaged filler wire created severe porosity and internal cracking throughout the structural girder. This weld will fail load tests. Pick a high-quality consumable."
+                    }
+                ]
+            },
+
+            s3b: {
+                title: "Tack Weld Misalignment Correction",
+                time: "Tuesday Morning",
+                badge: "Scenario 3 of 8 (Path B)",
+                desc: "On Tuesday morning, an operator notices that tack welds on a massive crane beam are misaligned by 4 millimeters.",
+                choices: [
+                    {
+                        text: "Cut improper tack welds, re-align steel plates using hydraulic clamps, and re-tack carefully.",
+                        pts: 2, type: "vg",
+                        fb: "You cut the improper tacks, re-aligned the steel plates using hydraulic clamps, and re-tacked carefully. Alignment became 100% accurate, ensuring perfect structural balance for heavy loads."
+                    },
+                    {
+                        text: "Grind down uneven tacks and pull joints into tolerance using heavy chain hoists.",
+                        pts: 1, type: "g",
+                        fb: "You ground down the uneven tacks and pulled the joint into tolerance using heavy chain hoists. The fix worked well, though setup time delayed morning assembly."
+                    },
+                    {
+                        text: "Fill the 4 millimeter gap with extra weld metal passes without cutting original tack welds.",
+                        pts: 0, type: "acc",
+                        fb: "You filled the 4mm gap with extra weld metal without cutting old tacks. The joint joined securely, but residual stress increased, requiring post-weld stress-relief heating."
+                    },
+                    {
+                        text: "Weld over the misaligned joint directly, relying on final grinding to smooth the exterior.",
+                        pts: -1, type: "poor",
+                        fb: "Welding over severe misalignment created an unstable structure that twisted under stress. The beam cannot support designed weight loads. Re-evaluate your structural correction choice."
+                    }
+                ]
+            },
+
+            e1: {
+                title: "Oxy-Fuel Gas Hose Leak & Spark Hazard",
+                time: "Tuesday Afternoon",
+                badge: "HAZARDOUS EMERGENCY 1",
+                desc: "CRITICAL HAZARD! An oxy-fuel cutting hose ruptures near grinding sparks. High-pressure gas is escaping with a loud hiss. What is your instant command?",
+                isEmergency: true,
+                choices: [
+                    {
+                        text: "Immediately close the main cylinder emergency shutoff valve and evacuate the bay safely.",
+                        pts: 2, type: "vg",
+                        fb: "You immediately closed the cylinder main emergency shutoff valve, evacuated the local bay, and ventilated safely. Your decisive action prevented fire and protected your whole team."
+                    },
+                    {
+                        text: "Evacuate workers first, then carefully return with safety equipment to isolate gas cylinders.",
+                        pts: 0, type: "acc",
+                        fb: "You shouted for everyone to step back and cleared the area before isolating the gas bottle. Safe execution, though delayed reaction increased gas concentration in the room."
+                    },
+                    {
+                        text: "Throw a heavy welding blanket over the leaking hose to muffle escaping pressurized gas.",
+                        pts: 0, type: "poor", gameOver: true,
+                        fb: "FATAL ERROR: Throwing a heavy welding blanket over the leaking high-pressure hose created an explosive gas pocket that ignited from nearby sparks. Workshop destroyed."
+                    },
+                    {
+                        text: "Attempt to pinch the leaking rubber hose closed using heavy metal hand pliers.",
+                        pts: 0, type: "poor", gameOver: true,
+                        fb: "FATAL ERROR: Attempting to crimp the pressurized leaking hose with hand pliers caused a sudden friction spark, igniting gas and starting a major explosion."
+                    }
+                ]
+            },
+
+            s4a: {
+                title: "Pressure Vessel Non-Destructive Testing (NDT)",
+                time: "Wednesday Full Shift",
+                badge: "Scenario 4 of 8 (Path A)",
+                desc: "Wednesday is quality control day for pressure vessels. Ultrasonic non-destructive testing detects a tiny internal fusion flaw.",
+                choices: [
+                    {
+                        text: "Carbon-arc gouge the defective area, prep a clean bevel, and re-weld using certified WPS procedures.",
+                        pts: 2, type: "vg",
+                        fb: "You gouged out the defective area, prepared a proper bevel angle, and re-welded using certified procedures. X-ray re-inspection confirmed zero defects, satisfying high-pressure safety standards."
+                    },
+                    {
+                        text: "Perform local repair welding and request a secondary phased-array ultrasonic scan from inspectors.",
+                        pts: 1, type: "g",
+                        fb: "You performed local repair welding and asked inspectors for a secondary phased-array scan. The repair passed inspection, though testing fees slightly exceeded weekly operational allowances."
+                    },
+                    {
+                        text: "Apply a heavy cap weld pass over the top surface to reinforce outer structural strength.",
+                        pts: 0, type: "acc",
+                        fb: "You applied a reinforced cap weld pass over the surface defect. Ultrasonic testing showed acceptable outer strength, but internal stress remains higher than ideal engineering limits."
+                    },
+                    {
+                        text: "Ask the quality inspector to overlook the minor internal signal and stamp approval.",
+                        pts: -1, type: "poor",
+                        fb: "Falsifying inspection reports to ignore internal fusion defects creates dangerous rupture risks under pressure. You must maintain strict professional safety and inspection standards always."
+                    }
+                ]
+            },
+
+            s4b: {
+                title: "Internal Defect Repair on Support Brackets",
+                time: "Wednesday Full Shift",
+                badge: "Scenario 4 of 8 (Path B)",
+                desc: "Wednesday inspection reveals internal porosity in structural support brackets. Repairs are needed before afternoon galvanized coating.",
+                choices: [
+                    {
+                        text: "Assign certified welders to gouge out internal defects completely and re-weld with low-hydrogen wire.",
+                        pts: 2, type: "vg",
+                        fb: "You assigned certified technicians to carbon-arc gouge defects and re-weld with low-hydrogen wire. All brackets passed structural testing on time with flawless interior metallurgical soundness."
+                    },
+                    {
+                        text: "Grind out defect zones manually using heavy angle grinders before re-welding the joint.",
+                        pts: 1, type: "g",
+                        fb: "You ground out defects manually using heavy angle grinders before re-welding. The process was noisy and physically exhausting, but achieved satisfactory joint integrity for galvanizing."
+                    },
+                    {
+                        text: "Re-melt surface defect zones using TIG torches without adding additional filler wire.",
+                        pts: 0, type: "acc",
+                        fb: "You re-melted defect zones using TIG torches without adding extra filler metal. Surface smoothness improved, though deeper porosity pockets remained untouched beneath the surface layer."
+                    },
+                    {
+                        text: "Fill surface holes with cosmetic metal body filler prior to Sending parts to galvanizing.",
+                        pts: -1, type: "poor",
+                        fb: "Covering uninspected internal holes with cosmetic paint before galvanizing violates safety codes. The brackets will fail under stress. Choose an honest engineering solution immediately."
+                    }
+                ]
+            },
+
+            s5a: {
+                title: "Robotic Welding Cell Integration",
+                time: "Thursday Full Shift",
+                badge: "Scenario 5 of 8 (Path A)",
+                desc: "Thursday involves setting up a collaborative robotic welding arm (cobot) for high-speed structural bracket production.",
+                choices: [
+                    {
+                        text: "Calibrate torch angles, program seam-tracking sensors, and train skilled welders to supervise programming.",
+                        pts: 2, type: "vg",
+                        fb: "You calibrated the cobot torch angles, programmed seam-tracking sensors, and trained experienced welders to supervise operation. Output tripled while maintaining superb bead appearance and zero defect rates."
+                    },
+                    {
+                        text: "Use factory default robot programs and monitor initial production runs closely with senior staff.",
+                        pts: 1, type: "g",
+                        fb: "You used pre-set factory robot programs and monitored initial runs closely. Production ran smoothly, though slight manual adjustments were needed on tight corner fillet welds."
+                    },
+                    {
+                        text: "Run the robotic arm at maximum speed without calibrating joint tracking sensors first.",
+                        pts: 0, type: "acc",
+                        fb: "You ran the robot at maximum speed without sensor calibration. Production was fast, but excessive spatter required extra manual cleaning staff at the finishing station."
+                    },
+                    {
+                        text: "Operate the automated cell without installing safety light curtains or perimeter guards.",
+                        pts: -1, type: "poor",
+                        fb: "Operating uncalibrated robotic equipment without safety light curtains caused a mechanical arm collision, damaging expensive torch heads. Re-think your automated production management strategy."
+                    }
+                ]
+            },
+
+            s5b: {
+                title: "Tight Deadline vs Weld Edge Preparation",
+                time: "Thursday Full Shift",
+                badge: "Scenario 5 of 8 (Path B)",
+                desc: "On Thursday, a client demands early delivery of heavy transport chassis. Operators suggest skipping edge bevel preparation.",
+                choices: [
+                    {
+                        text: "Refuse to skip joint prep, explain standards to the client, and schedule parallel prep shifts.",
+                        pts: 2, type: "vg",
+                        fb: "You refused to skip joint preparation, explaining quality standards to the client while assigning parallel prep shifts. Deliveries arrived on schedule with full weld penetration achieved."
+                    },
+                    {
+                        text: "Authorize mechanized beveling machinery to speed up edge preparation work safely.",
+                        pts: 1, type: "g",
+                        fb: "You authorized mechanized beveling machinery to speed up edge preparation. Quality remained high and full penetration was achieved, though equipment rental increased immediate production overhead."
+                    },
+                    {
+                        text: "Reduce bevel angles from 60 degrees to 30 degrees to complete joint preparation faster.",
+                        pts: 0, type: "acc",
+                        fb: "You reduced bevel angles from 60 degrees to 30 degrees. Welding finished faster, but thinner joint preparation restricted electrode access, causing slightly uneven root bead profile."
+                    },
+                    {
+                        text: "Skip edge beveling entirely and weld over square-cut heavy steel plate edges.",
+                        pts: -1, type: "poor",
+                        fb: "Welding unbeveled square edges on heavy plate metal resulted in zero root penetration. Joints snapped under minimal stress testing. Select a proper engineering preparation method."
+                    }
+                ]
+            },
+
+            e2: {
+                title: "Confined Space Storage Tank Entry Hazard",
+                time: "Friday Midday",
+                badge: "HAZARDOUS EMERGENCY 2",
+                desc: "CRITICAL HAZARD! A welder is preparing to enter a narrow enclosed storage tank for internal repairs without testing oxygen levels!",
+                isEmergency: true,
+                choices: [
+                    {
+                        text: "Halt entry immediately, issue a confined space permit, test air quality, and post a safety monitor.",
+                        pts: 2, type: "vg",
+                        fb: "You halted entry immediately, issued a confined space permit, tested air quality, and posted a trained safety monitor outside. Your quick intervention saved lives."
+                    },
+                    {
+                        text: "Set up external air blowers for thirty minutes before allowing entry with atmospheric monitoring.",
+                        pts: 0, type: "acc",
+                        fb: "You ordered forced ventilation setup and air testing before allowing entry. Work was delayed forty minutes, but safety protocols were respected without taking unnecessary risks."
+                    },
+                    {
+                        text: "Allow entry without testing air, telling the welder to complete the internal repair rapidly.",
+                        pts: 0, type: "poor", gameOver: true,
+                        fb: "FATAL ERROR: Allowing entry without testing air caused immediate asphyxiation from displaced argon shielding gas. The welder lost consciousness instantly. Game Over."
+                    },
+                    {
+                        text: "Use an open flame flame torch inside the unpurged container to check internal joint alignment.",
+                        pts: 0, type: "poor", gameOver: true,
+                        fb: "FATAL ERROR: Lighting an inspection torch inside an unpurged fuel container triggered a massive internal fuel vapor explosion. Workshop destroyed. Game Over."
+                    }
+                ]
+            },
+
+            s6a: {
+                title: "Aluminum Sheet Metal Heat Distortion Control",
+                time: "Friday Morning",
+                badge: "Scenario 6 of 8 (Path A)",
+                desc: "Friday morning requires fabricating thin aluminum panels for emergency vehicles. Overheating causes severe sheet buckling.",
+                choices: [
+                    {
+                        text: "Implement pulse TIG welding, heavy copper backing bars, and intermittent stitch welding techniques.",
+                        pts: 2, type: "vg",
+                        fb: "You implemented pulse TIG welding, copper backing bars, and intermittent stitch welding. Heat input remained low, yielding perfectly flat panels requiring zero mechanical straightening post-weld."
+                    },
+                    {
+                        text: "Clamp panels rigidly to steel tables and apply commercial heat-sink cooling paste along seams.",
+                        pts: 1, type: "g",
+                        fb: "You clamped panels to heavy steel welding tables and used heat-sink compound paste. Buckling was minimal, though cleaning residual cooling compound required extra labor time afterwards."
+                    },
+                    {
+                        text: "Weld continuously at reduced current, planning to hammer buckled sections flat afterwards.",
+                        pts: 0, type: "acc",
+                        fb: "You welded continuously at low amperage settings. Panels buckled slightly along outer edges, requiring wooden mallet dressing to achieve acceptable flatness before assembly."
+                    },
+                    {
+                        text: "Increase welding current to maximum so torch speed can be doubled across thin aluminum sheets.",
+                        pts: -1, type: "poor",
+                        fb: "Continuous high-amperage welding burned holes directly through aluminum sheets, destroying expensive raw materials. Choose a thermal control method suitable for light gauge metals."
+                    }
+                ]
+            },
+
+            s6b: {
+                title: "Aluminum Wire Feeding Jam (Bird-Nesting)",
+                time: "Friday Morning",
+                badge: "Scenario 6 of 8 (Path B)",
+                desc: "On Friday morning, soft aluminum welding wire keeps jamming (bird-nesting) inside MIG torch drive rolls, stopping assembly.",
+                choices: [
+                    {
+                        text: "Install smooth Teflon torch liners, U-groove drive rolls, and a push-pull torch feeding system.",
+                        pts: 2, type: "vg",
+                        fb: "You installed Teflon liners, U-groove drive rolls, and a push-pull gun system. Wire feeding became completely smooth, eliminating downtime and producing consistent aluminum welds."
+                    },
+                    {
+                        text: "Reduce drive roll tension and straighten torch cable bends to minimize friction on wire.",
+                        pts: 1, type: "g",
+                        fb: "You decreased drive roll tension and loosened torch cable bends. Wire jams decreased significantly, allowing production to resume with only occasional minor feeding adjustments."
+                    },
+                    {
+                        text: "Switch to thicker diameter aluminum wire to increase rigidity during feeding.",
+                        pts: 0, type: "acc",
+                        fb: "You switched to thicker diameter wire to reduce flexibility. Feeding improved, but higher heat input required careful speed adjustments to prevent burn-through on thin metal."
+                    },
+                    {
+                        text: "Tighten drive roll tension screws to maximum force to push jammed wire through.",
+                        pts: -1, type: "poor",
+                        fb: "Overtightening drive rollers flattened soft aluminum wire, completely clogging the liner and snapping internal torch components. Select appropriate equipment settings for soft filler metals."
+                    }
+                ]
+            },
+
+            s7a: {
+                title: "Final Municipal Bridge Quality Certification",
+                time: "Friday Afternoon",
+                badge: "Scenario 7 of 8 (Path A)",
+                desc: "Friday afternoon: A final audit requires complete traceability documentation for a municipal bridge project before shipping.",
+                choices: [
+                    {
+                        text: "Compile material test reports, WPS specs, welder certificates, and NDT logs into a digital dossier.",
+                        pts: 2, type: "vg",
+                        fb: "You compiled material test reports, WPS documentation, welder qualification records, and NDT certificates into an organized digital binder. The auditor approved shipment immediately with praise."
+                    },
+                    {
+                        text: "Assemble paper quality records and resolve two missing heat numbers with suppliers by telephone.",
+                        pts: 1, type: "g",
+                        fb: "You assembled paper quality records and resolved two missing heat numbers with suppliers by telephone. Certification was granted, allowing trucks to depart just before afternoon site closure."
+                    },
+                    {
+                        text: "Provide standard mill certificates while promising to email detailed welder logs next Monday.",
+                        pts: 0, type: "acc",
+                        fb: "You provided standard mill certificates but lacked detailed welder logbooks. Inspectors granted conditional shipping approval subject to submitting completed paperwork early Monday morning."
+                    },
+                    {
+                        text: "Apply inspector approval stamps yourself without waiting for certified auditor verification.",
+                        pts: -1, type: "poor",
+                        fb: "Forging an inspection stamp on uncertified bridge girders creates severe criminal liability. Shipment impounded immediately. Always uphold strict professional legal compliance and integrity."
+                    }
+                ]
+            },
+
+            s7b: {
+                title: "Weekly Workshop Servicing & Equipment Overhaul",
+                time: "Friday Afternoon",
+                badge: "Scenario 7 of 8 (Path B)",
+                desc: "Friday afternoon: Maintenance reports show several MIG guns have worn contact tips, clogged nozzles, and arcing ground clamps.",
+                choices: [
+                    {
+                        text: "Schedule end-of-week preventative maintenance, replacing tips, cleaning nozzles, and inspecting cables.",
+                        pts: 2, type: "vg",
+                        fb: "You scheduled end-of-week preventative maintenance, replacing worn consumables, cleaning ground clamps, and checking gas lines. Machinery stands ready for maximum efficiency next week."
+                    },
+                    {
+                        text: "Distribute replacement contact tips and nozzles to welders for self-service machine cleanup.",
+                        pts: 1, type: "g",
+                        fb: "You distributed replacement nozzles and contact tips to welders for self-service maintenance. Most machines were restored properly, though ground clamps will need technician inspection later."
+                    },
+                    {
+                        text: "Replace only severely damaged contact tips, deferring general nozzle cleaning until next week.",
+                        pts: 0, type: "acc",
+                        fb: "You replaced only severely damaged parts, deferring general nozzle cleaning until next week. Machines functioned adequately, but spatter buildup will increase gas turbulence on Monday."
+                    },
+                    {
+                        text: "Postpone all equipment servicing until machines suffer complete operational failure next week.",
+                        pts: -1, type: "poor",
+                        fb: "Ignoring worn equipment caused loose ground clamps to arcing, damaging machine electronics and causing electrical shock risks. Perform necessary maintenance to ensure operational safety."
+                    }
+                ]
+            },
+
+            s8a: {
+                title: "Weekly Workshop Performance Retrospective",
+                time: "Friday End of Shift",
+                badge: "Scenario 8 of 8 (Path A)",
+                desc: "Friday 4:30 PM: Production is complete. You lead a weekly team retrospective to review safety, weld quality, and workflows.",
+                choices: [
+                    {
+                        text: "Facilitate open discussion on bottlenecks, praise safety records, and log process improvements.",
+                        pts: 2, type: "vg",
+                        fb: "You facilitated an open discussion on process bottlenecks, rewarded top safety practices, and logged preventative measures. Team morale surged and operational plans for next week were solidified."
+                    },
+                    {
+                        text: "Present key production output figures and thank staff for meeting tight weekly deadlines.",
+                        pts: 1, type: "g",
+                        fb: "You presented key performance figures and thanked workers for meeting production targets. The team appreciated recognition, though specific technical discussions were kept brief due to time."
+                    },
+                    {
+                        text: "Post weekly production metrics on the bulletin board and dismiss staff ten minutes early.",
+                        pts: 0, type: "acc",
+                        fb: "You posted production reports on the noticeboard and dismissed staff early. Communication was clear, but missed an opportunity for collaborative feedback and continuous process improvement."
+                    },
+                    {
+                        text: "Criticize individual welders publicly for minor delays that occurred earlier in the week.",
+                        pts: -1, type: "poor",
+                        fb: "Blaming individual welders publicly for minor week delays ruined workshop trust and team unity. Two senior fabricators resigned immediately. Practice constructive and respectful leadership."
+                    }
+                ]
+            },
+
+            s8b: {
+                title: "Transport Logistics & Cargo Security Loading",
+                time: "Friday End of Shift",
+                badge: "Scenario 8 of 8 (Path B)",
+                desc: "Friday 4:30 PM: Flatbed trailers arrive to load heavy structural steel girders. Final tie-down distribution must be verified.",
+                choices: [
+                    {
+                        text: "Personally inspect dunnage placement, weight distribution, and ratchet strap tension before departure.",
+                        pts: 2, type: "vg",
+                        fb: "You personally inspected dunnage placement, weight distribution, and ratchet strap tension according to transport safety regulations. Girders were secured flawlessly for safe highway transit."
+                    },
+                    {
+                        text: "Supervise cargo loading and confirm overall trailer height limits with transportation drivers.",
+                        pts: 1, type: "g",
+                        fb: "You supervised cargo loading and verified overall load height limits. Truck drivers confirmed security, though minor re-positioning of wooden supports took fifteen minutes extra."
+                    },
+                    {
+                        text: "Delegate transport loading oversight entirely to external truck drivers without logging paperwork.",
+                        pts: 0, type: "acc",
+                        fb: "You delegated loading oversight entirely to truck drivers. Steel left facility safely, but lack of written loading logs created minor administrative follow-up work for Monday."
+                    },
+                    {
+                        text: "Overload trailer rear axles to consolidate shipment onto fewer transport trucks.",
+                        pts: -1, type: "poor",
+                        fb: "Overloading a single trailer axle without securing center supports caused steel girders to shift during initial movement. Transport halted immediately. Prioritize transport safety always."
+                    }
+                ]
+            },
+
+            bonus: {
+                title: "Emergency Hospital Ramp Support Repair",
+                time: "Friday 5:00 PM (Bonus Situation)",
+                badge: "BONUS OPPORTUNITY (+2 PTS)",
+                desc: "At 5:00 PM Friday, a local hospital emergency room requests urgent repair of a damaged ambulance access ramp support bracket.",
+                choices: [
+                    {
+                        text: "Volunteer to stay late, prepare high-strength steel, weld with TIG precision, and deliver the bracket.",
+                        pts: 2, type: "vg",
+                        fb: "You volunteered to stay late, carefully prepped high-strength steel, welded joints with TIG precision, and delivered the bracket. The hospital praised your community dedication and expertise!"
+                    },
+                    {
+                        text: "Refer emergency repair to a trusted partner shop with dedicated 24-hour night shift capabilities.",
+                        pts: 0, type: "acc",
+                        fb: "You referred the emergency repair to a trusted partner workshop with specialized night-shift staff. The hospital got fast support, and your workshop closed on schedule safely."
+                    },
+                    {
+                        text: "Decline the request abruptly without offering alternative technical assistance or shop references.",
+                        pts: 0, type: "poor",
+                        fb: "Refusing the emergency call rudely without offering alternatives damaged your workshop's community reputation. Always communicate professionally and offer supportive business solutions."
+                    }
+                ]
+            }
+        };
+
+        // --- VOCABULARY DATA ---
+        const vocabDB = [
+            { term: "Ventilation", def: "A mechanical system that circulates fresh air and extracts dangerous toxic fumes." },
+            { term: "Porosity", def: "Tiny gas pockets or hollow bubbles trapped inside a welded metal joint." },
+            { term: "Distortion", def: "Bending or physical warping of metal caused by intense localized heat." },
+            { term: "Consumable", def: "Materials like welding wire, gas, and electrodes that get used up during work." },
+            { term: "Inspection", def: "Careful visual or technical examination of finished welds to verify safety." },
+            { term: "Protective gear", def: "Safety clothing, leather gloves, and helmets worn by workshop operators." },
+            { term: "Calibration", def: "Adjusting machinery settings precisely so equipment operates accurately." },
+            { term: "Procedure", def: "Official step-by-step instructions (WPS) for completing a job correctly." }
+        ];
+
+        // --- DEBRIEFING SCORE BANDS (STRICT 60-80 WORDS) ---
+        const debriefBands = [
+            {
+                min: 18, max: 22,
+                title: "Master Workshop Director",
+                text: "Outstanding leadership! Throughout this demanding week, you demonstrated exceptional decision-making, strict safety adherence, and deep metallurgical knowledge. Your ability to solve complex technical problems while prioritizing worker health and customer standards was remarkable. You managed equipment, emergencies, and team members with outstanding efficiency. The workshop achieved maximum productivity with zero defects. Congratulations on being a truly elite Master Workshop Director!"
+            },
+            {
+                min: 14, max: 17,
+                title: "Senior Fabrication Manager",
+                text: "Great performance! You navigated the busy workshop environment with confidence and strong technical knowledge. You handled most structural challenges and emergency situations effectively, ensuring steady output and high quality. A few minor compromises in equipment setup or process timing slightly affected efficiency, but your overall management kept the shop safe and profitable. Keep refining your procedure choices to reach the top level of fabrication excellence!"
+            },
+            {
+                min: 9, max: 13,
+                title: "Developing Team Supervisor",
+                text: "Solid effort! You successfully guided the team through a challenging week and resolved several key production obstacles. However, some decisions prioritized quick fixes over root-cause solutions, leading to minor quality issues and extra maintenance work. Safety protocols were generally respected, but consistent attention to detail in technical procedures will boost your workshop performance. Review your choices and keep building your industrial leadership skills!"
+            },
+            {
+                min: 0, max: 8,
+                title: "Apprentice Workshop Manager",
+                text: "A valuable learning experience! Managing a fabrication shop requires balancing safety, weld quality, and production speed. You faced tough scenarios this week, and several choices led to unexpected delays or equipment issues. Do not be discouraged! Every challenge is an opportunity to improve your technical knowledge and management style. Revisit the vocabulary and practice scenarios to strengthen your confidence for your next workshop shift!"
+            }
+        ];
+
+        // --- UTILITY FUNCTIONS ---
+        // Fisher-Yates Randomization Algorithm
+        function shuffle(array) {
+            let m = array.length, t, i;
+            while (m) {
+                i = Math.floor(Math.random() * m--);
+                t = array[m];
+                array[m] = array[i];
+                array[i] = t;
+            }
+            return array;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('active');
+        }
+
+        // --- SIMULATION ENGINE ---
+        function startSimulation() {
+            score = 0;
+            currentStepKey = "s1";
+            branchS2 = "A"; branchS3 = "A"; branchS4 = "A"; branchS5 = "A"; branchS7 = "A"; branchS8 = "A";
+            isEmergencyActive = false; isBonusActive = false;
+            updateScoreUI();
+            document.getElementById('sim-landing').classList.add('hidden');
+            document.getElementById('sim-debrief').classList.add('hidden');
+            document.getElementById('sim-game').classList.remove('hidden');
+            renderScenario();
+        }
+
+        function updateScoreUI() {
+            document.getElementById('scoreDisplay').innerText = score + " pts";
+        }
+
+        function renderScenario() {
+            const sc = scenarioDB[currentStepKey];
+            document.getElementById('dayDisplay').innerText = sc.time;
+            document.getElementById('scenarioBadge').innerText = sc.badge;
+            document.getElementById('scenarioTitle').innerText = sc.title;
+            document.getElementById('scenarioDesc').innerText = sc.desc;
+
+            const emBadge = document.getElementById('emergencyBadge');
+            if (sc.isEmergency) {
+                emBadge.classList.remove('hidden');
+            } else {
+                emBadge.classList.add('hidden');
+            }
+
+            document.getElementById('feedbackBox').classList.add('hidden');
+            document.getElementById('btnContinue').classList.add('hidden');
+
+            const container = document.getElementById('choicesContainer');
+            container.innerHTML = "";
+
+            // Apply Fisher-Yates Shuffle on copy of choices
+            const shuffledChoices = shuffle([...sc.choices]);
+
+            shuffledChoices.forEach((ch, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "choice-btn w-full text-left p-4 rounded-xl bg-slate-900/90 hover:bg-slate-700/80 border border-slate-700 text-slate-200 text-sm font-medium flex items-start gap-3 shadow";
+                btn.innerHTML = `<span class="w-6 h-6 rounded-full bg-slate-800 text-amber-400 flex items-center justify-center text-xs font-bold shrink-0 border border-slate-700">${String.fromCharCode(65 + idx)}</span> <span class="flex-1">${ch.text}</span>`;
+                btn.onclick = () => handleChoiceSelect(ch, btn);
+                container.appendChild(btn);
+            });
+        }
+
+        function handleChoiceSelect(choice, btnElement) {
+            const sc = scenarioDB[currentStepKey];
+            const fbBox = document.getElementById('feedbackBox');
+            const fbTitle = document.getElementById('feedbackTitle');
+            const fbPts = document.getElementById('feedbackPts');
+            const fbText = document.getElementById('feedbackText');
+
+            // Set feedback box content
+            fbText.innerText = choice.fb;
+            fbBox.classList.remove('hidden', 'bg-emerald-950/40', 'border-emerald-500/40', 'bg-amber-950/40', 'border-amber-500/40', 'bg-rose-950/40', 'border-rose-500/40');
+
+            if (choice.gameOver) {
+                fbTitle.innerText = "💥 FATAL EMERGENCY ERROR";
+                fbTitle.className = "font-bold text-base text-rose-400";
+                fbPts.innerText = "GAME OVER";
+                fbPts.className = "text-xs font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                fbBox.classList.add('bg-rose-950/40', 'border-rose-500/40');
+                
+                // Disable all choice buttons
+                document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+                
+                const btnCont = document.getElementById('btnContinue');
+                btnCont.innerText = "💥 Incident Occurred - Reset Simulation";
+                btnCont.onclick = resetSimulation;
+                btnCont.classList.remove('hidden');
+                return;
+            }
+
+            if (choice.type === "vg") {
+                fbTitle.innerText = "🌟 Very Good Action";
+                fbTitle.className = "font-bold text-base text-emerald-400";
+                fbPts.innerText = "+2 PTS";
+                fbPts.className = "text-xs font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                fbBox.classList.add('bg-emerald-950/40', 'border-emerald-500/40');
+                score += choice.pts;
+                updateBranchLogic(currentStepKey, "vg");
+            } else if (choice.type === "g") {
+                fbTitle.innerText = "👍 Good Action";
+                fbTitle.className = "font-bold text-base text-amber-400";
+                fbPts.innerText = "+1 PT";
+                fbPts.className = "text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30";
+                fbBox.classList.add('bg-amber-950/40', 'border-amber-500/40');
+                score += choice.pts;
+                updateBranchLogic(currentStepKey, "g");
+            } else if (choice.type === "acc") {
+                fbTitle.innerText = "👌 Acceptable Action";
+                fbTitle.className = "font-bold text-base text-slate-300";
+                fbPts.innerText = "+0 PTS";
+                fbPts.className = "text-xs font-bold px-2 py-0.5 rounded bg-slate-700 text-slate-300";
+                fbBox.classList.add('bg-slate-900', 'border-slate-700');
+                score += choice.pts;
+                updateBranchLogic(currentStepKey, "acc");
+            } else if (choice.type === "poor") {
+                fbTitle.innerText = "⚠️ Poor Decision (-1 Pt)";
+                fbTitle.className = "font-bold text-base text-rose-400";
+                fbPts.innerText = "-1 PT";
+                fbPts.className = "text-xs font-bold px-2 py-0.5 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                fbBox.classList.add('bg-rose-950/40', 'border-rose-500/40');
+                score = Math.max(0, score + choice.pts);
+                updateScoreUI();
+                btnElement.disabled = true; // Force choose again!
+                return;
+            }
+
+            updateScoreUI();
+            document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+            const btnCont = document.getElementById('btnContinue');
+            btnCont.innerText = "Continue Shift →";
+            btnCont.onclick = advanceStory;
+            btnCont.classList.remove('hidden');
+        }
+
+        function updateBranchLogic(stepKey, choiceType) {
+            // Branch rules according to prompt:
+            // Scenarios 1, 3, 5, 7: VG or G -> Path A; Acc -> Path B
+            // Scenarios 2, 4, 6, 8: VG -> Path A; G or Acc -> Path B
+            if (stepKey === "s1") {
+                branchS2 = (choiceType === "vg" || choiceType === "g") ? "A" : "B";
+            } else if (stepKey === "s2a" || stepKey === "s2b") {
+                branchS3 = (choiceType === "vg") ? "A" : "B";
+            } else if (stepKey === "s3a" || stepKey === "s3b") {
+                branchS4 = (choiceType === "vg" || choiceType === "g") ? "A" : "B";
+            } else if (stepKey === "s4a" || stepKey === "s4b") {
+                branchS5 = (choiceType === "vg") ? "A" : "B";
+            } else if (stepKey === "s5a" || stepKey === "s5b") {
+                branchS7 = (choiceType === "vg" || choiceType === "g") ? "A" : "B";
+            } else if (stepKey === "s6a" || stepKey === "s6b") {
+                branchS7 = (choiceType === "vg") ? "A" : "B";
+            } else if (stepKey === "s7a" || stepKey === "s7b") {
+                branchS8 = (choiceType === "vg" || choiceType === "g") ? "A" : "B";
+            }
+        }
+
+        function advanceStory() {
+            // Sequence: S1 -> S2 -> S3 -> E1 -> S4 -> S5 -> S6 -> E2 -> S7 -> S8 -> (Bonus if score < 20) -> Debrief
+            if (currentStepKey === "s1") {
+                currentStepKey = branchS2 === "A" ? "s2a" : "s2b";
+            } else if (currentStepKey === "s2a" || currentStepKey === "s2b") {
+                currentStepKey = branchS3 === "A" ? "s3a" : "s3b";
+            } else if (currentStepKey === "s3a" || currentStepKey === "s3b") {
+                currentStepKey = "e1"; // Hazardous Emergency 1 after S3
+            } else if (currentStepKey === "e1") {
+                currentStepKey = branchS4 === "A" ? "s4a" : "s4b";
+            } else if (currentStepKey === "s4a" || currentStepKey === "s4b") {
+                currentStepKey = branchS5 === "A" ? "s5a" : "s5b";
+            } else if (currentStepKey === "s5a" || currentStepKey === "s5b") {
+                currentStepKey = "s6a"; // Friday morning S6
+            } else if (currentStepKey === "s6a" || currentStepKey === "s6b") {
+                currentStepKey = "e2"; // Hazardous Emergency 2 after S6
+            } else if (currentStepKey === "e2") {
+                currentStepKey = branchS7 === "A" ? "s7a" : "s7b";
+            } else if (currentStepKey === "s7a" || currentStepKey === "s7b") {
+                currentStepKey = branchS8 === "A" ? "s8a" : "s8b";
+            } else if (currentStepKey === "s8a" || currentStepKey === "s8b") {
+                if (score < 20) {
+                    currentStepKey = "bonus"; // Conditional Bonus Situation
+                } else {
+                    showDebriefing();
+                    return;
+                }
+            } else if (currentStepKey === "bonus") {
+                showDebriefing();
+                return;
+            }
+
+            renderScenario();
+        }
+
+        function showDebriefing() {
+            document.getElementById('sim-game').classList.add('hidden');
+            document.getElementById('sim-debrief').classList.remove('hidden');
+
+            document.getElementById('finalScoreVal').innerText = score + " / 20";
+
+            const band = debriefBands.find(b => score >= b.min && score <= b.max) || debriefBands[3];
+            document.getElementById('finalRankVal').innerText = band.title;
+            document.getElementById('bandFeedbackText').innerText = band.text;
+        }
+
+        function resetSimulation() {
+            startSimulation();
+        }
+
+        // --- VOCABULARY MATCHING LOGIC ---
+        function initVocabTab() {
+            const container = document.getElementById('vocabContainer');
+            container.innerHTML = "";
+            
+            // Shuffle definitions for column B
+            const shuffledDefs = shuffle([...vocabDB.map(v => v.def)]);
+
+            vocabDB.forEach((item, idx) => {
+                const row = document.createElement('div');
+                row.className = "bg-slate-900/80 p-4 rounded-xl border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4";
+                
+                let selectOptions = `<option value="">-- select definition --</option>`;
+                shuffledDefs.forEach(d => {
+                    selectOptions += `<option value="${d}">${d}</option>`;
+                });
+
+                row.innerHTML = `
+                    <div class="font-bold text-amber-400 text-base md:w-1/4">${idx + 1}. ${item.term}</div>
+                    <div class="md:w-3/4">
+                        <select data-term="${item.term}" data-correct="${item.def}" class="vocab-select w-full bg-slate-800 border border-slate-600 text-slate-200 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                            ${selectOptions}
+                        </select>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function checkVocabAnswers() {
+            const selects = document.querySelectorAll('.vocab-select');
+            let correctCount = 0;
+
+            selects.forEach(sel => {
+                const userVal = sel.value;
+                const correctVal = sel.getAttribute('data-correct');
+                if (userVal === correctVal) {
+                    correctCount++;
+                    sel.className = "vocab-select w-full bg-emerald-950/60 border border-emerald-500 text-emerald-200 rounded-lg p-2.5 text-sm";
+                } else {
+                    sel.className = "vocab-select w-full bg-rose-950/60 border border-rose-500 text-rose-200 rounded-lg p-2.5 text-sm";
+                }
+            });
+
+            const res = document.getElementById('vocabResult');
+            res.classList.remove('hidden', 'bg-emerald-900/40', 'border-emerald-500', 'bg-amber-900/40', 'border-amber-500');
+            if (correctCount === vocabDB.length) {
+                res.className = "p-4 rounded-xl text-center font-bold text-sm bg-emerald-900/40 border border-emerald-500 text-emerald-300";
+                res.innerText = `🎉 Perfect Score! ${correctCount} / ${vocabDB.length} terms correctly matched.`;
+            } else {
+                res.className = "p-4 rounded-xl text-center font-bold text-sm bg-amber-900/40 border border-amber-500 text-amber-300";
+                res.innerText = `You scored ${correctCount} / ${vocabDB.length}. Red fields need correction. Try again!`;
+            }
+        }
+
+        // --- GAP-FILL (CLOZE) LOGIC ---
+        function initClozeTab() {
+            const terms = vocabDB.map(v => v.term);
+            for (let i = 1; i <= 8; i++) {
+                const select = document.getElementById('gap' + i);
+                if (!select) continue;
+                select.innerHTML = `<option value="">-- select --</option>`;
+                shuffle([...terms]).forEach(t => {
+                    select.innerHTML += `<option value="${t}">${t}</option>`;
+                });
+            }
+        }
+
+        function checkClozeAnswers() {
+            const keyMap = {
+                gap1: "Ventilation",
+                gap2: "Protective gear",
+                gap3: "Calibration",
+                gap4: "Procedure",
+                gap5: "Porosity",
+                gap6: "Distortion",
+                gap7: "Consumable",
+                gap8: "Inspection"
+            };
+
+            let correct = 0;
+            for (let i = 1; i <= 8; i++) {
+                const sel = document.getElementById('gap' + i);
+                const correctAns = keyMap['gap' + i];
+                if (sel.value === correctAns) {
+                    correct++;
+                    sel.className = "bg-emerald-950 border border-emerald-500 text-emerald-300 rounded px-2 py-1 text-sm font-semibold mx-1";
+                } else {
+                    sel.className = "bg-rose-950 border border-rose-500 text-rose-300 rounded px-2 py-1 text-sm font-semibold mx-1";
+                }
+            }
+
+            const res = document.getElementById('clozeResult');
+            res.classList.remove('hidden');
+            if (correct === 8) {
+                res.className = "p-4 rounded-xl text-center font-bold text-sm bg-emerald-900/40 border border-emerald-500 text-emerald-300";
+                res.innerText = "🎉 Flawless! All 8 vocabulary blanks completed correctly in context.";
+            } else {
+                res.className = "p-4 rounded-xl text-center font-bold text-sm bg-amber-900/40 border border-amber-500 text-amber-300";
+                res.innerText = `Score: ${correct} / 8 correct. Review highlighted red selections and re-check your text!`;
+            }
+        }
+
+        // --- ON PAGE LOAD INIT ---
+        window.onload = function() {
+            initVocabTab();
+            initClozeTab();
+        };
+    </script>
+</body>
+</html>
