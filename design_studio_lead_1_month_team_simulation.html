@@ -1,0 +1,2008 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Studio Lead - 1-Month Team Simulation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        indigo: {
+                            DEFAULT: '#4f46e5',
+                            light: '#e0e7ff',
+                            dark: '#3730a3'
+                        },
+                        violet: {
+                            DEFAULT: '#7c3aed',
+                            light: '#ede9fe',
+                            dark: '#5b21b6'
+                        },
+                        emerald: {
+                            DEFAULT: '#10b981',
+                            light: '#d1fae5',
+                            dark: '#047857'
+                        },
+                        crimson: {
+                            DEFAULT: '#dc2626',
+                            light: '#fee2e2'
+                        },
+                        slate: {
+                            850: '#1e1b4b',
+                            900: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* 3D Flashcard Flip Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Vocabulary Term Tooltip Styling */
+        .vocab-term {
+            background-color: #ede9fe;
+            color: #5b21b6;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.25rem;
+            border-bottom: 2px solid #7c3aed;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        .vocab-term:hover {
+            background-color: #ddd6fe;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Animations */
+        @keyframes pulse-emergency {
+            0%, 100% { border-color: #dc2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            50% { border-color: #991b1b; box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        }
+
+        .emergency-card {
+            animation: pulse-emergency 2s infinite;
+            border: 3px solid #dc2626 !important;
+        }
+
+        .card-slide {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-indigo-100 selection:text-indigo-900">
+
+    <!-- MAIN HEADER WITH BRANDING & SVG LOGO -->
+    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-30 border-b-4 border-indigo">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            
+            <!-- Branding Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-indigo-light p-1.5 rounded-2xl border-2 border-indigo flex items-center justify-center shadow-inner">
+                    <!-- Inline Vector SVG: Designer at Graphics Tablet -->
+                    <svg class="w-10 h-10 md:w-11 md:h-11 flex-shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="46" fill="#ede9fe" stroke="#7c3aed" stroke-width="3"/>
+                        <!-- Tablet Base -->
+                        <rect x="22" y="38" width="56" height="40" rx="4" fill="#1e1b4b" stroke="#4f46e5" stroke-width="2"/>
+                        <rect x="28" y="43" width="44" height="30" rx="2" fill="#312e81"/>
+                        <!-- Canvas Art Vector Lines -->
+                        <path d="M 32 65 Q 42 48 52 58 T 66 50" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <circle cx="52" cy="58" r="3" fill="#fbbf24"/>
+                        <circle cx="66" cy="50" r="3" fill="#f43f5e"/>
+                        <!-- Stylus Pen & Hand -->
+                        <path d="M 62 30 L 74 44" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+                        <path d="M 60 28 L 64 32 L 72 24 Z" fill="#10b981"/>
+                        <!-- Designer Head Silhouette -->
+                        <circle cx="40" cy="26" r="10" fill="#4f46e5"/>
+                        <path d="M 28 38 C 28 32 34 32 40 32 C 46 32 52 32 52 38" fill="#4f46e5"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg md:text-xl leading-tight tracking-wide text-white flex items-center gap-1.5">
+                        Design Studio<span class="text-indigo-400">Lead</span>
+                    </h1>
+                    <p class="text-xs text-indigo-200 font-medium">1-Month Team Leadership Simulation (Low B1 English)</p>
+                </div>
+            </div>
+
+            <!-- Header Controls & Score -->
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleGlossaryModal()" class="text-xs md:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1 font-semibold">
+                    📖 <span class="hidden sm:inline">Design</span> Glossary
+                </button>
+
+                <button onclick="toggleSound()" id="sound-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-700 transition" title="Toggle Sound Feedback">
+                    🔊
+                </button>
+
+                <div class="bg-slate-950 px-4 py-1.5 rounded-xl border border-indigo/40 text-right shadow-inner">
+                    <span class="text-[10px] uppercase tracking-wider text-indigo-300 font-extrabold block">Leadership Score</span>
+                    <span id="global-score" class="font-mono text-xl font-black text-white">0</span>
+                    <span class="text-xs text-slate-400">/ 50</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB NAVIGATION BAR -->
+        <nav class="bg-slate-950 border-t border-slate-800 px-2 sm:px-4">
+            <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-1">
+                <div class="flex flex-wrap gap-1 py-1" id="tab-buttons-container">
+                    <button onclick="switchTab('discussion')" id="tab-btn-discussion" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-indigo text-white shadow">
+                        💬 1. Warm-Up Discussion
+                    </button>
+                    <button onclick="switchTab('vocabulary')" id="tab-btn-vocabulary" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850">
+                        🎴 2. Studio Vocabulary
+                    </button>
+                    <button onclick="switchTab('truefalse')" id="tab-btn-truefalse" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850">
+                        ✔️ 3. True / False Challenge
+                    </button>
+                    <button onclick="switchTab('simulation')" id="tab-btn-simulation" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850">
+                        🎨 4. Team Lead Simulation
+                    </button>
+                </div>
+
+                <!-- Direct Skip Button -->
+                <button onclick="switchTab('simulation')" class="my-1 text-xs bg-indigo/20 hover:bg-indigo/30 text-indigo-300 font-extrabold px-3 py-1.5 rounded-lg border border-indigo/50 transition flex items-center gap-1 ml-auto">
+                    Skip to Simulation ➔
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow">
+
+        <!-- ========================================================================== -->
+        <!-- TAB 1: WARM-UP DISCUSSION QUESTIONS -->
+        <!-- ========================================================================== -->
+        <section id="tab-discussion" class="card-slide">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-t-8 border-indigo mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-3xl">🗣️</span>
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">Module 1: Design Team Leadership Discussion</h2>
+                        <p class="text-xs md:text-sm text-slate-600">Prepare your management ideas and B1 English speaking phrases before leading your 6 designers.</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 my-6">
+                    <!-- Discussion Question 1 -->
+                    <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:border-indigo transition shadow-sm flex flex-col justify-between">
+                        <div>
+                            <span class="bg-indigo-light text-indigo-900 text-xs font-black uppercase px-2.5 py-1 rounded-md border border-indigo/30 inline-block mb-3">
+                                Question 1 • Task Delegation & Workload
+                            </span>
+                            <h3 class="font-bold text-slate-900 text-base md:text-lg mb-2">
+                                How do you distribute design tasks fairly when managing 6 designers with different skill levels?
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Consider matching tasks to individual strengths (UI, print, motion, branding) and managing deadlines without causing team burnout.
+                            </p>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Useful B1 Leadership Phrases:</span>
+                            <p class="text-xs text-indigo-950 bg-indigo-light/60 p-2 rounded border border-indigo/20 font-medium">
+                                "When delegating tasks, I always consider..." <br>
+                                "To balance the team workload, it is important to..."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Discussion Question 2 -->
+                    <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:border-indigo transition shadow-sm flex flex-col justify-between">
+                        <div>
+                            <span class="bg-violet-light text-violet-dark text-xs font-black uppercase px-2.5 py-1 rounded-md border border-violet/30 inline-block mb-3">
+                                Question 2 • Scope Creep & Client Feedback
+                            </span>
+                            <h3 class="font-bold text-slate-900 text-base md:text-lg mb-2">
+                                What is your strategy when stakeholders request last-minute changes without extending the delivery deadline?
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Think about protecting your team from stress, explaining scope limits politely, and reprioritizing key deliverables.
+                            </p>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Useful B1 Leadership Phrases:</span>
+                            <p class="text-xs text-violet-dark bg-violet-light/60 p-2 rounded border border-violet/20 font-medium">
+                                "To manage scope creep effectively, we should..." <br>
+                                "When giving feedback to designers, I prefer to say..."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Reflection Box -->
+                <div class="bg-slate-900 text-white rounded-2xl p-5 mt-6 shadow-inner">
+                    <label for="discussion-notes" class="block text-sm font-bold text-indigo-300 mb-2 flex items-center gap-2">
+                        📝 Your Leadership Reflection & Strategy Notes (Optional):
+                    </label>
+                    <textarea id="discussion-notes" rows="3" class="w-full bg-slate-800 text-slate-100 text-sm p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-indigo" placeholder="Type key management ideas or English phrases here to prepare for your studio lead simulation..."></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-[11px] text-slate-400">Notes are saved automatically in your browser.</span>
+                        <button onclick="switchTab('vocabulary')" class="bg-indigo hover:bg-indigo-dark text-white font-bold px-4 py-2 rounded-lg text-xs transition">
+                            Next: Studio Vocabulary ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================== -->
+        <!-- TAB 2: STUDIO VOCABULARY (FLASHCARDS & MATCHING GAME) -->
+        <!-- ========================================================================== -->
+        <section id="tab-vocabulary" class="hidden card-slide">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-t-8 border-violet mb-6">
+                
+                <!-- Section Header & Mode Toggle -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-200">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                            🎴 Module 2: Design Leadership Vocabulary
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-600 mt-1">Master 12 essential B1 graphic design management terms using 3D flashcards and a matching game.</p>
+                    </div>
+
+                    <!-- Sub-mode selector -->
+                    <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-stretch sm:self-auto">
+                        <button onclick="setVocabSubTab('flashcards')" id="sub-btn-flashcards" class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition bg-white shadow text-slate-900">
+                            🎴 Flashcards
+                        </button>
+                        <button onclick="setVocabSubTab('matching')" id="sub-btn-matching" class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:text-slate-900">
+                            🧩 Matching Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 2A: 3D FLASHCARDS -->
+                <div id="vocab-sub-flashcards">
+                    <div class="max-w-xl mx-auto">
+                        <!-- Card Counter & Hint -->
+                        <div class="flex justify-between items-center mb-3 text-xs font-bold text-slate-500">
+                            <span id="flashcard-counter">Card 1 of 12</span>
+                            <span class="text-violet-dark bg-violet-light px-2.5 py-0.5 rounded-full border border-violet/30">Click Card to Flip 🔄</span>
+                        </div>
+
+                        <!-- 3D Flip Card Container -->
+                        <div class="perspective-1000 w-full h-80 cursor-pointer" onclick="flipCurrentCard()">
+                            <div id="flashcard-element" class="flashcard w-full h-full">
+                                <div class="flashcard-inner rounded-2xl shadow-xl">
+                                    
+                                    <!-- FRONT OF CARD -->
+                                    <div class="flashcard-front bg-gradient-to-br from-slate-900 to-slate-850 text-white p-6 flex flex-col justify-between border-4 border-indigo">
+                                        <div class="flex justify-between items-center">
+                                            <span class="bg-indigo text-white font-black text-[10px] uppercase px-2.5 py-1 rounded tracking-wider">B1 Design Term</span>
+                                            <span id="card-pos" class="text-xs text-indigo-300 font-mono italic">noun</span>
+                                        </div>
+                                        
+                                        <div class="text-center my-auto">
+                                            <h3 id="card-term" class="text-3xl md:text-4xl font-black text-white tracking-wide">Delegation</h3>
+                                            <p id="card-phonetic" class="text-xs text-slate-400 mt-1 italic">/ˌdɛlɪˈɡeɪʃən/</p>
+                                        </div>
+
+                                        <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-700 text-xs text-slate-300">
+                                            <span class="text-indigo-300 font-bold block mb-0.5">Sample Sentence:</span>
+                                            <p id="card-sentence" class="italic">"Effective delegation allows the team lead to assign web banners to Maya and print ads to Leo."</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- BACK OF CARD -->
+                                    <div class="flashcard-back bg-gradient-to-br from-violet-light to-white text-slate-900 p-6 flex flex-col justify-between border-4 border-indigo">
+                                        <div>
+                                            <span class="bg-violet text-white font-black text-[10px] uppercase px-2.5 py-1 rounded tracking-wider">Definition</span>
+                                            <h4 id="card-back-term" class="text-xl font-black text-violet-dark mt-1">Delegation</h4>
+                                        </div>
+
+                                        <div class="my-auto">
+                                            <p id="card-definition" class="text-base md:text-lg font-bold text-slate-800 leading-snug">
+                                                Assigning specific design tasks and responsibilities to different team members.
+                                            </p>
+                                        </div>
+
+                                        <div class="bg-indigo/10 p-3 rounded-xl border border-indigo/30 text-xs text-slate-800">
+                                            <span class="text-indigo-900 font-extrabold block mb-0.5">Design Studio Context:</span>
+                                            <p id="card-context">"Good delegation matches task difficulty with each designer's skill level."</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Controls -->
+                        <div class="flex justify-between items-center gap-3 mt-6">
+                            <button onclick="prevCard()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2.5 rounded-xl border border-slate-300 text-xs transition flex items-center gap-1">
+                                ⬅️ Previous
+                            </button>
+                            
+                            <button onclick="shuffleCards()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">
+                                🔀 Shuffle Cards
+                            </button>
+
+                            <button onclick="nextCard()" class="bg-indigo hover:bg-indigo-dark text-white font-bold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1">
+                                Next ➡️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 2B: MATCHING GAME -->
+                <div id="vocab-sub-matching" class="hidden">
+                    <div class="flex justify-between items-center mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-700">Click a <strong class="text-indigo-900">Term</strong>, then click its matching <strong class="text-violet-dark">Definition</strong>:</span>
+                        <div class="flex items-center gap-3">
+                            <span id="matching-score-badge" class="bg-emerald text-white font-black text-xs px-3 py-1 rounded-full">Matched: 0 / 12</span>
+                            <button onclick="resetMatchingGame()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-2.5 py-1 rounded-lg">
+                                🔄 Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div class="space-y-2.5" id="match-terms-column"></div>
+                        <div class="space-y-2.5" id="match-defs-column"></div>
+                    </div>
+
+                    <div id="matching-complete-banner" class="hidden bg-emerald-light border-2 border-emerald p-5 rounded-2xl mt-6 text-center card-slide">
+                        <span class="text-4xl block mb-1">🎉</span>
+                        <h3 class="text-xl font-extrabold text-emerald-dark">Studio Vocabulary Mastered!</h3>
+                        <p class="text-xs text-emerald-dark mt-1">You correctly matched all 12 design management terms. Excellent work!</p>
+                        <button onclick="switchTab('truefalse')" class="mt-3 bg-emerald hover:bg-emerald-dark text-white font-bold px-5 py-2 rounded-xl text-xs transition">
+                            Proceed to True / False Challenge ➔
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================================== -->
+        <!-- TAB 3: TRUE / FALSE STATEMENTS CHALLENGE -->
+        <!-- ========================================================================== -->
+        <section id="tab-truefalse" class="hidden card-slide">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-t-8 border-indigo mb-6">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                            ✔️ Module 3: True / False Design Management Concepts
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-600 mt-1">Check your understanding of workplace design leadership rules and team workflow.</p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white px-4 py-2 rounded-xl text-right">
+                        <span class="text-[10px] uppercase font-bold text-indigo-300 block">Challenge Score</span>
+                        <span id="tf-score" class="font-mono text-lg font-black text-white">0 / 8</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="tf-statements-container"></div>
+
+                <div class="mt-8 pt-4 border-t border-slate-200 flex justify-between items-center">
+                    <span class="text-xs text-slate-500">Ready to lead your design team?</span>
+                    <button onclick="switchTab('simulation')" class="bg-emerald hover:bg-emerald-dark text-white font-extrabold px-6 py-3 rounded-xl text-sm shadow-md hover:shadow-lg transition flex items-center gap-2">
+                        🎨 Start 1-Month Team Simulation Game ➔
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================================== -->
+        <!-- TAB 4: 1-MONTH DESIGN LEAD SIMULATION GAME -->
+        <!-- ========================================================================== -->
+        <section id="tab-simulation" class="hidden">
+            
+            <!-- INTRO SCREEN FOR GAME -->
+            <div id="screen-intro" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border-t-8 border-slate-900 card-slide">
+                <div class="flex flex-col md:flex-row items-center gap-6 mb-6">
+                    <div class="bg-indigo-light p-5 rounded-2xl border-2 border-indigo flex-shrink-0 text-center flex flex-col items-center justify-center">
+                        <span class="text-5xl">🎨</span>
+                        <span class="text-xs font-black text-indigo-900 mt-1 uppercase">Design Lead</span>
+                    </div>
+                    <div>
+                        <span class="bg-indigo-light text-indigo-900 font-bold text-xs uppercase px-3 py-1 rounded-full tracking-wider border border-indigo/30">Graphic Design Team Leader</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2">Welcome to Your 1-Month Studio Simulation!</h2>
+                        <p class="text-slate-600 mt-2 text-sm md:text-base leading-relaxed">
+                            You are the <strong>Lead Graphic Designer</strong> in charge of a talented team of 6 designers: <strong>Maya</strong> (UI/UX), <strong>Leo</strong> (Print & Packaging), <strong>Sam</strong> (Illustration), <strong>Elena</strong> (Branding), <strong>Ben</strong> (Junior Designer), and <strong>Chloe</strong> (Motion & Social Media).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4 my-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-indigo font-bold text-sm flex items-center gap-1.5">📅 1 Month Chronological Flow</div>
+                        <p class="text-xs text-slate-600 mt-1">Lead a major company product rebrand from initial brief to final launch across 4 business weeks.</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-slate-900 font-bold text-sm flex items-center gap-1.5">👥 12 Realistic Leadership Decisions</div>
+                        <p class="text-xs text-slate-600 mt-1">Manage delegation, scope creep, pre-press quality, constructive critique, and burnout.</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-crimson font-bold text-sm flex items-center gap-1.5">🚨 2 High-Stakes Emergencies</div>
+                        <p class="text-xs text-slate-600 mt-1">Act fast during urgent copyright font risks and last-minute executive direction changes!</p>
+                    </div>
+                </div>
+
+                <div class="bg-indigo-light border-l-4 border-indigo p-4 rounded-r-xl mb-6 text-sm text-indigo-950">
+                    <p class="font-bold flex items-center gap-1.5 mb-1">
+                        💡 Interactive B1 Design Vocabulary:
+                    </p>
+                    <p class="text-xs md:text-sm">
+                        Click any highlighted term like <span class="vocab-term" onclick="openGlossaryTerm('delegation')">delegation</span> or <span class="vocab-term" onclick="openGlossaryTerm('scope creep')">scope creep</span> throughout the scenario to view instant definitions.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="beginGame()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 text-base">
+                        🚀 Begin 1-Month Studio Simulation
+                    </button>
+                    <button onclick="confirmReset()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 px-5 rounded-xl border border-slate-300 transition text-sm">
+                        🔄 Restart Fresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- MAIN SCENARIO INTERFACE -->
+            <div id="screen-main" class="hidden card-slide">
+                
+                <!-- Timeline & Phase Banner -->
+                <div id="step-banner" class="bg-slate-900 text-white p-4.5 rounded-2xl shadow-md mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-l-8 border-indigo">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="timeline-badge" class="bg-indigo text-white font-black text-xs px-2.5 py-0.5 rounded uppercase tracking-wider">
+                                WEEK 1 • DAY 1
+                            </span>
+                            <span id="phase-badge" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                                Project Brief & Setup
+                            </span>
+                        </div>
+                        <h2 id="question-title" class="text-xl font-extrabold mt-1 text-white">
+                            Decision Title
+                        </h2>
+                    </div>
+                    <div id="emergency-indicator" class="hidden">
+                        <span class="bg-crimson text-white font-black text-xs px-3 py-1 rounded-full animate-pulse flex items-center gap-1 shadow">
+                            🚨 CRITICAL STUDIO EMERGENCY
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Scenario Card -->
+                <div class="bg-white rounded-2xl shadow-md p-6 mb-6 border border-slate-200" id="scenario-card">
+                    <p id="question-text" class="text-slate-800 text-base md:text-lg leading-relaxed font-normal">
+                        Scenario narrative goes here...
+                    </p>
+                </div>
+
+                <!-- Options Grid -->
+                <div class="space-y-3 mb-6" id="options-grid"></div>
+
+                <!-- Feedback Result Box -->
+                <div id="result-feedback" class="hidden bg-white rounded-2xl p-6 shadow-lg border-l-8 border-slate-300 transition-all duration-300 mb-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="point-tag" class="px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider">
+                            +4 Points
+                        </span>
+                        <span id="feedback-rating" class="text-sm font-bold text-slate-800">Excellent Leadership Response!</span>
+                    </div>
+                    <p id="feedback-msg" class="text-slate-700 text-sm md:text-base leading-relaxed mt-2">
+                        Feedback text goes here...
+                    </p>
+                </div>
+
+                <!-- Navigation Action Bar -->
+                <div id="nav-action-bar" class="hidden flex justify-end">
+                    <button id="next-step-btn" class="w-full sm:w-auto bg-emerald hover:bg-emerald-dark text-white font-black py-3.5 px-8 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 text-base">
+                        Continue to Next Scenario ➔
+                    </button>
+                </div>
+            </div>
+
+            <!-- END OF MONTH EVALUATION SCREEN -->
+            <div id="screen-end" class="hidden card-slide">
+                <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border-t-8 border-emerald">
+                    <div class="text-center max-w-xl mx-auto">
+                        <div class="bg-indigo-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-indigo">
+                            <span class="text-3xl">🎨</span>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Month-End Studio Leadership Review</h2>
+                        <p class="text-slate-600 text-sm mt-1">Here is your official evaluation as Lead Graphic Designer managing 6 team members.</p>
+
+                        <!-- Final Score Box -->
+                        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 my-6 shadow-inner">
+                            <div class="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Total Cumulative Leadership Score</div>
+                            <div id="final-total" class="text-4xl md:text-5xl font-black text-slate-900 my-1 font-mono">0 / 50</div>
+                            <div id="final-percentage" class="text-xs font-extrabold text-emerald-dark">0% Success Rate</div>
+                        </div>
+
+                        <!-- Rank Evaluation Box -->
+                        <div id="evaluation-box" class="p-6 rounded-2xl mb-6 text-left shadow-sm"></div>
+
+                        <!-- Vocabulary Review Summary -->
+                        <div class="bg-slate-50 rounded-xl p-4 text-left border border-slate-200 mb-6">
+                            <h4 class="font-bold text-slate-900 text-sm mb-2 flex items-center gap-1">
+                                🎓 Key Design Leadership Vocabulary Covered This Month:
+                            </h4>
+                            <div class="flex flex-wrap gap-1.5 text-xs">
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">delegation</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">workload</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">deadline</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">feedback</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">scope creep</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">assets</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">copyright</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">deliverables</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">brief</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">brand guidelines</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">review</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">burnout</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button onclick="clearSaveAndRestart()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition text-base">
+                                🔄 Play Month 1 Simulation Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-100 border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span class="flex items-center gap-1 font-medium">© Design Studio Lead • Workplace English Simulation</span>
+            <span>Target Level: Low B1 / Strong A2 English Learners</span>
+        </div>
+    </footer>
+
+    <!-- GAME OVER FATAL MODAL -->
+    <div id="game-over-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border-t-8 border-crimson card-slide">
+            <span class="text-6xl block mb-2">💥</span>
+            <span class="bg-crimson-light text-crimson font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider">Critical Management Failure</span>
+            <h3 class="text-2xl font-black text-slate-900 mt-2">Project Canceled - Game Over</h3>
+            <p id="game-over-msg" class="text-slate-600 text-sm mt-3 leading-relaxed">
+                A critical mistake ruined the project launch and exposed the company to severe risk!
+            </p>
+            <div class="bg-red-50 p-3 rounded-xl text-red-900 text-xs font-semibold my-4 border border-red-200">
+                ⚠️ Emergency Rule: Ignoring copyright laws or arguing aggressively with executive directors causes immediate campaign failure.
+            </div>
+            <button onclick="clearSaveAndRestart()" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
+                🔁 Restart Simulation
+            </button>
+        </div>
+    </div>
+
+    <!-- GLOSSARY MODAL -->
+    <div id="glossary-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[85vh] flex flex-col shadow-2xl card-slide">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+                <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                    📖 Design Studio Vocabulary Guide (B1 Level)
+                </h3>
+                <button onclick="toggleGlossaryModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2">
+                    &times;
+                </button>
+            </div>
+            
+            <div class="overflow-y-auto py-4 space-y-3 text-sm flex-grow pr-1" id="glossary-list"></div>
+
+            <div class="pt-3 border-t border-slate-200 text-right">
+                <button onclick="toggleGlossaryModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2 rounded-lg text-xs">
+                    Close Guide
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESET CONFIRMATION MODAL -->
+    <div id="reset-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border-t-4 border-indigo">
+            <h3 class="text-lg font-bold text-slate-900">Restart Simulation?</h3>
+            <p class="text-xs text-slate-600 mt-2">Are you sure you want to restart? Your current score and progress will be reset.</p>
+            <div class="flex gap-2 mt-5">
+                <button onclick="clearSaveAndRestart()" class="w-full bg-indigo hover:bg-indigo-dark text-white font-bold py-2 rounded-lg text-xs shadow">
+                    Yes, Restart
+                </button>
+                <button onclick="closeResetModal()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-2 rounded-lg text-xs">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ==========================================================================
+   12 ESSENTIAL GRAPHIC DESIGN LEADERSHIP VOCABULARY ITEMS
+   ========================================================================== */
+const flashcardsData = [
+    {
+        id: 1,
+        term: "Delegation",
+        pos: "noun",
+        phonetic: "/ˌdɛlɪˈɡeɪʃən/",
+        sentence: "Effective delegation allows the team lead to assign web banners to Maya and print ads to Leo.",
+        definition: "Assigning specific design tasks and responsibilities to different team members.",
+        context: "Good delegation matches task difficulty with each designer's skill level."
+    },
+    {
+        id: 2,
+        term: "Workload",
+        pos: "noun",
+        phonetic: "/ˈwɜːklaʊd/",
+        sentence: "The team lead checks designer workload every Monday to ensure nobody feels overwhelmed.",
+        definition: "The total amount of work and tasks assigned to a designer or team.",
+        context: "Balancing workload prevents stress and maintains high graphic quality."
+    },
+    {
+        id: 3,
+        term: "Deadline",
+        pos: "noun",
+        phonetic: "/ˈdɛdlaɪn/",
+        sentence: "The print deadline for the catalog is Friday at 5:00 PM.",
+        definition: "The exact date or time by which a design project must be finished.",
+        context: "Meeting print deadlines is critical because commercial printers charge late fees."
+    },
+    {
+        id: 4,
+        term: "Feedback",
+        pos: "noun",
+        phonetic: "/ˈfiːdbæk/",
+        sentence: "During design reviews, the lead gives constructive feedback to help designers improve.",
+        definition: "Helpful comments and suggestions about a design to make it better.",
+        context: "Giving clear feedback helps designers revise layouts quickly without confusion."
+    },
+    {
+        id: 5,
+        term: "Scope Creep",
+        pos: "noun",
+        phonetic: "/skəʊp kriːp/",
+        sentence: "Marketing keeps requesting extra icon designs, causing scope creep.",
+        definition: "Unplanned extra work added to a project without extending the deadline or budget.",
+        context: "A design lead must control scope creep to protect team schedules."
+    },
+    {
+        id: 6,
+        term: "Assets",
+        pos: "noun (plural)",
+        phonetic: "/ˈæsɛts/",
+        sentence: "Save high-resolution image assets in the shared team drive.",
+        definition: "Digital files used in design work, such as logos, fonts, icons, and photos.",
+        context: "Organized asset folders allow designers to find logos and illustrations fast."
+    },
+    {
+        id: 7,
+        term: "Copyright",
+        pos: "noun",
+        phonetic: "/ˈkɒpiraɪt/",
+        sentence: "Always verify font copyright licenses before launching a commercial campaign.",
+        definition: "The legal right to publish, use, or sell creative work, images, or typography.",
+        context: "Using commercial assets without a copyright license causes legal lawsuits."
+    },
+    {
+        id: 8,
+        term: "Deliverables",
+        pos: "noun (plural)",
+        phonetic: "/dɪˈlɪvərəblz/",
+        sentence: "The campaign deliverables include 5 web banners, 2 print posters, and 3 video ads.",
+        definition: "The final completed design files handed over to clients or printers.",
+        context: "Final deliverables must be formatted in correct CMYK or RGB color modes."
+    },
+    {
+        id: 9,
+        term: "Brief",
+        pos: "noun",
+        phonetic: "/briːf/",
+        sentence: "The marketing director provided a clear project brief explaining the rebrand goals.",
+        definition: "A document detailing project requirements, audience, goals, and style guidelines.",
+        context: "Reading the brief carefully ensures designers do not waste time on wrong concepts."
+    },
+    {
+        id: 10,
+        term: "Brand Guidelines",
+        pos: "noun (plural)",
+        phonetic: "/brænd ˈɡaɪdlaɪnz/",
+        sentence: "Check the brand guidelines for official brand colors and logo spacing rules.",
+        definition: "Rules explaining how a company's visual identity (colors, fonts, logo) must be used.",
+        context: "Following brand guidelines keeps company designs consistent everywhere."
+    },
+    {
+        id: 11,
+        term: "Review",
+        pos: "noun / verb",
+        phonetic: "/rɪˈvjuː/",
+        sentence: "We schedule a daily design review at 10 AM to inspect work in progress.",
+        definition: "Inspecting and evaluating design drafts before sending them to clients.",
+        context: "Design reviews catch typos and layout errors before final printing."
+    },
+    {
+        id: 12,
+        term: "Burnout",
+        pos: "noun",
+        phonetic: "/ˈbɜːnaʊt/",
+        sentence: "Working 14-hour days causes creative burnout and lowers design quality.",
+        definition: "Physical and mental exhaustion caused by continuous stress and long working hours.",
+        context: "Good team leads protect designers from burnout by managing realistic timelines."
+    }
+];
+
+/* ==========================================================================
+   8 TRUE / FALSE STATEMENTS (DESIGN LEADERSHIP)
+   ========================================================================== */
+const trueFalseData = [
+    {
+        id: 1,
+        statement: "'Delegation' means doing all 6 designers' visual tasks by yourself to ensure perfect quality.",
+        isTrue: false,
+        explanation: "False! Delegation means assigning tasks to team members based on their specific strengths."
+    },
+    {
+        id: 2,
+        statement: "A 'project brief' defines campaign goals, target audience, and required design deliverables.",
+        isTrue: true,
+        explanation: "True! A design brief gives clear direction before creative work begins."
+    },
+    {
+        id: 3,
+        statement: "'Scope creep' happens when clients continuously add unapproved extra designs to a project.",
+        isTrue: true,
+        explanation: "True! Scope creep expands workload without adding extra time or budget."
+    },
+    {
+        id: 4,
+        statement: "It is acceptable to use any commercial stock font without checking its copyright license.",
+        isTrue: false,
+        explanation: "False! Using unlicensed fonts or stock images exposes the company to severe legal lawsuits."
+    },
+    {
+        id: 5,
+        statement: "CMYK color mode is used for print deliverables, while RGB color mode is for web screens.",
+        isTrue: true,
+        explanation: "True! Print production requires CMYK, whereas digital displays render in RGB."
+    },
+    {
+        id: 6,
+        statement: "Giving constructive feedback means pointing out mistakes without suggesting solutions.",
+        isTrue: false,
+        explanation: "False! Constructive feedback explains what to improve and offers positive guidance."
+    },
+    {
+        id: 7,
+        statement: "'Burnout' is caused by long-term workplace stress and continuous overtime.",
+        isTrue: true,
+        explanation: "True! Team leaders must monitor workload to protect designers from exhaustion."
+    },
+    {
+        id: 8,
+        statement: "Brand guidelines are flexible suggestions that designers can ignore whenever they want.",
+        isTrue: false,
+        explanation: "False! Brand guidelines must be followed strictly to maintain visual identity consistency."
+    }
+];
+
+/* ==========================================================================
+   CHRONOLOGICAL 1-MONTH NARRATIVE SIMULATION DATA (12 DECISIONS + 2 EMERGENCIES)
+   ========================================================================== */
+const gameData = {
+    d1: {
+        title: "Analyzing the Product Rebrand Brief",
+        timeline: "WEEK 1 • DAY 1",
+        phase: "Brief & Setup Phase",
+        text: "You receive a major 100-page project <span class='vocab-term' onclick='openGlossaryTerm(\"brief\")'>brief</span> for the company's annual product rebrand. You lead 6 designers. What is your first step to launch the project?",
+        choices: [
+            {
+                text: "Hold a 30-minute team kick-off meeting to review goals, clarify target audience, and outline the master schedule.",
+                pts: 4,
+                fb: "Excellent! Aligning the whole team around project goals ensures a shared creative vision from Day 1."
+            },
+            {
+                text: "Read the brief alone and email separate task lists to each of the 6 designers without a meeting.",
+                pts: 3,
+                fb: "Good effort. Emailing tasks works, but holding a kick-off meeting builds team collaboration."
+            },
+            {
+                text: "Forward the raw PDF brief to all designers and tell them to start designing whatever they prefer.",
+                pts: 2,
+                fb: "Neutral. Without clear direction, designers will create inconsistent concepts."
+            },
+            {
+                text: "Ignore the brief and start designing layout templates yourself in Photoshop.",
+                pts: 1,
+                fb: "Weak strategy. As team lead, your primary job is project guidance and delegation, not doing all tasks alone."
+            },
+            {
+                text: "Tell the marketing director that 100 pages is too long to read and ask for a 1-sentence summary.",
+                pts: -1,
+                fb: "Bad choice! Refusing to read official project documentation looks unprofessional."
+            }
+        ],
+        next: "d2"
+    },
+    d2: {
+        title: "Smart Task Delegation Across 6 Designers",
+        timeline: "WEEK 1 • DAY 3",
+        phase: "Delegation Phase",
+        text: "You must assign initial tasks across your team: Maya (UI), Leo (Print), Sam (Illustration), Elena (Branding), Ben (Junior), and Chloe (Motion). How do you manage <span class='vocab-term' onclick='openGlossaryTerm(\"delegation\")'>delegation</span>?",
+        choices: [
+            {
+                text: "Assign packaging to Leo, web UI to Maya, brand logo rules to Elena, social video to Chloe, icons to Sam, and asset resizing to Ben.",
+                pts: 4,
+                fb: "Masterful delegation! Matching specific design strengths to tasks optimizes studio output."
+            },
+            {
+                text: "Ask designers to vote on which tasks they like best and divide the remaining work equally.",
+                pts: 3,
+                fb: "Good approach! Giving designers personal choice boosts motivation, though skill matching is still key."
+            },
+            {
+                text: "Give all complex packaging design work to Junior Designer Ben to test his speed under pressure.",
+                pts: 2,
+                fb: "Risky. Overwhelming junior staff with high-risk packaging causes errors and stress."
+            },
+            {
+                text: "Assign all 15 campaign deliverables to senior designers and give Ben zero work.",
+                pts: 1,
+                fb: "Weak management. Leaving junior designers with no tasks wastes team capacity."
+            },
+            {
+                text: "Pick task assignments randomly out of a hat without considering designer skills.",
+                pts: -1,
+                fb: "Bad choice! Random delegation leads to delayed deadlines and poor quality."
+            }
+        ],
+        next: "d3"
+    },
+    d3: {
+        title: "Aligning First Concepts with Brand Guidelines",
+        timeline: "WEEK 1 • DAY 5",
+        phase: "Concept Review Phase",
+        text: "Elena and Sam present initial brand visual concepts. Elena's design follows <span class='vocab-term' onclick='openGlossaryTerm(\"brand guidelines\")'>brand guidelines</span>, but Sam's illustrations use unapproved bright colors. How do you respond during <span class='vocab-term' onclick='openGlossaryTerm(\"review\")'>review</span>?",
+        choices: [
+            {
+                text: "Praise Sam's creativity, explain the brand color rules gently, and guide him to adapt his illustrations to the official palette.",
+                pts: 4,
+                fb: "Outstanding leadership! Encouraging creative energy while enforcing brand rules maintains team morale."
+            },
+            {
+                text: "Approve Sam's unapproved colors for the entire campaign without asking executive approval.",
+                pts: 3,
+                fb: "Risky. Innovative colors can work, but violating brand guidelines without stakeholder approval causes rework."
+            },
+            {
+                text: "Reject Sam's work completely in front of the team and tell him to restart from scratch.",
+                pts: 2,
+                fb: "Suboptimal feedback style. Harsh rejection damages designer confidence."
+            },
+            {
+                text: "Quietly re-color Sam's files yourself after work without telling him.",
+                pts: 1,
+                fb: "Weak leadership. Fixing files secretly prevents your team member from learning."
+            },
+            {
+                text: "Cancel Sam's illustration tasks and ban him from the project.",
+                pts: -1,
+                fb: "Bad choice! Overreacting to initial creative drafts creates a toxic work culture."
+            }
+        ],
+        next: "d4"
+    },
+    d4: {
+        title: "Controlling Scope Creep from Marketing",
+        timeline: "WEEK 2 • DAY 8",
+        phase: "Scope Creep Control",
+        text: "Marketing requests 12 additional social media ad sizes mid-project without extending Friday's <span class='vocab-term' onclick='openGlossaryTerm(\"deadline\")'>deadline</span>. This is classic <span class='vocab-term' onclick='openGlossaryTerm(\"scope creep\")'>scope creep</span>. How do you manage this?",
+        choices: [
+            {
+                text: "Negotiate politely: agree to supply the 4 core ad formats by Friday, and schedule the remaining 8 formats for Phase 2 next week.",
+                pts: 4,
+                fb: "Brilliant boundary management! Protecting team capacity while offering realistic delivery phases satisfies stakeholders."
+            },
+            {
+                text: "Accept all 12 new ad sizes and ask Chloe to work 4 extra hours of overtime every night.",
+                pts: 3,
+                fb: "Acceptable short-term solution, but forcing heavy overtime risks team burnout."
+            },
+            {
+                text: "Refuse the request aggressively and tell marketing that design leads do not take orders.",
+                pts: 2,
+                fb: "Unprofessional tone. Setting boundaries is necessary, but hostile communication damages department trust."
+            },
+            {
+                text: "Accept the extra work silently without telling your team until Thursday afternoon.",
+                pts: 1,
+                fb: "Weak communication. Surprising team members with last-minute tasks creates panic."
+            },
+            {
+                text: "Delete marketing's email request and pretend you never received it.",
+                pts: -1,
+                fb: "Bad choice! Ignoring official stakeholder requests leads to executive reprimands."
+            }
+        ],
+        next: "e1"
+    },
+    e1: {
+        title: "Unlicensed Font & Stock Asset Crisis",
+        timeline: "WEEK 2 • DAY 11",
+        phase: "EMERGENCY 1",
+        isEmergency: true,
+        text: "🚨 <strong>URGENT COPYRIGHT CRISIS!</strong> Junior designer Ben downloaded an unlicensed commercial font for 50,000 product boxes going to commercial press in 3 hours! The font owner sends a legal cease-and-desist warning regarding <span class='vocab-term' onclick='openGlossaryTerm(\"copyright\")'>copyright</span>. How do you act?",
+        choices: [
+            {
+                text: "Immediately pause press production, purchase the official commercial desktop license online for $150, and verify license documentation before restarting the press run.",
+                type: "good",
+                pts: 2,
+                fb: "EMERGENCY RESOLVED! Purchasing legal licenses immediately protected the company from massive legal lawsuits (+2 Points)."
+            },
+            {
+                text: "Halt print production, replace the unlicensed font with an open-source Google Font alternative in pre-press, and re-export PDFs.",
+                type: "good",
+                pts: 1,
+                fb: "EMERGENCY RESOLVED! Replacing unlicensed fonts with legal open-source alternatives avoided legal risk (+1 Point)."
+            },
+            {
+                text: "Tell the printer to proceed with printing anyway and hope the font owner never notices 50,000 boxes.",
+                type: "bad",
+                gameOver: true,
+                fb: "GAME OVER! Printing with stolen font licenses caused a severe legal lawsuit. Executive leadership terminated the project!"
+            }
+        ],
+        next: "d5"
+    },
+    d5: {
+        title: "Constructive Feedback & Defensive Designers",
+        timeline: "WEEK 2 • DAY 13",
+        phase: "Feedback Session",
+        text: "During a visual check, you notice Maya's UI layout lacks proper whitespace contrast. When you give <span class='vocab-term' onclick='openGlossaryTerm(\"feedback\")'>feedback</span>, she becomes defensive: 'I like it this way!' How do you handle this?",
+        choices: [
+            {
+                text: "Use the 'Sandwich Method': compliment her visual style, explain accessibility standards with visual examples, and invite her input on adjustments.",
+                pts: 4,
+                fb: "Excellent communication! Objective guidelines and constructive dialogue resolve creative defensiveness."
+            },
+            {
+                text: "Show her user research metrics proving that higher contrast layouts increase mobile user conversion.",
+                pts: 3,
+                fb: "Very good! Data-driven explanations reduce personal arguments about design."
+            },
+            {
+                text: "Override her authority instantly and order her to change the layout without explanation.",
+                pts: 2,
+                fb: "Suboptimal. Dictatorial commands create resentment in senior designers."
+            },
+            {
+                text: "Back down immediately to avoid conflict and approve the low-contrast design.",
+                pts: 1,
+                fb: "Weak leadership. Avoiding feedback compromises final product quality."
+            },
+            {
+                text: "Tell Maya that if she dislikes critique she should change careers.",
+                pts: -1,
+                fb: "Bad choice! Insulting team members damages studio culture."
+            }
+        ],
+        next: "d6"
+    },
+    d6: {
+        title: "Asset Management & File Organization",
+        timeline: "WEEK 2 • DAY 15",
+        phase: "Asset Management",
+        text: "Designers are saving vector <span class='vocab-term' onclick='openGlossaryTerm(\"assets\")'>assets</span> on local desktop folders instead of the cloud drive, causing missing links in Leo's print catalog files. How do you solve this?",
+        choices: [
+            {
+                text: "Establish a standard studio folder structure (Banners, Print, Fonts, Logos) and mandate cloud file packaging before daily sign-off.",
+                pts: 4,
+                fb: "Standardizing asset organization prevents lost files and pre-press errors."
+            },
+            {
+                text: "Assign Junior Designer Ben to collect and re-organize all team desktop files every afternoon.",
+                pts: 3,
+                fb: "Helpful task delegation, though building automated cloud habits across the entire team is better."
+            },
+            {
+                text: "Remind the team in Slack to organize their files when they have free time.",
+                pts: 2,
+                fb: "Neutral. Informal Slack reminders are easily forgotten during busy deadlines."
+            },
+            {
+                text: "Re-create all missing image assets yourself late at night.",
+                pts: 1,
+                fb: "Inefficient. Fixing team file habits is better than re-doing work yourself."
+            },
+            {
+                text: "Lock all designers out of server drives until they memorize file names.",
+                pts: -1,
+                fb: "Bad choice! Extreme punishments disrupt studio productivity."
+            }
+        ],
+        next: "d7"
+    },
+    d7: {
+        title: "Pre-Press Quality Checks & Preflighting",
+        timeline: "WEEK 3 • DAY 18",
+        phase: "Quality Check Phase",
+        text: "Leo completes final print catalog files. Before sending them to commercial printing, you perform a quality <span class='vocab-term' onclick='openGlossaryTerm(\"review\")'>review</span>. You find 72 DPI low-resolution RGB images in the pre-press file. What do you do?",
+        choices: [
+            {
+                text: "Flag the issue to Leo, guide him to replace low-res RGB files with 300 DPI CMYK vector/TIFF assets, and run a final Adobe Preflight check.",
+                pts: 4,
+                fb: "Perfect technical preflighting! Catching resolution and CMYK errors prevents expensive print re-runs."
+            },
+            {
+                text: "Convert the 72 DPI low-res images to CMYK automatically and send to the printer without replacing source files.",
+                pts: 3,
+                fb: "Acceptable color mode fix, but low-resolution 72 DPI images will still appear blurry in print."
+            },
+            {
+                text: "Send the files directly to the printing company and rely on their pre-press team to fix errors.",
+                pts: 2,
+                fb: "Risky. Commercial printers charge expensive hourly fees to correct client file errors."
+            },
+            {
+                text: "Approve the blurry print proof to meet the delivery deadline on time.",
+                pts: 1,
+                fb: "Weak quality control. Delivering pixelated print catalogs hurts brand reputation."
+            },
+            {
+                text: "Blame Leo publicly in front of executive management for not knowing CMYK rules.",
+                pts: -1,
+                fb: "Bad choice! Publicly shaming team members destroys trust."
+            }
+        ],
+        next: "e2"
+    },
+    e2: {
+        title: "Last-Minute Executive Strategy Pivot",
+        timeline: "WEEK 3 • DAY 21",
+        phase: "EMERGENCY 2",
+        isEmergency: true,
+        text: "🚨 <strong>ALERT!</strong> 12 hours before the digital campaign launch, the Chief Marketing Officer changes the main slogan and requests a new visual theme! The team is exhausted. How do you lead your 6 designers through this crisis?",
+        choices: [
+            {
+                text: "Gather the team for a 15-minute emergency huddle, focus only on updating master template components in Figma/Illustrator, divide slogan updates among 6 designers, and order dinner for the team.",
+                type: "good",
+                pts: 2,
+                fb: "CRISIS RESOLVED! Using master components allowed rapid multi-asset updates while keeping team morale steady (+2 Points)."
+            },
+            {
+                text: "Negotiate with the CMO to delay digital launch by 24 hours to ensure high design quality without causing team burnout.",
+                type: "good",
+                pts: 1,
+                fb: "CRISIS RESOLVED! Negotiating a short deadline extension protected design quality and team health (+1 Point)."
+            },
+            {
+                text: "Refuse the CMO's request angrily over the phone, stating that designs cannot be changed after approval.",
+                type: "bad",
+                gameOver: true,
+                fb: "GAME OVER! Hostile refusal to accommodate executive leadership caused the CMO to cancel the design studio contract!"
+            }
+        ],
+        next: "d8"
+    },
+    d8: {
+        title: "Resolving Interpersonal Team Conflict",
+        timeline: "WEEK 3 • DAY 23",
+        phase: "Team Conflict Phase",
+        text: "Senior designers Leo and Elena get into a heated argument over who owns final visual approval for campaign packaging icons. Studio tension is high. How do you mediate?",
+        choices: [
+            {
+                text: "Host a private 1-on-1 meeting with both designers, clarify clear role boundaries (Elena owns brand system rules; Leo owns packaging layout), and establish a collaborative approval workflow.",
+                pts: 4,
+                fb: "Outstanding conflict resolution! Clarifying role boundaries removes personal friction."
+            },
+            {
+                text: "Make the decision yourself quickly in private and tell them both to stop talking about it.",
+                pts: 3,
+                fb: "Decisive leadership, though mediating mutual understanding prevents future conflict better."
+            },
+            {
+                text: "Tell them to figure it out between themselves because team leads should not deal with personal drama.",
+                pts: 2,
+                fb: "Suboptimal. Ignoring workplace conflict allows resentment to grow."
+            },
+            {
+                text: "Side with Senior Designer Elena publicly because she has been with the company longer.",
+                pts: 1,
+                fb: "Weak management. Showing favoritism damages team unity."
+            },
+            {
+                text: "Re-assign both designers to lower positions as punishment.",
+                pts: -1,
+                fb: "Bad choice! Punishing team members for expressing creative opinions ruins morale."
+            }
+        ],
+        next: "d9"
+    },
+    d9: {
+        title: "Preventing Overtime & Team Burnout",
+        timeline: "WEEK 3 • DAY 25",
+        phase: "Burnout Prevention",
+        text: "After 3 late-night launch shifts, Sam and Chloe show clear signs of exhaustion and creative <span class='vocab-term' onclick='openGlossaryTerm(\"burnout\")'>burnout</span>. They still have minor graphic tweaks left. How do you manage team well-being?",
+        choices: [
+            {
+                text: "Re-distribute minor asset tweaking to less busy team members, enforce mandatory on-time departure today, and thank them for their dedication.",
+                pts: 4,
+                fb: "Compassionate leadership! Protecting your team from burnout ensures long-term studio retention."
+            },
+            {
+                text: "Give Sam and Chloe half a day off tomorrow morning while you cover urgent final asset exports yourself.",
+                pts: 3,
+                fb: "Great leadership empathy! Providing rest boosts team loyalty."
+            },
+            {
+                text: "Offer energy drinks and encourage them to push through 4 more hours of late-night work.",
+                pts: 2,
+                fb: "Suboptimal. Pushing exhausted designers leads to costly typos and mistakes."
+            },
+            {
+                text: "Tell them that creative burnout is part of working in design and everybody must suffer.",
+                pts: 1,
+                fb: "Weak empathy. Dismissing fatigue leads to high staff turnover."
+            },
+            {
+                text: "Deduct salary pay for every hour a designer asks to rest.",
+                pts: -1,
+                fb: "Bad choice! Illegal and unethical treatment of staff."
+            }
+        ],
+        next: "d10"
+    },
+    d10: {
+        title: "Executive Presentation of Final Deliverables",
+        timeline: "WEEK 4 • DAY 26",
+        phase: "Executive Presentation",
+        text: "You present all final rebrand <span class='vocab-term' onclick='openGlossaryTerm(\"deliverables\")'>deliverables</span> to executive stakeholders. The CEO asks: 'Why did we choose this minimalist visual identity?' How do you present the work?",
+        choices: [
+            {
+                text: "Explain how minimalist design improves mobile page loading speed by 40%, enhances brand recall, and connects with target customer survey data.",
+                pts: 4,
+                fb: "Masterclass presentation! Connecting design aesthetics directly to business goals impresses C-suite executives."
+            },
+            {
+                text: "Invite Maya and Elena to present their specific UI and branding slides during the meeting to share team spotlight.",
+                pts: 3,
+                fb: "Excellent leadership! Highlighting team members' work builds strong internal morale."
+            },
+            {
+                text: "Tell the CEO that minimalist layouts are trendy on Instagram right now.",
+                pts: 2,
+                fb: "Neutral. C-suite executives prefer business metrics over design trends."
+            },
+            {
+                text: "Answer nervously that you followed instructions in the brief without question.",
+                pts: 1,
+                fb: "Weak presentation. Team leads must explain the creative rationale behind designs."
+            },
+            {
+                text: "Tell the CEO that non-designers cannot understand visual aesthetics.",
+                pts: -1,
+                fb: "Bad choice! Insulting executive decision-makers ruins career growth."
+            }
+        ],
+        next: "d11"
+    },
+    d11: {
+        title: "Final Export & Pre-Press Handoff",
+        timeline: "WEEK 4 • DAY 28",
+        phase: "Deliverables Handoff",
+        text: "It is final file handoff day! You must package vector <span class='vocab-term' onclick='openGlossaryTerm(\"assets\")'>assets</span> for web developers and commercial printers. How do you ensure error-free export?",
+        choices: [
+            {
+                text: "Conduct a systematic audit: verify outlined fonts, packaged linked assets, SVG web optimization, CMYK print PDFs, and color profile tags.",
+                pts: 4,
+                fb: "Perfect technical execution! Thorough file audits eliminate post-handoff developer bugs and printer delays."
+            },
+            {
+                text: "Delegate final file checking to Leo and Maya with a detailed 10-point handoff checklist.",
+                pts: 3,
+                fb: "Very good! Using structured checklists ensures high accuracy during task delegation."
+            },
+            {
+                text: "Compress all working Photoshop files into a ZIP archive and send to developers without exporting SVG/PNGs.",
+                pts: 2,
+                fb: "Suboptimal. Web developers require optimized SVG/PNG assets, not un-exported PSD working files."
+            },
+            {
+                text: "Email download links without testing if file permissions are open.",
+                pts: 1,
+                fb: "Weak handoff. Broken download links cause last-minute launch delays."
+            },
+            {
+                text: "Delete working source files immediately after exporting final PDFs.",
+                pts: -1,
+                fb: "Bad choice! Deleting source working files makes future revisions impossible."
+            }
+        ],
+        next: "d12"
+    },
+    d12: {
+        title: "Month-End Team Retrospective & Growth",
+        timeline: "WEEK 4 • DAY 30",
+        phase: "Post-Project Retrospective",
+        text: "The rebrand campaign launched successfully! You host a project retrospective with your 6 designers to review lessons learned. How do you conclude Month 1?",
+        choices: [
+            {
+                text: "Celebrate campaign success, acknowledge each designer's specific contributions, discuss workflow improvements for next month, and record template learnings.",
+                pts: 4,
+                fb: "Masterclass leadership! Celebrating team wins and capturing process improvements sets your studio up for long-term excellence!"
+            },
+            {
+                text: "Organize a team lunch to relax and invite designers to give anonymous feedback on your leadership style.",
+                pts: 3,
+                fb: "Great leadership vulnerability! Welcoming feedback builds high team trust."
+            },
+            {
+                text: "Send a brief Slack message saying 'Good job team' and immediately assign next month's projects.",
+                pts: 2,
+                fb: "Neutral. A brief message is polite, but holding a proper team retrospective builds better growth."
+            },
+            {
+                text: "Focus the entire retrospective meeting on listing Ben's junior mistakes.",
+                pts: 1,
+                fb: "Weak leadership. Single out mistakes publicly creates fear."
+            },
+            {
+                text: "Take 100% credit for the entire rebrand campaign during the executive board meeting.",
+                pts: -1,
+                fb: "Bad choice! Stealing credit from your 6 designers causes immediate team resignation."
+            }
+        ],
+        next: "final"
+    }
+};
+
+/* ==========================================================================
+   EVALUATION RANKS (POSITIVE & CONSTRUCTIVE FEEDBACK)
+   ========================================================================== */
+const evalTiers = [
+    {
+        min: 0, max: 24,
+        title: "Design Studio Trainee (Building Skills)",
+        color: "border-indigo bg-indigo-50 text-indigo-950",
+        badgeBg: "bg-indigo text-white font-bold",
+        desc: "Great effort completing your first month leading a design team! Leadership is a continuous learning process. You demonstrated good creative energy and team spirit. Focusing on clear task delegation, catching pre-press errors early, and giving structured feedback will help you achieve even higher leadership results next month."
+    },
+    {
+        min: 25, max: 37,
+        title: "Design Team Lead (Developing Leader)",
+        color: "border-indigo bg-indigo-light text-indigo-900",
+        badgeBg: "bg-indigo text-white font-black",
+        desc: "Solid management performance! You effectively coordinated 6 designers, balanced creative requests, and delivered campaign assets on schedule. With a bit more practice controlling scope creep and protecting staff from burnout, you are well on your way to senior creative management!"
+    },
+    {
+        min: 38, max: 45,
+        title: "Senior Creative Lead (Accomplished Manager)",
+        color: "border-emerald bg-emerald-light text-emerald-950",
+        badgeBg: "bg-emerald text-white font-bold",
+        desc: "Excellent leadership! You demonstrated strong B1 communication, delegated tasks effectively, resolved interpersonal studio friction, and protected brand guidelines while maintaining team morale. Your team respects your guidance!"
+    },
+    {
+        min: 46, max: 50,
+        title: "Creative Director (Studio Leadership Master)",
+        color: "border-slate-900 bg-slate-100 text-slate-900",
+        badgeBg: "bg-slate-900 text-indigo-300 font-extrabold",
+        desc: "Outstanding achievement! You mastered every aspect of design leadership: strategic delegation, high-stakes crisis resolution, pre-press quality control, and executive stakeholder presentation. You inspire your 6 designers to deliver world-class creative work!"
+    }
+];
+
+/* ==========================================================================
+   APP STATE & CONTROL LOGIC
+   ========================================================================== */
+let currentScore = 0;
+let activeStep = "d1";
+let soundEnabled = true;
+let hasAnsweredCurrentStep = false;
+
+// Flashcards state
+let currentCardIndex = 0;
+let isCardFlipped = false;
+
+// Vocabulary Matching state
+let selectedTermObj = null;
+let selectedDefObj = null;
+let matchedCount = 0;
+let shuffledTermsList = [];
+let shuffledDefsList = [];
+
+// True/False state
+let tfUserAnswers = {};
+
+// Web Audio API Sound Generator
+function playAudioFeedback(type) {
+    if (!soundEnabled) return;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.2);
+        } else if (type === 'emergency') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        }
+    } catch(e) {}
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
+}
+
+function fisherYatesShuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+/* ==========================================================================
+   TAB SWITCHING LOGIC
+   ========================================================================== */
+function switchTab(tabId) {
+    document.getElementById('tab-discussion').classList.add('hidden');
+    document.getElementById('tab-vocabulary').classList.add('hidden');
+    document.getElementById('tab-truefalse').classList.add('hidden');
+    document.getElementById('tab-simulation').classList.add('hidden');
+
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+        btn.className = "tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850";
+    });
+
+    const targetSection = document.getElementById('tab-' + tabId);
+    targetSection.classList.remove('hidden');
+
+    const activeBtn = document.getElementById('tab-btn-' + tabId);
+    if (activeBtn) {
+        activeBtn.className = "tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-indigo text-white shadow";
+    }
+
+    if (tabId === 'vocabulary') {
+        renderFlashcard();
+    } else if (tabId === 'truefalse') {
+        renderTrueFalse();
+    }
+}
+
+/* ==========================================================================
+   TAB 1: DISCUSSION NOTES
+   ========================================================================== */
+function setupDiscussionNotes() {
+    const area = document.getElementById('discussion-notes');
+    const saved = localStorage.getItem('designDiscussionNotes');
+    if (saved) area.value = saved;
+
+    area.addEventListener('input', () => {
+        localStorage.setItem('designDiscussionNotes', area.value);
+    });
+}
+
+/* ==========================================================================
+   TAB 2: FLASHCARDS & MATCHING
+   ========================================================================== */
+function setVocabSubTab(mode) {
+    const flashcardsSec = document.getElementById('vocab-sub-flashcards');
+    const matchingSec = document.getElementById('vocab-sub-matching');
+    const btnFlash = document.getElementById('sub-btn-flashcards');
+    const btnMatch = document.getElementById('sub-btn-matching');
+
+    if (mode === 'flashcards') {
+        flashcardsSec.classList.remove('hidden');
+        matchingSec.classList.add('hidden');
+        btnFlash.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition bg-white shadow text-slate-900";
+        btnMatch.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
+        renderFlashcard();
+    } else {
+        flashcardsSec.classList.add('hidden');
+        matchingSec.classList.remove('hidden');
+        btnMatch.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition bg-white shadow text-slate-900";
+        btnFlash.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
+        initMatchingGame();
+    }
+}
+
+function renderFlashcard() {
+    const data = flashcardsData[currentCardIndex];
+    const cardEl = document.getElementById('flashcard-element');
+
+    cardEl.classList.remove('flipped');
+    isCardFlipped = false;
+
+    document.getElementById('card-term').innerText = data.term;
+    document.getElementById('card-pos').innerText = data.pos;
+    document.getElementById('card-phonetic').innerText = data.phonetic;
+    document.getElementById('card-sentence').innerText = `"${data.sentence}"`;
+
+    document.getElementById('card-back-term').innerText = data.term;
+    document.getElementById('card-definition').innerText = data.definition;
+    document.getElementById('card-context').innerText = `"${data.context}"`;
+
+    document.getElementById('flashcard-counter').innerText = `Card ${currentCardIndex + 1} of ${flashcardsData.length}`;
+}
+
+function flipCurrentCard() {
+    const cardEl = document.getElementById('flashcard-element');
+    isCardFlipped = !isCardFlipped;
+    if (isCardFlipped) {
+        cardEl.classList.add('flipped');
+    } else {
+        cardEl.classList.remove('flipped');
+    }
+}
+
+function nextCard() {
+    currentCardIndex = (currentCardIndex + 1) % flashcardsData.length;
+    renderFlashcard();
+}
+
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + flashcardsData.length) % flashcardsData.length;
+    renderFlashcard();
+}
+
+function shuffleCards() {
+    currentCardIndex = Math.floor(Math.random() * flashcardsData.length);
+    renderFlashcard();
+}
+
+/* Matching Game Logic */
+function initMatchingGame() {
+    matchedCount = 0;
+    selectedTermObj = null;
+    selectedDefObj = null;
+    document.getElementById('matching-score-badge').innerText = `Matched: 0 / ${flashcardsData.length}`;
+    document.getElementById('matching-complete-banner').classList.add('hidden');
+
+    shuffledTermsList = fisherYatesShuffle(flashcardsData);
+    shuffledDefsList = fisherYatesShuffle(flashcardsData);
+
+    renderMatchingUI();
+}
+
+function resetMatchingGame() {
+    initMatchingGame();
+}
+
+function renderMatchingUI() {
+    const termsCol = document.getElementById('match-terms-column');
+    const defsCol = document.getElementById('match-defs-column');
+
+    termsCol.innerHTML = "";
+    defsCol.innerHTML = "";
+
+    shuffledTermsList.forEach(item => {
+        const btn = document.createElement('button');
+        btn.id = `match-term-${item.id}`;
+        btn.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-indigo text-slate-800 font-bold text-xs md:text-sm transition flex justify-between items-center shadow-sm";
+        btn.innerHTML = `<span>📌 ${item.term}</span> <span class="text-[10px] text-slate-400 uppercase font-mono">Term</span>`;
+        btn.onclick = () => selectMatchingTerm(item, btn);
+        termsCol.appendChild(btn);
+    });
+
+    shuffledDefsList.forEach(item => {
+        const btn = document.createElement('button');
+        btn.id = `match-def-${item.id}`;
+        btn.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-violet text-slate-800 text-xs md:text-sm transition shadow-sm leading-snug";
+        btn.innerText = item.definition;
+        btn.onclick = () => selectMatchingDef(item, btn);
+        defsCol.appendChild(btn);
+    });
+}
+
+function selectMatchingTerm(item, btn) {
+    if (btn.disabled) return;
+
+    document.querySelectorAll('.match-term-btn').forEach(b => {
+        if (!b.disabled) b.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-indigo text-slate-800 font-bold text-xs md:text-sm transition flex justify-between items-center shadow-sm";
+    });
+
+    btn.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-indigo bg-indigo-light text-indigo-900 font-extrabold text-xs md:text-sm transition flex justify-between items-center shadow-md ring-2 ring-indigo/40";
+    selectedTermObj = item;
+
+    checkPairMatch();
+}
+
+function selectMatchingDef(item, btn) {
+    if (btn.disabled) return;
+
+    document.querySelectorAll('.match-def-btn').forEach(b => {
+        if (!b.disabled) b.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-violet text-slate-800 text-xs md:text-sm transition shadow-sm leading-snug";
+    });
+
+    btn.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-violet bg-violet-light text-violet-dark font-semibold text-xs md:text-sm transition shadow-md ring-2 ring-violet/40";
+    selectedDefObj = item;
+
+    checkPairMatch();
+}
+
+function checkPairMatch() {
+    if (!selectedTermObj || !selectedDefObj) return;
+
+    const termBtn = document.getElementById(`match-term-${selectedTermObj.id}`);
+    const defBtn = document.getElementById(`match-def-${selectedDefObj.id}`);
+
+    if (selectedTermObj.id === selectedDefObj.id) {
+        playAudioFeedback('success');
+        termBtn.className = "w-full text-left p-3 rounded-xl border-2 border-emerald bg-emerald-light text-emerald-dark font-extrabold text-xs md:text-sm opacity-90 transition shadow-sm cursor-default flex justify-between items-center";
+        defBtn.className = "w-full text-left p-3 rounded-xl border-2 border-emerald bg-emerald-light text-emerald-dark font-semibold text-xs md:text-sm opacity-90 transition shadow-sm cursor-default";
+
+        termBtn.innerHTML = `<span>✅ ${selectedTermObj.term}</span> <span class="text-[10px] bg-emerald text-white font-bold px-1.5 py-0.5 rounded">Matched</span>`;
+        
+        termBtn.disabled = true;
+        defBtn.disabled = true;
+
+        matchedCount++;
+        document.getElementById('matching-score-badge').innerText = `Matched: ${matchedCount} / ${flashcardsData.length}`;
+
+        selectedTermObj = null;
+        selectedDefObj = null;
+
+        if (matchedCount === flashcardsData.length) {
+            document.getElementById('matching-complete-banner').classList.remove('hidden');
+        }
+    } else {
+        playAudioFeedback('error');
+        termBtn.classList.add('animate-shake', 'border-crimson', 'bg-red-50');
+        defBtn.classList.add('animate-shake', 'border-crimson', 'bg-red-50');
+
+        const tempTermBtn = termBtn;
+        const tempDefBtn = defBtn;
+
+        setTimeout(() => {
+            if (!tempTermBtn.disabled) {
+                tempTermBtn.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-indigo text-slate-800 font-bold text-xs md:text-sm transition flex justify-between items-center shadow-sm";
+            }
+            if (!tempDefBtn.disabled) {
+                tempDefBtn.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-violet text-slate-800 text-xs md:text-sm transition shadow-sm leading-snug";
+            }
+        }, 600);
+
+        selectedTermObj = null;
+        selectedDefObj = null;
+    }
+}
+
+/* ==========================================================================
+   TAB 3: TRUE / FALSE CHALLENGE
+   ========================================================================== */
+function renderTrueFalse() {
+    const container = document.getElementById('tf-statements-container');
+    container.innerHTML = "";
+
+    let correctCount = 0;
+    Object.keys(tfUserAnswers).forEach(id => {
+        if (tfUserAnswers[id].isCorrect) correctCount++;
+    });
+    document.getElementById('tf-score').innerText = `${correctCount} / ${trueFalseData.length}`;
+
+    trueFalseData.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 transition shadow-sm";
+
+        const hasAnswered = tfUserAnswers.hasOwnProperty(item.id);
+        const ansInfo = tfUserAnswers[item.id];
+
+        let feedbackHtml = "";
+        if (hasAnswered) {
+            const badgeClass = ansInfo.isCorrect ? "bg-emerald text-white" : "bg-crimson text-white";
+            const badgeText = ansInfo.isCorrect ? "Correct! ✅" : "Incorrect ❌";
+            feedbackHtml = `
+                <div class="mt-3 pt-3 border-t border-slate-200 card-slide">
+                    <span class="text-xs font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${badgeClass}">
+                        ${badgeText}
+                    </span>
+                    <p class="text-xs text-slate-700 mt-2 font-medium leading-relaxed">
+                        ${item.explanation}
+                    </p>
+                </div>
+            `;
+        }
+
+        card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start gap-3">
+                    <span class="bg-slate-200 text-slate-800 font-black text-xs px-2.5 py-1 rounded-md flex-shrink-0 mt-0.5">
+                        Statement ${index + 1}
+                    </span>
+                    <p class="text-sm font-bold text-slate-900 leading-snug">
+                        "${item.statement}"
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
+                    <button onclick="answerTrueFalse(${item.id}, true)" ${hasAnswered ? 'disabled' : ''} class="px-4 py-1.5 rounded-xl text-xs font-black transition ${hasAnswered && ansInfo.chosen === true ? (ansInfo.isCorrect ? 'bg-emerald text-white' : 'bg-crimson text-white') : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'}">
+                        TRUE
+                    </button>
+                    <button onclick="answerTrueFalse(${item.id}, false)" ${hasAnswered ? 'disabled' : ''} class="px-4 py-1.5 rounded-xl text-xs font-black transition ${hasAnswered && ansInfo.chosen === false ? (ansInfo.isCorrect ? 'bg-emerald text-white' : 'bg-crimson text-white') : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'}">
+                        FALSE
+                    </button>
+                </div>
+            </div>
+            ${feedbackHtml}
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function answerTrueFalse(id, choice) {
+    const item = trueFalseData.find(x => x.id === id);
+    if (!item) return;
+
+    const isCorrect = (choice === item.isTrue);
+    if (isCorrect) playAudioFeedback('success'); else playAudioFeedback('error');
+
+    tfUserAnswers[id] = {
+        chosen: choice,
+        isCorrect: isCorrect
+    };
+
+    renderTrueFalse();
+}
+
+/* ==========================================================================
+   TAB 4: SIMULATION GAME CORE LOGIC
+   ========================================================================== */
+function initGame() {
+    buildGlossaryUI();
+    setupDiscussionNotes();
+
+    const savedStep = localStorage.getItem('designLeadStep');
+    const savedScore = localStorage.getItem('designLeadScore');
+
+    if (savedStep && savedScore !== null) {
+        activeStep = savedStep;
+        currentScore = Math.min(50, Math.max(0, parseInt(savedScore, 10)));
+        updateScoreDisplay();
+        if (activeStep === "final") {
+            finishSimulation();
+        } else {
+            showScreen('main');
+            loadTask();
+        }
+    }
+}
+
+function saveGame() {
+    localStorage.setItem('designLeadStep', activeStep);
+    localStorage.setItem('designLeadScore', currentScore);
+}
+
+function clearSaveAndRestart() {
+    localStorage.removeItem('designLeadStep');
+    localStorage.removeItem('designLeadScore');
+    location.reload();
+}
+
+function confirmReset() {
+    document.getElementById('reset-modal').classList.remove('hidden');
+}
+
+function closeResetModal() {
+    document.getElementById('reset-modal').classList.add('hidden');
+}
+
+function beginGame() {
+    currentScore = 0;
+    activeStep = "d1";
+    updateScoreDisplay();
+    saveGame();
+    showScreen('main');
+    loadTask();
+}
+
+function showScreen(screenId) {
+    document.getElementById('screen-intro').classList.add('hidden');
+    document.getElementById('screen-main').classList.add('hidden');
+    document.getElementById('screen-end').classList.add('hidden');
+
+    const target = document.getElementById('screen-' + screenId);
+    target.classList.remove('hidden');
+    target.classList.remove('card-slide');
+    void target.offsetWidth;
+    target.classList.add('card-slide');
+}
+
+function updateScoreDisplay() {
+    currentScore = Math.min(50, Math.max(0, currentScore));
+    document.getElementById('global-score').innerText = currentScore;
+}
+
+function loadTask() {
+    const data = gameData[activeStep];
+    if (!data) return;
+
+    hasAnsweredCurrentStep = false;
+
+    document.getElementById('timeline-badge').innerText = data.timeline;
+    document.getElementById('phase-badge').innerText = data.phase;
+    document.getElementById('question-title').innerText = data.title;
+    document.getElementById('question-text').innerHTML = data.text;
+
+    const emIndicator = document.getElementById('emergency-indicator');
+    const scenarioCard = document.getElementById('scenario-card');
+
+    if (data.isEmergency) {
+        emIndicator.classList.remove('hidden');
+        scenarioCard.classList.add('emergency-card');
+        playAudioFeedback('emergency');
+    } else {
+        emIndicator.classList.add('hidden');
+        scenarioCard.classList.remove('emergency-card');
+    }
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = "";
+    document.getElementById('result-feedback').classList.add('hidden');
+    document.getElementById('nav-action-bar').classList.add('hidden');
+
+    const randomized = fisherYatesShuffle(data.choices);
+
+    randomized.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-800 p-4 rounded-xl font-medium text-slate-800 text-sm md:text-base transition-all duration-200 shadow-sm flex items-start gap-3 active:scale-[0.99]";
+        
+        btn.innerHTML = `
+            <span class="bg-slate-100 text-slate-700 font-extrabold text-xs px-2.5 py-1 rounded-md border border-slate-300 mt-0.5 flex-shrink-0">
+                Option
+            </span>
+            <span class="flex-grow">${choice.text}</span>
+        `;
+        
+        btn.onclick = () => selectOption(choice, btn);
+        grid.appendChild(btn);
+    });
+}
+
+function selectOption(choice, btn) {
+    if (hasAnsweredCurrentStep && choice.pts !== -1) return;
+    const data = gameData[activeStep];
+    const fbPanel = document.getElementById('result-feedback');
+    const badge = document.getElementById('point-tag');
+    const ratingText = document.getElementById('feedback-rating');
+    const msg = document.getElementById('feedback-msg');
+
+    if (choice.gameOver) {
+        playAudioFeedback('error');
+        document.getElementById('game-over-msg').innerText = choice.fb;
+        document.getElementById('game-over-modal').classList.remove('hidden');
+        return;
+    }
+
+    if (choice.pts === -1) {
+        playAudioFeedback('error');
+        currentScore -= 1;
+        updateScoreDisplay();
+
+        badge.innerText = "-1 Point";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-crimson";
+        ratingText.innerText = "Ineffective Leadership Strategy";
+        msg.innerText = choice.fb;
+
+        fbPanel.className = "bg-red-50 rounded-2xl p-5 shadow-md border-l-8 border-crimson mb-6 card-slide";
+        fbPanel.classList.remove('hidden');
+
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'line-through', 'border-red-300', 'bg-red-50');
+        btn.classList.remove('hover:border-slate-800', 'hover:bg-slate-50');
+
+        saveGame();
+        return;
+    }
+
+    hasAnsweredCurrentStep = true;
+    playAudioFeedback('success');
+    document.querySelectorAll('#options-grid button').forEach(b => b.disabled = true);
+
+    btn.classList.add('border-emerald', 'bg-emerald-light', 'ring-2', 'ring-emerald/40');
+
+    currentScore += choice.pts;
+    updateScoreDisplay();
+
+    if (data.isEmergency) {
+        badge.innerText = "+" + choice.pts + (choice.pts === 1 ? " Point" : " Points");
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-emerald";
+        ratingText.innerText = "Emergency Resolved Successfully!";
+        fbPanel.className = "bg-emerald-light/70 rounded-2xl p-5 shadow-md border-l-8 border-emerald mb-6 card-slide";
+    } else if (choice.pts === 4) {
+        badge.innerText = "+4 Points";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-emerald";
+        ratingText.innerText = "Best Professional Strategy!";
+        fbPanel.className = "bg-emerald-light/70 rounded-2xl p-5 shadow-md border-l-8 border-emerald mb-6 card-slide";
+    } else if (choice.pts === 3) {
+        badge.innerText = "+3 Points";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-indigo";
+        ratingText.innerText = "Good Alternative Strategy";
+        fbPanel.className = "bg-indigo-light/70 rounded-2xl p-5 shadow-md border-l-8 border-indigo mb-6 card-slide";
+    } else {
+        badge.innerText = "+" + choice.pts + " Points";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-slate-600";
+        ratingText.innerText = "Acceptable Response";
+        fbPanel.className = "bg-slate-100 rounded-2xl p-5 shadow-md border-l-8 border-slate-500 mb-6 card-slide";
+    }
+
+    msg.innerText = choice.fb;
+    fbPanel.classList.remove('hidden');
+
+    const navBar = document.getElementById('nav-action-bar');
+    const nextBtn = document.getElementById('next-step-btn');
+    navBar.classList.remove('hidden');
+
+    nextBtn.onclick = () => {
+        activeStep = data.next;
+        saveGame();
+        if (activeStep === "final") {
+            finishSimulation();
+        } else {
+            loadTask();
+        }
+    };
+}
+
+function finishSimulation() {
+    showScreen('end');
+
+    currentScore = Math.min(50, Math.max(0, currentScore));
+    document.getElementById('final-total').innerText = currentScore + " / 50";
+    const percentage = Math.min(100, Math.max(0, Math.round((currentScore / 50) * 100)));
+    document.getElementById('final-percentage').innerText = percentage + "% Success Rate";
+
+    const tier = evalTiers.find(t => currentScore >= t.min && currentScore <= t.max) || evalTiers[0];
+    const box = document.getElementById('evaluation-box');
+    
+    box.className = `p-6 rounded-2xl mb-6 text-left shadow-md border-2 ${tier.color}`;
+    box.innerHTML = `
+        <div class="flex items-center justify-between gap-2 mb-3">
+            <span class="text-xs uppercase font-extrabold tracking-wider">Official Title Earned</span>
+            <span class="text-xs px-3 py-1 rounded-full ${tier.badgeBg}">${tier.title}</span>
+        </div>
+        <h3 class="text-xl font-black mb-2">${tier.title}</h3>
+        <p class="text-sm leading-relaxed">${tier.desc}</p>
+    `;
+
+    localStorage.removeItem('designLeadStep');
+    localStorage.removeItem('designLeadScore');
+}
+
+/* ==========================================================================
+   GLOSSARY MODAL GENERATOR
+   ========================================================================== */
+function buildGlossaryUI() {
+    const list = document.getElementById('glossary-list');
+    list.innerHTML = "";
+
+    flashcardsData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-indigo transition";
+        div.id = 'vocab-' + item.term.toLowerCase().replace(/\s+/g, '-');
+        div.innerHTML = `
+            <div class="font-bold text-slate-900 text-sm capitalize flex items-center justify-between">
+                <span>📌 ${item.term}</span>
+                <span class="text-[10px] bg-indigo-light text-indigo-900 font-extrabold px-2 py-0.5 rounded uppercase">${item.pos}</span>
+            </div>
+            <p class="text-xs text-slate-700 font-semibold mt-1">${item.definition}</p>
+            <p class="text-[11px] text-slate-500 italic mt-0.5">${item.context}</p>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function toggleGlossaryModal() {
+    document.getElementById('glossary-modal').classList.toggle('hidden');
+}
+
+function openGlossaryTerm(termKey) {
+    const modal = document.getElementById('glossary-modal');
+    modal.classList.remove('hidden');
+    const element = document.getElementById('vocab-' + termKey.toLowerCase().replace(/\s+/g, '-'));
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('ring-2', 'ring-indigo');
+        setTimeout(() => element.classList.remove('ring-2', 'ring-indigo'), 2000);
+    }
+}
+
+// Window load initialization
+window.onload = initGame;
+</script>
+</body>
+</html>

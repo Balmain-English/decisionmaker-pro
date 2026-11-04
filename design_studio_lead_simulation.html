@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Studio Lead: 1-Month Team Simulation (B1 English)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary: #4f46e5;
+        --primary-dark: #4338ca;
+        --primary-light: #eef2ff;
+        --secondary: #0891b2;
+        --accent: #f59e0b;
+        --success: #10b981;
+        --danger: #ef4444;
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --radius: 12px;
+        --shadow: 0 10px 25px -5px rgba(0,0,0,0.05), 0 8px 10px -6px rgba(0,0,0,0.05);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    header {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 1rem 1.5rem;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03);
+    }
+
+    .header-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .brand-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        font-size: 1.2rem;
+    }
+
+    .brand-title h1 {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: var(--text);
+        line-height: 1.2;
+    }
+
+    .brand-title p {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        font-weight: 500;
+    }
+
+    .score-badge {
+        background: var(--primary-light);
+        border: 1px solid #c7d2fe;
+        padding: 0.4rem 1rem;
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .score-label {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--primary-dark);
+        letter-spacing: 0.5px;
+    }
+
+    .score-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--primary);
+    }
+
+    .tab-nav {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        overflow-x: auto;
+    }
+
+    .tab-btn {
+        background: transparent;
+        border: none;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .tab-btn.active {
+        background: var(--primary);
+        color: white;
+    }
+
+    .main-layout {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        width: 100%;
+        flex: 1;
+    }
+
+    .tab-panel {
+        display: none;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .tab-panel.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 2rem;
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+        margin-bottom: 1.5rem;
+    }
+
+    h2.panel-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    p.panel-desc {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        margin-bottom: 1.5rem;
+    }
+
+    /* Discussion Tab */
+    .disc-question {
+        background: var(--bg);
+        border-left: 4px solid var(--primary);
+        padding: 1.25rem;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 1.5rem;
+    }
+
+    .disc-question h3 {
+        font-size: 1rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: var(--primary-dark);
+    }
+
+    .speaking-stems {
+        background: #fff;
+        border: 1px dashed var(--border);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        margin-top: 0.75rem;
+    }
+
+    .speaking-stems strong { color: var(--text); }
+
+    textarea.notes-box {
+        width: 100%;
+        min-height: 120px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        font-family: inherit;
+        font-size: 0.95rem;
+        margin-top: 0.5rem;
+        resize: vertical;
+        outline: none;
+    }
+
+    textarea.notes-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
+
+    /* Flashcard Tab */
+    .fc-container {
+        perspective: 1000px;
+        max-width: 500px;
+        height: 280px;
+        margin: 1.5rem auto;
+        cursor: pointer;
+    }
+
+    .fc-card {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+    }
+
+    .fc-card.flipped { transform: rotateY(180deg); }
+
+    .fc-front, .fc-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: var(--radius);
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        border: 1px solid var(--border);
+        background: var(--surface);
+    }
+
+    .fc-front {
+        background: linear-gradient(135deg, #ffffff, var(--primary-light));
+    }
+
+    .fc-back {
+        transform: rotateY(180deg);
+        background: var(--surface);
+        border-top: 5px solid var(--secondary);
+    }
+
+    .fc-term { font-size: 1.8rem; font-weight: 800; color: var(--primary-dark); margin-bottom: 0.25rem; }
+    .fc-pos { font-size: 0.85rem; font-style: italic; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .fc-phonetic { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--secondary); margin-bottom: 1rem; }
+    .fc-def { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.75rem; }
+    .fc-ex { font-size: 0.85rem; color: var(--text-muted); font-style: italic; background: var(--bg); padding: 0.5rem 0.75rem; border-radius: 6px; }
+
+    .fc-controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .btn-sm {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+    .btn-sm:hover { background: var(--bg); }
+
+    /* Matching Game */
+    .match-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    @media (max-width: 640px) {
+        .match-grid { grid-template-columns: 1fr; }
+    }
+
+    .match-column { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .match-card {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: left;
+    }
+
+    .match-card:hover:not(.matched) { border-color: var(--primary); background: var(--primary-light); }
+    .match-card.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 2px var(--primary); }
+    .match-card.matched { border-color: var(--success); background: #ecfdf5; color: #065f46; cursor: default; opacity: 0.8; }
+    .match-card.error { border-color: var(--danger); background: #fef2f2; animation: shake 0.4s; }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+
+    /* True False Tab */
+    .tf-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        padding: 1.25rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .tf-text { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.75rem; }
+
+    .tf-btn-group { display: flex; gap: 0.5rem; margin-bottom: 0.5rem; }
+
+    .tf-btn {
+        padding: 0.4rem 1.2rem;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--bg);
+        font-weight: 700;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    .tf-btn.selected-true { background: #dcfce7; border-color: var(--success); color: #14532d; }
+    .tf-btn.selected-false { background: #fee2e2; border-color: var(--danger); color: #7f1d1d; }
+
+    .tf-feedback {
+        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
+        display: none;
+        margin-top: 0.5rem;
+    }
+
+    /* Simulation Game */
+    .sim-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .sim-tag {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        padding: 0.25rem 0.6rem;
+        border-radius: 4px;
+        background: var(--primary-light);
+        color: var(--primary-dark);
+    }
+
+    .sim-tag.emergency {
+        background: #fee2e2;
+        color: var(--danger);
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+
+    .sim-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 0.75rem; color: var(--text); }
+    .sim-desc { font-size: 1rem; color: #334155; margin-bottom: 1.5rem; }
+
+    .opt-list { display: flex; flex-direction: column; gap: 0.75rem; }
+
+    .opt-btn {
+        background: var(--surface);
+        border: 2px solid var(--border);
+        padding: 1rem 1.25rem;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--text);
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .opt-btn:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-light); }
+    .opt-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .feedback-box {
+        margin-top: 1.5rem;
+        padding: 1.25rem;
+        border-radius: 8px;
+        border-left: 5px solid var(--primary);
+        background: var(--bg);
+        display: none;
+    }
+
+    .fb-badge {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 800;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        color: white;
+        margin-bottom: 0.5rem;
+    }
+
+    .next-btn {
+        width: 100%;
+        margin-top: 1.5rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: none;
+    }
+
+    .next-btn:hover { background: var(--primary-dark); }
+
+    /* Modal for Game Over */
+    .modal-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(15, 23, 42, 0.8);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        padding: 1rem;
+    }
+
+    .modal-card {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 12px;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal-card h3 { font-size: 1.5rem; color: var(--danger); margin-bottom: 1rem; }
+    .modal-card p { margin-bottom: 1.5rem; color: var(--text-muted); }
+
+    .modal-btn {
+        background: var(--danger);
+        color: white;
+        border: none;
+        padding: 0.8rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 700;
+        cursor: pointer;
+    }
+
+    .review-box {
+        text-align: center;
+        padding: 2rem;
+        background: var(--primary-light);
+        border: 2px dashed var(--primary);
+        border-radius: 12px;
+        margin-top: 1rem;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-container">
+        <div class="brand">
+            <div class="brand-icon">DS</div>
+            <div class="brand-title">
+                <h1>DESIGN STUDIO LEAD</h1>
+                <p>1-Month Graphic Design Team Simulation (CEFR B1)</p>
+            </div>
+        </div>
+        <div class="score-badge">
+            <span class="score-label">Leadership Score</span>
+            <span class="score-val" id="global-score">0 / 50</span>
+        </div>
+    </div>
+</header>
+
+<nav class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('tab-disc')">1. Warm-Up Discussion</button>
+    <button class="tab-btn" onclick="switchTab('tab-vocab')">2. Studio Vocabulary</button>
+    <button class="tab-btn" onclick="switchTab('tab-tf')">3. True / False Challenge</button>
+    <button class="tab-btn" onclick="switchTab('tab-sim')">4. Studio Simulation</button>
+</nav>
+
+<main class="main-layout">
+
+    <!-- TAB 1: WARM UP -->
+    <div id="tab-disc" class="tab-panel active">
+        <div class="card">
+            <h2 class="panel-title">Team Leader Warm-Up Discussion</h2>
+            <p class="panel-desc">Reflect on these common design management scenarios before starting your month as Lead Designer.</p>
+
+            <div class="disc-question">
+                <h3>Question 1: Task Delegation</h3>
+                <p>You manage six graphic designers (Maya, Leo, Sam, Elena, Ben, Chloe). When a major new branding brief arrives, how do you decide who gets which task?</p>
+                <div class="speaking-stems">
+                    <strong>Useful B1 Speaking Stems:</strong><br>
+                    • "I prefer to assign tasks based on individual strengths because..."<br>
+                    • "It is important to check everyone's current workload before..."
+                </div>
+            </div>
+
+            <div class="disc-question">
+                <h3>Question 2: Feedback & Defensiveness</h3>
+                <p>A client rejects a logo draft and leaves critical comments. Your senior designer feels offended and defensive. How do you handle the situation?</p>
+                <div class="speaking-stems">
+                    <strong>Useful B1 Speaking Stems:</strong><br>
+                    • "I would sit down with the designer and explain that feedback is not personal..."<br>
+                    • "We need to focus on solving the client's business goal..."
+                </div>
+            </div>
+
+            <div>
+                <label style="font-weight: 700; font-size: 0.9rem;">Your Reflection Notes (Auto-saved):</label>
+                <textarea class="notes-box" id="user-notes" placeholder="Type your ideas here..." oninput="saveNotes()"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: VOCABULARY -->
+    <div id="tab-vocab" class="tab-panel">
+        <div class="card">
+            <h2 class="panel-title">Essential Studio Vocabulary</h2>
+            <p class="panel-desc">Master these 12 core graphic design leadership terms. Toggle between Flashcards and the Matching Game.</p>
+
+            <div style="display: flex; justify-content: center; gap: 0.5rem; margin-bottom: 1rem;">
+                <button class="btn-sm" id="btn-mode-fc" onclick="setVocabMode('fc')" style="background: var(--primary); color: white;">3D Flashcards</button>
+                <button class="btn-sm" id="btn-mode-match" onclick="setVocabMode('match')">Matching Game</button>
+            </div>
+
+            <!-- Flashcard Section -->
+            <div id="fc-section">
+                <div class="fc-container" onclick="flipCard()">
+                    <div class="fc-card" id="fc-card-elem">
+                        <div class="fc-front">
+                            <div class="fc-term" id="fc-term">Delegation</div>
+                            <div class="fc-pos" id="fc-pos">noun</div>
+                            <div class="fc-phonetic" id="fc-phonetic">/ˌdel.ɪˈɡeɪ.ʃən/</div>
+                            <small style="color: var(--text-muted); margin-top: 1rem;">(Click to flip card)</small>
+                        </div>
+                        <div class="fc-back">
+                            <div class="fc-def" id="fc-def">The act of assigning tasks and responsibilities to team members.</div>
+                            <div class="fc-ex" id="fc-ex">"Effective delegation helps the design studio meet tight deadlines."</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="fc-controls">
+                    <button class="btn-sm" onclick="prevCard()">← Prev</button>
+                    <span id="fc-counter" style="font-weight: 700; font-size: 0.9rem;">1 / 12</span>
+                    <button class="btn-sm" onclick="nextCard()">Next →</button>
+                </div>
+            </div>
+
+            <!-- Matching Game Section -->
+            <div id="match-section" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="font-weight: 700; font-size: 0.9rem;">Matches Completed: <span id="match-score">0 / 12</span></span>
+                    <button class="btn-sm" onclick="initMatchGame()">Reset Matching</button>
+                </div>
+                <div class="match-grid">
+                    <div class="match-column" id="terms-col"></div>
+                    <div class="match-column" id="defs-col"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 3: TRUE / FALSE -->
+    <div id="tab-tf" class="tab-panel">
+        <div class="card">
+            <h2 class="panel-title">Studio Leadership Protocols (True / False)</h2>
+            <p class="panel-desc">Test your understanding of professional graphic design management principles.</p>
+
+            <div id="tf-container"></div>
+        </div>
+    </div>
+
+    <!-- TAB 4: SIMULATION -->
+    <div id="tab-sim" class="tab-panel">
+        <div class="card" id="sim-card">
+            <div class="sim-meta">
+                <span class="sim-tag" id="sim-week-tag">Week 1 • Scenario 1</span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);" id="sim-step-num">Step 1 of 14</span>
+            </div>
+
+            <h2 class="sim-title" id="sim-title">Briefing & Team Allocation</h2>
+            <p class="sim-desc" id="sim-desc">A major client requests a full rebrand including logo design, packaging, and digital assets in three weeks. You sit down with your six designers (Maya, Leo, Sam, Elena, Ben, Chloe). How do you start?</p>
+
+            <div class="opt-list" id="opt-container"></div>
+
+            <div class="feedback-box" id="sim-fb">
+                <span class="fb-badge" id="fb-badge">GREAT DECISION</span>
+                <p id="fb-text" style="font-size: 0.95rem; font-weight: 500;"></p>
+            </div>
+
+            <button class="next-btn" id="sim-next-btn" onclick="nextScenario()">Continue to Next Step →</button>
+        </div>
+
+        <!-- End of Game Screen -->
+        <div class="card" id="end-card" style="display: none;">
+            <h2 class="panel-title" style="justify-content: center; color: var(--primary);">Month-End Performance Review</h2>
+            <p style="text-align: center; color: var(--text-muted);">You completed your 1-month simulation as Lead Graphic Designer!</p>
+
+            <div class="review-box">
+                <h3 id="final-tier-title" style="font-size: 1.5rem; color: var(--primary-dark); margin-bottom: 0.5rem;">Senior Creative Director</h3>
+                <div style="font-size: 2.5rem; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--primary); margin: 0.5rem 0;" id="final-score-val">44 / 50</div>
+                <p id="final-tier-desc" style="font-size: 1rem; color: var(--text);">Excellent leadership! You balanced creativity, deadlines, quality control, and team well-being with great skill.</p>
+            </div>
+
+            <button class="next-btn" style="display: block; margin-top: 2rem;" onclick="restartSim()">Restart Simulation</button>
+        </div>
+    </div>
+
+</main>
+
+<!-- Modal for Emergency Fail -->
+<div class="modal-overlay" id="fail-modal">
+    <div class="modal-card">
+        <h3>CRITICAL FAILURE</h3>
+        <p id="fail-modal-text">The client cancelled the project due to copyright infringement!</p>
+        <button class="modal-btn" onclick="restartSim()">Restart Simulation</button>
+    </div>
+</div>
+
+<script>
+// VOCAB DATA (12 Items)
+const vocabData = [
+    { term: "Delegation", pos: "noun", phonetic: "/ˌdel.ɪˈɡeɪ.ʃən/", def: "Assigning specific tasks and duties to individual team members.", ex: "Effective delegation prevents team overload." },
+    { term: "Workload", pos: "noun", phonetic: "/ˈwɜːk.ləʊd/", def: "The total amount of work assigned to a person or team.", ex: "We need to rebalance the team workload this week." },
+    { term: "Deadline", pos: "noun", phonetic: "/ˈded.laɪn/", def: "The date or time by which a project must be completed.", ex: "The client extended our print deadline to Friday." },
+    { term: "Feedback", pos: "noun", phonetic: "/ˈfiːd.bæk/", def: "Constructive evaluation and advice on design drafts.", ex: "Always give specific feedback to your designers." },
+    { term: "Scope Creep", pos: "noun", phonetic: "/skəʊp kriːp/", def: "Uncontrolled expansion of project goals without extra budget or time.", ex: "Extra revision requests led to severe scope creep." },
+    { term: "Assets", pos: "noun (plural)", phonetic: "/ˈæs.ets/", def: "Digital files such as logos, photos, fonts, and illustrations.", ex: "Make sure all brand assets are placed in the cloud folder." },
+    { term: "Copyright", pos: "noun", phonetic: "/ˈkɒp.i.raɪt/", def: "The legal right to publish and commercialize creative work.", ex: "Using unlicensed images violates commercial copyright." },
+    { term: "Deliverables", pos: "noun (plural)", phonetic: "/dɪˈlɪv.ər.ə.bəlz/", def: "Final items promised to be completed and delivered to a client.", ex: "The final deliverables include export formats in SVG and PDF." },
+    { term: "Brief", pos: "noun", phonetic: "/briːf/", def: "A document outlining client requirements, goals, and constraints.", ex: "Read the project brief carefully before sketching ideas." },
+    { term: "Brand Guidelines", pos: "noun (plural)", phonetic: "/brænd ˈɡaɪd.laɪnz/", def: "Strict rules for using color palettes, typography, and logos.", ex: "Check the brand guidelines to ensure color compliance." },
+    { term: "Review", pos: "noun / verb", phonetic: "/rɪˈvjuː/", def: "Examining design files to ensure quality and precision.", ex: "We hold a daily morning review to check design progress." },
+    { term: "Burnout", pos: "noun", phonetic: "/ˈbɜːn.aʊt/", def: "Physical or mental exhaustion caused by continuous overwork.", ex: "Clear boundaries help prevent designer burnout." }
+];
+
+// TRUE FALSE DATA (8 Items)
+const tfData = [
+    { text: "1. A lead designer should always do all complex design work themselves instead of delegating to team members.", answer: false, exp: "False. Delegating allows junior designers to grow and prevents the lead designer from becoming overwhelmed." },
+    { text: "2. Scope creep happens when clients add new requirements without adjusting deadlines or budgets.", answer: true, exp: "True. Scope creep requires clear client communication and extra quotes." },
+    { text: "3. Preflight CMYK checks are unnecessary if the design looks good on an RGB computer monitor.", answer: false, exp: "False. Colors look different on screen (RGB) versus physical print (CMYK). Preflight checks prevent print errors." },
+    { text: "4. Constructive feedback should focus on the design goals rather than personal preferences.", answer: true, exp: "True. Feedback is most effective when aligned with the client brief and brand strategy." },
+    { text: "5. Using commercial fonts without a proper desktop or print license is legal if it's for a small client.", answer: false, exp: "False. Using unlicensed fonts for commercial work is illegal regardless of client size." },
+    { text: "6. Daily brief stand-up meetings help identify bottlenecks early.", answer: true, exp: "True. Brief daily syncs ensure team alignment and early problem detection." },
+    { text: "7. It is best to ignore signs of team burnout to maintain high studio productivity.", answer: false, exp: "False. Ignoring burnout leads to mistakes, resignation, and lower work quality." },
+    { text: "8. Organizing deliverable files into structured folders is essential for professional client handoff.", answer: true, exp: "True. Clear file naming and folder organization ensure smooth client handoff." }
+];
+
+// SIMULATION SCENARIOS (12 Decisions + 2 Emergencies)
+const simData = {
+    d1: {
+        weekTag: "Week 1 • Scenario 1",
+        title: "Decision 1: Briefing & Task Allocation",
+        desc: "A major client requests a full corporate rebrand in three weeks. You sit down with your team of 6 designers. How do you allocate the workload?",
+        options: [
+            { text: "Review each designer's current capacity and match tasks to their strengths (e.g., Maya on logo, Leo on packaging).", pts: 4, fb: "Excellent delegation! Matching tasks to skills and checking capacity ensures high quality and on-time delivery." },
+            { text: "Assign equal numbers of files to everyone regardless of their specialization.", pts: 3, fb: "Fair workload distribution, though matching tasks to specialized skills yields better creative output." },
+            { text: "Let designers pick whichever files they feel like working on today.", pts: 2, fb: "A bit disorganized. Some critical assets might be neglected." },
+            { text: "Do all key brand designs yourself and give minor export tasks to the team.", pts: 1, fb: "This creates a bottleneck with you and demotivates your talented team." },
+            { text: "Force the newest designer to handle the entire project alone under pressure.", pts: -1, fb: "Unfair and risk-heavy! This will cause stress and likely errors." }
+        ],
+        next: "d2"
+    },
+    d2: {
+        weekTag: "Week 1 • Scenario 2",
+        title: "Decision 2: Handling Scope Creep",
+        desc: "Mid-week, the sales department asks your team to design five additional social media banners not included in the original project brief.",
+        options: [
+            { text: "Politely explain scope creep, evaluate team capacity, and offer a secondary timeline or extra quote.", pts: 4, fb: "Great boundary management! Protecting team workload while offering solutions maintains professional relations." },
+            { text: "Accept the extra banners but inform your team they must work 1 extra hour.", pts: 3, fb: "The work gets done, but adding unplanned work without adjusting deadlines increases stress." },
+            { text: "Tell sales to design the banners themselves using online templates.", pts: 2, fb: "Slightly dismissive. Better to manage requests through official channels." },
+            { text: "Ignore the email request completely.", pts: 1, fb: "Avoiding communication creates friction between sales and design teams." },
+            { text: "Rude response saying 'That's not my problem' to the sales director.", pts: -1, fb: "Unprofessional! Communication should remain respectful across departments." }
+        ],
+        next: "d3"
+    },
+    d3: {
+        weekTag: "Week 1 • Scenario 3",
+        title: "Decision 3: Tight Deadline vs Quality",
+        desc: "Maya's initial logo concepts look promising, but she needs more time to refine the typography. The review meeting with the client is tomorrow.",
+        options: [
+            { text: "Help Maya select the top two strongest concepts and focus on polishing those for tomorrow.", pts: 4, fb: "Smart curation! Presenting 2 polished options is better than 5 unfinished drafts." },
+            { text: "Stay late with Maya to finish all concepts together.", pts: 3, fb: "Supportive gesture, but managing scope prevents unnecessary late-night work." },
+            { text: "Present unfinished sketches to the client without warning.", pts: 2, fb: "Risky. Clients may struggle to visualize rough sketches without context." },
+            { text: "Cancel the client meeting 2 hours before start.", pts: 1, fb: "Cancelling last-minute damages studio credibility." },
+            { text: "Take Maya off the project and publicly criticize her speed.", pts: -1, fb: "Harsh and toxic management! Destroys team trust." }
+        ],
+        next: "d4"
+    },
+    d4: {
+        weekTag: "Week 2 • Scenario 4",
+        title: "Decision 4: Brand Guideline Compliance",
+        desc: "Leo submits a packaging mock-up. It looks visually stunning, but he used colors outside the client's official brand guidelines.",
+        options: [
+            { text: "Praise Leo's creativity, explain the brand constraints, and guide him to adapt the design within official specs.", pts: 4, fb: "Perfect leadership feedback! You validated his creativity while maintaining strict compliance." },
+            { text: "Approve the design as-is because it looks great.", pts: 2, fb: "Dangerous! Non-compliant brand colors lead to client rejection." },
+            { text: "Redesign the packaging yourself without telling Leo.", pts: 1, fb: "Missed learning opportunity for Leo and wastes your management time." },
+            { text: "Reject the work harshly and make Leo start from scratch.", pts: -1, fb: "Demotivating and unhelpful. Explain the 'why' behind revisions." }
+        ],
+        next: "e1"
+    },
+    e1: {
+        weekTag: "Week 2 • EMERGENCY 1",
+        isEmergency: true,
+        title: "EMERGENCY 1: Unlicensed Commercial Font Crisis!",
+        desc: "You discover that a designer accidentally used an unlicensed custom desktop font on 50,000 product packaging boxes currently at the printer!",
+        options: [
+            { text: "Immediately pause printing, contact the font foundry to purchase a commercial license, and update the print files.", pts: 2, fb: "Great crisis management! Resolving legal compliance protects the agency and client." },
+            { text: "Call the printer, halt production, and substitute with an open-source licensed font from Google Fonts.", pts: 1, fb: "Safe and fast solution that avoids legal penalties." },
+            { text: "Hope nobody notices and let all 50,000 boxes print without a commercial license.", pts: 0, gameOver: true, fb: "GAME OVER: The font foundry sued the client for $100,000. Your agency lost the client instantly!" }
+        ],
+        next: "d5"
+    },
+    d5: {
+        weekTag: "Week 2 • Scenario 5",
+        title: "Decision 5: Handling Defensive Feedback",
+        desc: "During internal reviews, Chloe becomes defensive when Sam offers constructive feedback on her layout visual hierarchy.",
+        options: [
+            { text: "Mediate calmly, refocus discussion on project objectives, and model constructive feedback techniques.", pts: 4, fb: "Excellent conflict resolution! Keeps the focus on design goals rather than personal ego." },
+            { text: "Tell Chloe to stop arguing and accept Sam's feedback immediately.", pts: 2, fb: "Resolves the moment, but doesn't build a supportive feedback culture." },
+            { text: "Cancel all team feedback sessions to avoid future arguments.", pts: 1, fb: "Avoidance strategy that harms overall studio design quality." },
+            { text: "Side with Chloe publicly without analyzing the design arguments.", pts: -1, fb: "Biased management creates team resentment." }
+        ],
+        next: "d6"
+    },
+    d6: {
+        weekTag: "Week 2 • Scenario 6",
+        title: "Decision 6: Missing Client Assets",
+        desc: "The client hasn't sent high-resolution vector logos for the website layout. Ben cannot proceed with his front-end mockups.",
+        options: [
+            { text: "Draft a clear, professional email requesting vector formats (.AI/.EPS) while setting placeholder SVGs for Ben.", pts: 4, fb: "Proactive problem solving! Keeps work moving forward while securing proper assets." },
+            { text: "Tell Ben to stop working on the project until the client responds.", pts: 2, fb: "Stalls progress unnecessarily when placeholders could be used." },
+            { text: "Use a blurry low-res JPG pulled from Google Search for the final site.", pts: -1, fb: "Unacceptable production quality! Low-res graphics look unprofessional." }
+        ],
+        next: "d7"
+    },
+    d7: {
+        weekTag: "Week 3 • Scenario 7",
+        title: "Decision 7: Pre-Press CMYK Preflight Error",
+        desc: "Your team is preparing files for offset printing. The print shop warns that the black background is pure RGB black (0,0,0) rather than rich CMYK black.",
+        options: [
+            { text: "Conduct a preflight check, adjust color profiles to rich CMYK black (e.g. C:60 M:40 Y:40 K:100), and re-export PDFs.", pts: 4, fb: "Master level pre-press knowledge! Rich black ensures deep print quality without paper oversaturation." },
+            { text: "Tell the printer to convert automatically without sending a proof.", pts: 2, fb: "Automatic conversions can cause unexpected color shifts." },
+            { text: "Ignore the print shop's warning and order printing.", pts: -1, fb: "Poor print quality! RGB black will look grey and dull when printed." }
+        ],
+        next: "e2"
+    },
+    e2: {
+        weekTag: "Week 3 • EMERGENCY 2",
+        isEmergency: true,
+        title: "EMERGENCY 2: 12 Hours Before Campaign Launch!",
+        desc: "The client's new CMO radically changes the primary slogan and branding theme 12 hours before the national digital launch!",
+        options: [
+            { text: "Call an emergency sync, negotiate essential asset priority with CMO, and distribute updates across team.", pts: 2, fb: "Heroic leadership! Strategic prioritization saved the digital launch window." },
+            { text: "Mobilize team to update core digital banners first, scheduling secondary assets for post-launch.", pts: 1, fb: "Pragmatic triage strategy focused on high-visibility launch touchpoints." },
+            { text: "Refuse to make changes and send the old campaign graphics to media channels.", pts: 0, gameOver: true, fb: "GAME OVER: Launching outdated branding caused huge public confusion and the account was lost!" }
+        ],
+        next: "d8"
+    },
+    d8: {
+        weekTag: "Week 3 • Scenario 8",
+        title: "Decision 8: Preventing Designer Burnout",
+        desc: "Ben has been working late three nights in a row. He looks visibly exhausted and starts making simple layout errors.",
+        options: [
+            { text: "Reassign non-urgent tasks from Ben to Elena, require him to take time off, and review project schedules.", pts: 4, fb: "Outstanding empathy and management! Protecting team health maintains long-term quality." },
+            { text: "Buy Ben coffee and energy drinks and ask him to push through one more night.", pts: 2, fb: "Temporary band-aid that worsens burnout." },
+            { text: "Complain to Ben about his recent layout errors.", pts: -1, fb: "Insensitive management. Address root causes like workload stress." }
+        ],
+        next: "d9"
+    },
+    d9: {
+        weekTag: "Week 3 • Scenario 9",
+        title: "Decision 9: Client Approval Delay",
+        desc: "The client hasn't approved the homepage design, leaving Sam idling while waiting for feedback to start secondary pages.",
+        options: [
+            { text: "Have Sam work on universal design components (typography scale, UI icon library) while sending a polite follow-up.", pts: 4, fb: "Proactive resourcefulness! Building design system components maximizes productive time." },
+            { text: "Send 5 urgent follow-up emails to the client within 2 hours.", pts: 1, fb: "Overly aggressive client communication." },
+            { text: "Tell Sam to take the rest of the day off without logging hours.", pts: 2, fb: "Unstructured downtime management." }
+        ],
+        next: "d10"
+    },
+    d10: {
+        weekTag: "Week 4 • Scenario 10",
+        title: "Decision 10: Deliverable Handoff Structure",
+        desc: "It is time to organize final project deliverables for client handoff. How should your team structure the deliverable folder?",
+        options: [
+            { text: "Create structured folders (01_Vector, 02_Web_Exports, 03_Print_PDFs, 04_Brand_Guidelines) with clear file naming conventions.", pts: 4, fb: "Exemplary organization! Professional folder structures make asset usage easy for clients." },
+            { text: "Dump all 150 raw files into one zip folder titled 'Final_Design_Stuff.zip'.", pts: 1, fb: "Messy handoff creates client confusion and extra support requests." },
+            { text: "Send editable raw files without embedding fonts or links.", pts: -1, fb: "Broken files! Unlinked graphics and missing fonts cause errors for clients." }
+        ],
+        next: "d11"
+    },
+    d11: {
+        weekTag: "Week 4 • Scenario 11",
+        title: "Decision 11: Negative Online Review",
+        desc: "A client posts a public review online complaining about 'slow response times' during week 2 of the design process.",
+        options: [
+            { text: "Draft a polite, professional public response acknowledging feedback, explaining studio standards, and inviting a private call.", pts: 4, fb: "Excellent PR management! Professional tone turns negative feedback into a display of reliability." },
+            { text: "Argue aggressively in the comment section explaining why the client was wrong.", pts: -1, fb: "Damages studio reputation publicly." },
+            { text: "Ignore the review completely.", pts: 2, fb: "Passive stance. Potential clients may read unanswered reviews." }
+        ],
+        next: "d12"
+    },
+    d12: {
+        weekTag: "Week 4 • Scenario 12",
+        title: "Decision 12: Team Retrospective",
+        desc: "The rebrand campaign launched successfully! How do you wrap up the month with your design team?",
+        options: [
+            { text: "Host a team retrospective meeting to celebrate wins, analyze bottlenecks, and thank everyone for their hard work.", pts: 4, fb: "Inspiring conclusion! Retrospectives build team unity and continuous process improvement." },
+            { text: "Send a quick email saying 'Good job' and immediately assign the next heavy workload.", pts: 2, fb: "Acknowledges success, but misses out on celebrating achievements." },
+            { text: "Take all the credit in front of company management without mentioning your 6 designers.", pts: -1, fb: "Selfish management that destroys team morale!" }
+        ],
+        next: "final"
+    }
+};
+
+// GLOBAL STATE
+let currentScore = 0;
+let activeSimStep = "d1";
+let hasAnsweredCurrentStep = false;
+let fcIndex = 0;
+let fcFlipped = false;
+
+// INITIALIZATION
+window.onload = function() {
+    loadNotes();
+    initFC();
+    initMatchGame();
+    initTF();
+    loadSimState();
+};
+
+// TAB SWITCHING
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tabId).classList.add('active');
+}
+
+// NOTES MANAGEMENT
+function saveNotes() {
+    const val = document.getElementById('user-notes').value;
+    localStorage.setItem('ds_notes', val);
+}
+function loadNotes() {
+    const saved = localStorage.getItem('ds_notes');
+    if (saved) document.getElementById('user-notes').value = saved;
+}
+
+// FLASHCARD FUNCTIONS
+function setVocabMode(mode) {
+    if (mode === 'fc') {
+        document.getElementById('fc-section').style.display = 'block';
+        document.getElementById('match-section').style.display = 'none';
+        document.getElementById('btn-mode-fc').style.background = 'var(--primary)';
+        document.getElementById('btn-mode-fc').style.color = 'white';
+        document.getElementById('btn-mode-match').style.background = 'var(--surface)';
+        document.getElementById('btn-mode-match').style.color = 'var(--text)';
+    } else {
+        document.getElementById('fc-section').style.display = 'none';
+        document.getElementById('match-section').style.display = 'block';
+        document.getElementById('btn-mode-match').style.background = 'var(--primary)';
+        document.getElementById('btn-mode-match').style.color = 'white';
+        document.getElementById('btn-mode-fc').style.background = 'var(--surface)';
+        document.getElementById('btn-mode-fc').style.color = 'var(--text)';
+    }
+}
+
+function initFC() {
+    updateFCCard();
+}
+
+function updateFCCard() {
+    const item = vocabData[fcIndex];
+    document.getElementById('fc-term').innerText = item.term;
+    document.getElementById('fc-pos').innerText = item.pos;
+    document.getElementById('fc-phonetic').innerText = item.phonetic;
+    document.getElementById('fc-def').innerText = item.def;
+    document.getElementById('fc-ex').innerText = `"${item.ex}"`;
+    document.getElementById('fc-counter').innerText = `${fcIndex + 1} / ${vocabData.length}`;
+    
+    const card = document.getElementById('fc-card-elem');
+    card.classList.remove('flipped');
+    fcFlipped = false;
+}
+
+function flipCard() {
+    const card = document.getElementById('fc-card-elem');
+    fcFlipped = !fcFlipped;
+    if (fcFlipped) card.classList.add('flipped');
+    else card.classList.remove('flipped');
+}
+
+function nextCard() {
+    fcIndex = (fcIndex + 1) % vocabData.length;
+    updateFCCard();
+}
+
+function prevCard() {
+    fcIndex = (fcIndex - 1 + vocabData.length) % vocabData.length;
+    updateFCCard();
+}
+
+// MATCHING GAME FUNCTIONS
+let selectedTermCard = null;
+let selectedDefCard = null;
+let matchesCount = 0;
+
+function initMatchGame() {
+    matchesCount = 0;
+    selectedTermCard = null;
+    selectedDefCard = null;
+    document.getElementById('match-score').innerText = `0 / ${vocabData.length}`;
+    
+    const termsCol = document.getElementById('terms-col');
+    const defsCol = document.getElementById('defs-col');
+    termsCol.innerHTML = '';
+    defsCol.innerHTML = '';
+
+    const shuffledTerms = [...vocabData].sort(() => Math.random() - 0.5);
+    const shuffledDefs = [...vocabData].sort(() => Math.random() - 0.5);
+
+    shuffledTerms.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'match-card';
+        div.innerText = item.term;
+        div.dataset.term = item.term;
+        div.onclick = () => selectMatchItem(div, 'term');
+        termsCol.appendChild(div);
+    });
+
+    shuffledDefs.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'match-card';
+        div.innerText = item.def;
+        div.dataset.term = item.term;
+        div.onclick = () => selectMatchItem(div, 'def');
+        defsCol.appendChild(div);
+    });
+}
+
+function selectMatchItem(elem, type) {
+    if (elem.classList.contains('matched')) return;
+
+    if (type === 'term') {
+        if (selectedTermCard) selectedTermCard.classList.remove('selected');
+        selectedTermCard = elem;
+        selectedTermCard.classList.add('selected');
+    } else {
+        if (selectedDefCard) selectedDefCard.classList.remove('selected');
+        selectedDefCard = elem;
+        selectedDefCard.classList.add('selected');
+    }
+
+    if (selectedTermCard && selectedDefCard) {
+        if (selectedTermCard.dataset.term === selectedDefCard.dataset.term) {
+            selectedTermCard.className = 'match-card matched';
+            selectedDefCard.className = 'match-card matched';
+            selectedTermCard = null;
+            selectedDefCard = null;
+            matchesCount++;
+            document.getElementById('match-score').innerText = `${matchesCount} / ${vocabData.length}`;
+        } else {
+            const t = selectedTermCard;
+            const d = selectedDefCard;
+            t.classList.add('error');
+            d.classList.add('error');
+            setTimeout(() => {
+                t.classList.remove('error', 'selected');
+                d.classList.remove('error', 'selected');
+            }, 500);
+            selectedTermCard = null;
+            selectedDefCard = null;
+        }
+    }
+}
+
+// TRUE FALSE FUNCTIONS
+function initTF() {
+    const container = document.getElementById('tf-container');
+    container.innerHTML = '';
+
+    tfData.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'tf-item';
+        div.innerHTML = `
+            <div class="tf-text">${item.text}</div>
+            <div class="tf-btn-group">
+                <button class="tf-btn" onclick="checkTF(${index}, true, this)">True</button>
+                <button class="tf-btn" onclick="checkTF(${index}, false, this)">False</button>
+            </div>
+            <div class="tf-feedback" id="tf-fb-${index}"></div>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function checkTF(index, userAns, btn) {
+    const item = tfData[index];
+    const parent = btn.parentElement;
+    const fb = document.getElementById(`tf-fb-${index}`);
+
+    parent.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('selected-true', 'selected-false'));
+
+    if (userAns === true) btn.classList.add('selected-true');
+    else btn.classList.add('selected-false');
+
+    fb.style.display = 'block';
+    if (userAns === item.answer) {
+        fb.style.background = '#dcfce7';
+        fb.style.color = '#14532d';
+        fb.innerText = `Correct! ${item.exp}`;
+    } else {
+        fb.style.background = '#fee2e2';
+        fb.style.color = '#7f1d1d';
+        fb.innerText = `Incorrect. ${item.exp}`;
+    }
+}
+
+// SIMULATION ENGINE
+function loadSimState() {
+    const savedScore = localStorage.getItem('ds_score');
+    const savedStep = localStorage.getItem('ds_step');
+
+    if (savedScore !== null) currentScore = parseInt(savedScore);
+    if (savedStep && simData[savedStep]) activeSimStep = savedStep;
+
+    updateScoreDisplay();
+    renderScenario();
+}
+
+function updateScoreDisplay() {
+    currentScore = Math.min(50, Math.max(0, currentScore));
+    document.getElementById('global-score').innerText = `${currentScore} / 50`;
+    localStorage.setItem('ds_score', currentScore);
+    localStorage.setItem('ds_step', activeSimStep);
+}
+
+function renderScenario() {
+    const data = simData[activeSimStep];
+    if (!data) return;
+
+    hasAnsweredCurrentStep = false;
+    document.getElementById('sim-week-tag').innerText = data.weekTag;
+    if (data.isEmergency) {
+        document.getElementById('sim-week-tag').className = 'sim-tag emergency';
+    } else {
+        document.getElementById('sim-week-tag').className = 'sim-tag';
+    }
+
+    document.getElementById('sim-title').innerText = data.title;
+    document.getElementById('sim-desc').innerText = data.desc;
+
+    const optContainer = document.getElementById('opt-container');
+    optContainer.innerHTML = '';
+    document.getElementById('sim-fb').style.display = 'none';
+    document.getElementById('sim-next-btn').style.display = 'none';
+
+    // Shuffle choices
+    const shuffledOptions = [...data.options].sort(() => Math.random() - 0.5);
+
+    shuffledOptions.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'opt-btn';
+        btn.innerText = opt.text;
+        btn.onclick = () => selectOption(opt, btn);
+        optContainer.appendChild(btn);
+    });
+}
+
+function selectOption(opt, btnElem) {
+    if (hasAnsweredCurrentStep) return;
+
+    const data = simData[activeSimStep];
+
+    if (opt.gameOver) {
+        document.getElementById('fail-modal-text').innerText = opt.fb;
+        document.getElementById('fail-modal').style.display = 'flex';
+        return;
+    }
+
+    if (opt.pts === -1) {
+        currentScore -= 1;
+        updateScoreDisplay();
+        btnElem.disabled = true;
+        btnElem.style.borderColor = 'var(--danger)';
+        btnElem.style.background = '#fef2f2';
+
+        const fbBox = document.getElementById('sim-fb');
+        fbBox.style.display = 'block';
+        fbBox.style.borderLeftColor = 'var(--danger)';
+        document.getElementById('fb-badge').style.background = 'var(--danger)';
+        document.getElementById('fb-badge').innerText = '-1 PENALTY';
+        document.getElementById('fb-text').innerText = opt.fb;
+        return;
+    }
+
+    hasAnsweredCurrentStep = true;
+    currentScore += opt.pts;
+    updateScoreDisplay();
+
+    document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+    btnElem.style.borderColor = 'var(--success)';
+    btnElem.style.background = '#ecfdf5';
+
+    const fbBox = document.getElementById('sim-fb');
+    fbBox.style.display = 'block';
+    fbBox.style.borderLeftColor = 'var(--success)';
+
+    const badge = document.getElementById('fb-badge');
+    badge.style.background = 'var(--success)';
+    badge.innerText = `+${opt.pts} POINTS`;
+    document.getElementById('fb-text').innerText = opt.fb;
+
+    const nextBtn = document.getElementById('sim-next-btn');
+    nextBtn.style.display = 'block';
+}
+
+function nextScenario() {
+    const data = simData[activeSimStep];
+    if (data.next === 'final') {
+        showEndScreen();
+    } else {
+        activeSimStep = data.next;
+        updateScoreDisplay();
+        renderScenario();
+    }
+}
+
+function showEndScreen() {
+    document.getElementById('sim-card').style.display = 'none';
+    document.getElementById('end-card').style.display = 'block';
+
+    const finalVal = Math.min(50, currentScore);
+    document.getElementById('final-score-val').innerText = `${finalVal} / 50`;
+
+    let tierTitle = "";
+    let tierDesc = "";
+
+    if (finalVal >= 46) {
+        tierTitle = "Master Design Lead";
+        tierDesc = "Exceptional performance! You demonstrated world-class team leadership, flawless brand management, proactive problem-solving, and continuous team care.";
+    } else if (finalVal >= 38) {
+        tierTitle = "Senior Creative Director";
+        tierDesc = "Great job! You balanced creativity, tight deadlines, client communication, and team well-being effectively.";
+    } else if (finalVal >= 25) {
+        tierTitle = "Accomplished Team Manager";
+        tierDesc = "Solid work! You led the studio through key branding challenges while supporting your team of designers.";
+    } else {
+        tierTitle = "Junior Studio Lead";
+        tierDesc = "Good effort! You completed the month-long simulation. With more experience in pre-press checks and scope management, your leadership will grow even stronger.";
+    }
+
+    document.getElementById('final-tier-title').innerText = tierTitle;
+    document.getElementById('final-tier-desc').innerText = tierDesc;
+}
+
+function restartSim() {
+    document.getElementById('fail-modal').style.display = 'none';
+    currentScore = 0;
+    activeSimStep = "d1";
+    localStorage.removeItem('ds_score');
+    localStorage.removeItem('ds_step');
+    document.getElementById('sim-card').style.display = 'block';
+    document.getElementById('end-card').style.display = 'none';
+    updateScoreDisplay();
+    renderScenario();
+}
+</script>
+</body>
+</html>
