@@ -1,0 +1,2032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JoeyHospitality - Safe & Joyful Stays for Little Guests</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#172033',
+                            900: '#1e293b'
+                        },
+                        amber: {
+                            DEFAULT: '#d97706',
+                            light: '#fef3c7',
+                            dark: '#b45309'
+                        },
+                        sage: {
+                            DEFAULT: '#059669',
+                            light: '#d1fae5',
+                            dark: '#047857'
+                        },
+                        crimson: {
+                            DEFAULT: '#dc2626',
+                            light: '#fee2e2'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+
+        /* 3D Flashcard Flip Effect */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+        .flashcard.flipped .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        /* Vocabulary Term Tooltip Styling */
+        .vocab-term {
+            background-color: #fef3c7;
+            color: #92400e;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 0.25rem;
+            border-bottom: 2px solid #d97706;
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.2s ease;
+        }
+        .vocab-term:hover {
+            background-color: #fde68a;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        /* Animations */
+        @keyframes pulse-emergency {
+            0%, 100% { border-color: #dc2626; box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            50% { border-color: #991b1b; box-shadow: 0 0 0 10px rgba(220, 38, 38, 0); }
+        }
+
+        .emergency-card {
+            animation: pulse-emergency 2s infinite;
+            border: 3px solid #dc2626 !important;
+        }
+
+        .card-slide {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-amber-100 selection:text-amber-900">
+
+    <!-- MAIN HEADER WITH BRANDING -->
+    <header class="bg-slate-900 text-white shadow-xl sticky top-0 z-30 border-b-4 border-amber">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            
+            <!-- Branding Logo & Title -->
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-light p-1.5 rounded-2xl border-2 border-amber flex items-center justify-center shadow-inner">
+                    <svg class="w-10 h-10 md:w-11 md:h-11 flex-shrink-0" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="46" fill="#fef3c7" stroke="#d97706" stroke-width="3"/>
+                        <path d="M 30 38 C 24 16, 36 12, 40 28" stroke="#d97706" stroke-width="3.5" fill="#f59e0b" stroke-linecap="round"/>
+                        <path d="M 70 38 C 76 16, 64 12, 60 28" stroke="#d97706" stroke-width="3.5" fill="#f59e0b" stroke-linecap="round"/>
+                        <path d="M 33 26 C 29 20, 36 18, 37 25" fill="#fef3c7"/>
+                        <path d="M 67 26 C 71 20, 64 18, 63 25" fill="#fef3c7"/>
+                        <ellipse cx="50" cy="50" rx="23" ry="21" fill="#f59e0b"/>
+                        <ellipse cx="50" cy="55" rx="14" ry="12" fill="#fef3c7"/>
+                        <circle cx="41" cy="45" r="3.5" fill="#1e293b"/>
+                        <circle cx="59" cy="45" r="3.5" fill="#1e293b"/>
+                        <circle cx="42.5" cy="43.5" r="1.2" fill="#ffffff"/>
+                        <circle cx="60.5" cy="43.5" r="1.2" fill="#ffffff"/>
+                        <ellipse cx="50" cy="51" rx="4" ry="3" fill="#d97706"/>
+                        <path d="M 45 55 Q 50 60 55 55" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+                        <path d="M 32 68 Q 50 84 68 68" fill="#d97706" stroke="#b45309" stroke-width="2.5"/>
+                        <circle cx="36" cy="62" r="3.5" fill="#f59e0b"/>
+                        <circle cx="64" cy="62" r="3.5" fill="#f59e0b"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-lg md:text-xl leading-tight tracking-wide text-white flex items-center gap-1.5">
+                        Joey<span class="text-amber">Hospitality</span>
+                    </h1>
+                    <p class="text-xs text-slate-300 font-medium">Safe & Joyful Stays for Little Guests (Low B1 English)</p>
+                </div>
+            </div>
+
+            <!-- Top Header Controls & Score -->
+            <div class="flex items-center space-x-3">
+                <button onclick="toggleGlossaryModal()" class="text-xs md:text-sm bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1 font-semibold">
+                    📖 <span class="hidden sm:inline">Sales</span> Glossary
+                </button>
+
+                <button onclick="toggleSound()" id="sound-btn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 p-1.5 rounded-lg border border-slate-700 transition" title="Toggle Sound Feedback">
+                    🔊
+                </button>
+
+                <div class="bg-slate-950 px-4 py-1.5 rounded-xl border border-amber/40 text-right shadow-inner">
+                    <span class="text-[10px] uppercase tracking-wider text-amber font-extrabold block">Simulation Score</span>
+                    <span id="global-score" class="font-mono text-xl font-black text-white">0</span>
+                    <span class="text-xs text-slate-400">/ 50</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB NAVIGATION BAR -->
+        <nav class="bg-slate-950 border-t border-slate-800 px-2 sm:px-4">
+            <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-1">
+                <div class="flex flex-wrap gap-1 py-1" id="tab-buttons-container">
+                    <button onclick="switchTab('discussion')" id="tab-btn-discussion" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-amber text-slate-950 shadow">
+                        💬 1. Warm-Up Discussion
+                    </button>
+                    <button onclick="switchTab('vocabulary')" id="tab-btn-vocabulary" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850">
+                        🎴 2. Sales Vocabulary
+                    </button>
+                    <button onclick="switchTab('truefalse')" id="tab-btn-truefalse" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850">
+                        ✔️ 3. True / False Challenge
+                    </button>
+                    <button onclick="switchTab('simulation')" id="tab-btn-simulation" class="tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850">
+                        🚀 4. Sales Simulation Game
+                    </button>
+                </div>
+
+                <!-- Direct Skip Button -->
+                <button onclick="switchTab('simulation')" class="my-1 text-xs bg-amber/20 hover:bg-amber/30 text-amber font-extrabold px-3 py-1.5 rounded-lg border border-amber/50 transition flex items-center gap-1 ml-auto">
+                    Skip to Simulation ➔
+                </button>
+            </div>
+        </nav>
+    </header>
+
+    <!-- MAIN APP BODY -->
+    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow">
+
+        <!-- ========================================================================== -->
+        <!-- TAB 1: WARM-UP DISCUSSION QUESTIONS -->
+        <!-- ========================================================================== -->
+        <section id="tab-discussion" class="card-slide">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-t-8 border-amber mb-6">
+                <div class="flex items-center gap-3 mb-4">
+                    <span class="text-3xl">🗣️</span>
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900">Module 1: Warm-Up Sales Discussion</h2>
+                        <p class="text-xs md:text-sm text-slate-600">Practice your speaking and critical thinking before starting client calls.</p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 my-6">
+                    <!-- Discussion Question 1 -->
+                    <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:border-amber transition shadow-sm flex flex-col justify-between">
+                        <div>
+                            <span class="bg-amber-light text-amber-900 text-xs font-black uppercase px-2.5 py-1 rounded-md border border-amber/30 inline-block mb-3">
+                                Question 1 • Product Value
+                            </span>
+                            <h3 class="font-bold text-slate-900 text-base md:text-lg mb-2">
+                                What features make children's equipment (cribs, high chairs, play corners) attractive to hotel directors?
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Think about safety certifications, stackable storage, non-toxic eco finishes, and brand image.
+                            </p>
+                        </div>
+
+                        <!-- Reflection Prompts -->
+                        <div class="mt-4 pt-3 border-t border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Useful B1 Phrases:</span>
+                            <p class="text-xs text-amber-900 bg-amber-light/60 p-2 rounded border border-amber/20 font-medium">
+                                "In my opinion, hotel directors prioritize..." <br>
+                                "Equipment needs to be easy for housekeeping to clean because..."
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Discussion Question 2 -->
+                    <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:border-amber transition shadow-sm flex flex-col justify-between">
+                        <div>
+                            <span class="bg-sage-light text-sage-dark text-xs font-black uppercase px-2.5 py-1 rounded-md border border-sage/30 inline-block mb-3">
+                                Question 2 • Customer Service
+                            </span>
+                            <h3 class="font-bold text-slate-900 text-base md:text-lg mb-2">
+                                How do you handle an angry hotel manager when an equipment delivery is delayed or defective?
+                            </h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Consider listening actively, offering loaner units, providing prompt refunds or replacement guarantees.
+                            </p>
+                        </div>
+
+                        <!-- Reflection Prompts -->
+                        <div class="mt-4 pt-3 border-t border-slate-200">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Useful B1 Phrases:</span>
+                            <p class="text-xs text-sage-dark bg-sage-light/60 p-2 rounded border border-sage/20 font-medium">
+                                "To reassure an unhappy customer, I would first..." <br>
+                                "The best strategy to resolve a delay is to offer..."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Reflection Box -->
+                <div class="bg-slate-900 text-white rounded-2xl p-5 mt-6 shadow-inner">
+                    <label for="discussion-notes" class="block text-sm font-bold text-amber mb-2 flex items-center gap-2">
+                        📝 Your Personal Speaking & Reflection Notes (Optional):
+                    </label>
+                    <textarea id="discussion-notes" rows="3" class="w-full bg-slate-800 text-slate-100 text-sm p-3 rounded-xl border border-slate-700 focus:outline-none focus:border-amber" placeholder="Type key sales ideas or phrases here to prepare for the simulation game..."></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span class="text-[11px] text-slate-400">Notes are saved automatically in your browser.</span>
+                        <button onclick="switchTab('vocabulary')" class="bg-amber hover:bg-amber-dark text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition">
+                            Next: Sales Vocabulary ➔
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================================================== -->
+        <!-- TAB 2: SALES VOCABULARY (FLASHCARDS & MATCHING GAME) -->
+        <!-- ========================================================================== -->
+        <section id="tab-vocabulary" class="hidden card-slide">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-t-8 border-sage mb-6">
+                
+                <!-- Section Header & Mode Toggle -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-200">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                            🎴 Module 2: Essential B1 Sales Vocabulary
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-600 mt-1">Master 12 critical B2B equipment sales terms using flashcards and a matching game.</p>
+                    </div>
+
+                    <!-- Sub-mode selector -->
+                    <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 self-stretch sm:self-auto">
+                        <button onclick="setVocabSubTab('flashcards')" id="sub-btn-flashcards" class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition bg-white shadow text-slate-900">
+                            🎴 Flashcards
+                        </button>
+                        <button onclick="setVocabSubTab('matching')" id="sub-btn-matching" class="flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:text-slate-900">
+                            🧩 Matching Game
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 2A: 3D FLASHCARDS -->
+                <div id="vocab-sub-flashcards">
+                    <div class="max-w-xl mx-auto">
+                        <!-- Card Counter & Controls Header -->
+                        <div class="flex justify-between items-center mb-3 text-xs font-bold text-slate-500">
+                            <span id="flashcard-counter">Card 1 of 12</span>
+                            <span class="text-amber-900 bg-amber-light px-2.5 py-0.5 rounded-full border border-amber/30">Click Card to Flip 🔄</span>
+                        </div>
+
+                        <!-- 3D Flip Card Container -->
+                        <div class="perspective-1000 w-full h-80 cursor-pointer" onclick="flipCurrentCard()">
+                            <div id="flashcard-element" class="flashcard w-full h-full">
+                                <div class="flashcard-inner rounded-2xl shadow-xl">
+                                    
+                                    <!-- FRONT OF CARD -->
+                                    <div class="flashcard-front bg-gradient-to-br from-slate-900 to-slate-800 text-white p-6 flex flex-col justify-between border-4 border-amber">
+                                        <div class="flex justify-between items-center">
+                                            <span class="bg-amber text-slate-950 font-black text-[10px] uppercase px-2.5 py-1 rounded tracking-wider">B1 Sales Term</span>
+                                            <span id="card-pos" class="text-xs text-amber font-mono italic">noun</span>
+                                        </div>
+                                        
+                                        <div class="text-center my-auto">
+                                            <h3 id="card-term" class="text-3xl md:text-4xl font-black text-white tracking-wide">Prospecting</h3>
+                                            <p id="card-phonetic" class="text-xs text-slate-400 mt-1 italic">/ˈprɒspɛktɪŋ/</p>
+                                        </div>
+
+                                        <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-700 text-xs text-slate-300">
+                                            <span class="text-amber font-bold block mb-0.5">Sample Sentence:</span>
+                                            <p id="card-sentence" class="italic">"Our sales team spends Monday mornings prospecting new boutique hotel accounts."</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- BACK OF CARD -->
+                                    <div class="flashcard-back bg-gradient-to-br from-amber-light to-white text-slate-900 p-6 flex flex-col justify-between border-4 border-amber">
+                                        <div>
+                                            <span class="bg-amber text-slate-950 font-black text-[10px] uppercase px-2.5 py-1 rounded tracking-wider">Definition</span>
+                                            <h4 id="card-back-term" class="text-xl font-black text-amber-900 mt-1">Prospecting</h4>
+                                        </div>
+
+                                        <div class="my-auto">
+                                            <p id="card-definition" class="text-base md:text-lg font-bold text-slate-800 leading-snug">
+                                                Searching for new potential hotel clients and business buyers.
+                                            </p>
+                                        </div>
+
+                                        <div class="bg-amber/10 p-3 rounded-xl border border-amber/30 text-xs text-slate-800">
+                                            <span class="text-amber-900 font-extrabold block mb-0.5">Hotel Sales Context:</span>
+                                            <p id="card-context">"Prospecting includes finding newly constructed luxury resorts that need children's furniture."</p>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Navigation Controls -->
+                        <div class="flex justify-between items-center gap-3 mt-6">
+                            <button onclick="prevCard()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold px-4 py-2.5 rounded-xl border border-slate-300 text-xs transition flex items-center gap-1">
+                                ⬅️ Previous
+                            </button>
+                            
+                            <button onclick="shuffleCards()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs transition">
+                                🔀 Shuffle Cards
+                            </button>
+
+                            <button onclick="nextCard()" class="bg-amber hover:bg-amber-dark text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition flex items-center gap-1">
+                                Next ➡️
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TAB 2B: MATCHING GAME -->
+                <div id="vocab-sub-matching" class="hidden">
+                    <div class="flex justify-between items-center mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-xs font-bold text-slate-700">Click a <strong class="text-amber-900">Term</strong>, then click its matching <strong class="text-sage-dark">Definition</strong>:</span>
+                        <div class="flex items-center gap-3">
+                            <span id="matching-score-badge" class="bg-sage text-white font-black text-xs px-3 py-1 rounded-full">Matched: 0 / 12</span>
+                            <button onclick="resetMatchingGame()" class="text-xs bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-2.5 py-1 rounded-lg">
+                                🔄 Reset
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Matching Columns Grid -->
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <!-- Terms Column -->
+                        <div class="space-y-2.5" id="match-terms-column">
+                            <!-- Terms injected dynamically -->
+                        </div>
+
+                        <!-- Definitions Column -->
+                        <div class="space-y-2.5" id="match-defs-column">
+                            <!-- Definitions injected dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Match Completion Banner -->
+                    <div id="matching-complete-banner" class="hidden bg-sage-light border-2 border-sage p-5 rounded-2xl mt-6 text-center card-slide">
+                        <span class="text-4xl block mb-1">🎉</span>
+                        <h3 class="text-xl font-extrabold text-sage-dark">Vocabulary Mastered!</h3>
+                        <p class="text-xs text-sage-dark mt-1">You correctly paired all 12 B1 sales equipment terms. You are ready for the challenge!</p>
+                        <button onclick="switchTab('truefalse')" class="mt-3 bg-sage hover:bg-sage-dark text-white font-bold px-5 py-2 rounded-xl text-xs transition">
+                            Proceed to True / False Challenge ➔
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================================== -->
+        <!-- TAB 3: TRUE / FALSE STATEMENTS CHALLENGE -->
+        <!-- ========================================================================== -->
+        <section id="tab-truefalse" class="hidden card-slide">
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8 border-t-8 border-amber mb-6">
+                
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 pb-4 border-b border-slate-200">
+                    <div>
+                        <h2 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                            ✔️ Module 3: True / False Sales Concepts
+                        </h2>
+                        <p class="text-xs md:text-sm text-slate-600 mt-1">Test your knowledge of key sales procedures and hotel equipment regulations.</p>
+                    </div>
+
+                    <div class="bg-slate-900 text-white px-4 py-2 rounded-xl text-right">
+                        <span class="text-[10px] uppercase font-bold text-amber block">Challenge Score</span>
+                        <span id="tf-score" class="font-mono text-lg font-black text-white">0 / 8</span>
+                    </div>
+                </div>
+
+                <!-- True / False Statements List -->
+                <div class="space-y-4" id="tf-statements-container">
+                    <!-- Injected dynamically -->
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-slate-200 flex justify-between items-center">
+                    <span class="text-xs text-slate-500">Finished reviewing concepts?</span>
+                    <button onclick="switchTab('simulation')" class="bg-sage hover:bg-sage-dark text-white font-extrabold px-6 py-3 rounded-xl text-sm shadow-md hover:shadow-lg transition flex items-center gap-2">
+                        🚀 Start 1-Month Sales Simulation Game ➔
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ========================================================================== -->
+        <!-- TAB 4: 1-MONTH SALES SIMULATION GAME -->
+        <!-- ========================================================================== -->
+        <section id="tab-simulation" class="hidden">
+            
+            <!-- INTRO SCREEN FOR GAME -->
+            <div id="screen-intro" class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border-t-8 border-slate-900 card-slide">
+                <div class="flex flex-col md:flex-row items-center gap-6 mb-6">
+                    <div class="bg-amber-light p-5 rounded-2xl border-2 border-amber flex-shrink-0 text-center flex flex-col items-center justify-center">
+                        <span class="text-5xl">🦘</span>
+                        <span class="text-xs font-black text-amber-900 mt-1 uppercase">Joey Hospitality</span>
+                    </div>
+                    <div>
+                        <span class="bg-amber-light text-amber-900 font-bold text-xs uppercase px-3 py-1 rounded-full tracking-wider border border-amber/30">New Sales Representative</span>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-2">Welcome to Your 1-Month Sales Mission!</h2>
+                        <p class="text-slate-600 mt-2 text-sm md:text-base leading-relaxed">
+                            You represent <strong>JoeyHospitality</strong> — a leading manufacturer of premium children's equipment for luxury boutique hotels and family resorts (wooden modular cribs, stackable high chairs, indoor play sets, safety gates, and booster seats).
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4 my-6">
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-amber font-bold text-sm flex items-center gap-1.5">📅 1 Month Timeline</div>
+                        <p class="text-xs text-slate-600 mt-1">Navigate a chronological story across 4 business weeks, from outreach to account renewal.</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-slate-900 font-bold text-sm flex items-center gap-1.5">🎯 12 Key Decisions</div>
+                        <p class="text-xs text-slate-600 mt-1">Resolve real B2B sales challenges including price negotiations, custom requests, and invoices.</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="text-crimson font-bold text-sm flex items-center gap-1.5">🚨 2 Emergency Crisis Points</div>
+                        <p class="text-xs text-slate-600 mt-1">Act fast under pressure during high-stakes legal and product safety misunderstandings!</p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-light border-l-4 border-amber p-4 rounded-r-xl mb-6 text-sm text-amber-900">
+                    <p class="font-bold flex items-center gap-1.5 mb-1">
+                        💡 Interactive B1 Sales Vocabulary:
+                    </p>
+                    <p class="text-xs md:text-sm">
+                        Click any highlighted term like <span class="vocab-term" onclick="openGlossaryTerm('prospecting')">prospecting</span> or <span class="vocab-term" onclick="openGlossaryTerm('liability clause')">liability clause</span> throughout the game to view clear, accessible definitions.
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <button onclick="beginGame()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 text-base">
+                        🚀 Begin 1-Month Sales Mission
+                    </button>
+                    <button onclick="confirmReset()" class="w-full sm:w-auto bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 px-5 rounded-xl border border-slate-300 transition text-sm">
+                        🔄 Restart Fresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- MAIN SCENARIO INTERFACE -->
+            <div id="screen-main" class="hidden card-slide">
+                
+                <!-- Timeline & Phase Banner -->
+                <div id="step-banner" class="bg-slate-900 text-white p-4.5 rounded-2xl shadow-md mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-l-8 border-amber">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span id="timeline-badge" class="bg-amber text-slate-950 font-black text-xs px-2.5 py-0.5 rounded uppercase tracking-wider">
+                                WEEK 1 • DAY 1
+                            </span>
+                            <span id="phase-badge" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                                Prospection Phase
+                            </span>
+                        </div>
+                        <h2 id="question-title" class="text-xl font-extrabold mt-1 text-white">
+                            Decision Title
+                        </h2>
+                    </div>
+                    <div id="emergency-indicator" class="hidden">
+                        <span class="bg-crimson text-white font-black text-xs px-3 py-1 rounded-full animate-pulse flex items-center gap-1 shadow">
+                            🚨 CRITICAL EMERGENCY
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Scenario Card -->
+                <div class="bg-white rounded-2xl shadow-md p-6 mb-6 border border-slate-200" id="scenario-card">
+                    <p id="question-text" class="text-slate-800 text-base md:text-lg leading-relaxed font-normal">
+                        Scenario narrative goes here...
+                    </p>
+                </div>
+
+                <!-- Options Grid -->
+                <div class="space-y-3 mb-6" id="options-grid">
+                    <!-- Options injected dynamically -->
+                </div>
+
+                <!-- Feedback Result Box -->
+                <div id="result-feedback" class="hidden bg-white rounded-2xl p-6 shadow-lg border-l-8 border-slate-300 transition-all duration-300 mb-6">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span id="point-tag" class="px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider">
+                            +4 Points
+                        </span>
+                        <span id="feedback-rating" class="text-sm font-bold text-slate-800">Excellent Response!</span>
+                    </div>
+                    <p id="feedback-msg" class="text-slate-700 text-sm md:text-base leading-relaxed mt-2">
+                        Feedback text goes here...
+                    </p>
+                </div>
+
+                <!-- Navigation Action Bar -->
+                <div id="nav-action-bar" class="hidden flex justify-end">
+                    <button id="next-step-btn" class="w-full sm:w-auto bg-sage hover:bg-sage-dark text-white font-black py-3.5 px-8 rounded-xl shadow-lg hover:shadow-xl transition flex items-center justify-center gap-2 text-base">
+                        Continue to Next Scenario ➔
+                    </button>
+                </div>
+            </div>
+
+            <!-- END OF MONTH EVALUATION SCREEN -->
+            <div id="screen-end" class="hidden card-slide">
+                <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 border-t-8 border-sage">
+                    <div class="text-center max-w-xl mx-auto">
+                        <div class="bg-amber-light w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 border-2 border-amber">
+                            <span class="text-3xl">🦘</span>
+                        </div>
+                        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900">Month-End Sales Performance Review</h2>
+                        <p class="text-slate-600 text-sm mt-1">Here is your official evaluation as a B2B Sales Representative for JoeyHospitality.</p>
+
+                        <!-- Final Score Box -->
+                        <div class="bg-slate-50 border-2 border-slate-200 rounded-2xl p-6 my-6 shadow-inner">
+                            <div class="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Total Cumulative Sales Score</div>
+                            <div id="final-total" class="text-4xl md:text-5xl font-black text-slate-900 my-1 font-mono">0 / 48</div>
+                            <div id="final-percentage" class="text-xs font-extrabold text-sage-dark">0% Success Rate</div>
+                        </div>
+
+                        <!-- Rank Evaluation Box -->
+                        <div id="evaluation-box" class="p-6 rounded-2xl mb-6 text-left shadow-sm">
+                            <!-- Dynamic Content -->
+                        </div>
+
+                        <!-- Vocabulary Review Summary -->
+                        <div class="bg-slate-50 rounded-xl p-4 text-left border border-slate-200 mb-6">
+                            <h4 class="font-bold text-slate-900 text-sm mb-2 flex items-center gap-1">
+                                🎓 Key B2B Sales Vocabulary Covered This Month:
+                            </h4>
+                            <div class="flex flex-wrap gap-1.5 text-xs">
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">prospecting</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">lead</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">needs analysis</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">quote</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">discount</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">contract</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">deposit</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">delivery</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">warranty</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">liability</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">refund</span>
+                                <span class="bg-white border border-slate-200 px-2 py-1 rounded font-semibold text-slate-800">follow-up</span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button onclick="clearSaveAndRestart()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg transition text-base">
+                                🔄 Play Month 1 Simulation Again
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-100 border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <span class="flex items-center gap-1 font-medium">© JoeyHospitality • Sales English Learning App</span>
+            <span>Target Level: Low B1 / Strong A2 English Learners</span>
+        </div>
+    </footer>
+
+    <!-- GAME OVER FATAL MODAL -->
+    <div id="game-over-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center shadow-2xl border-t-8 border-crimson card-slide">
+            <span class="text-6xl block mb-2">💥</span>
+            <span class="bg-crimson-light text-crimson font-black text-xs px-3 py-1 rounded-full uppercase tracking-wider">Critical Failure</span>
+            <h3 class="text-2xl font-black text-slate-900 mt-2">Client Lost - Game Over</h3>
+            <p id="game-over-msg" class="text-slate-600 text-sm mt-3 leading-relaxed">
+                You mishandled a critical crisis. The hotel terminated all negotiations and canceled all business with JoeyHospitality!
+            </p>
+            <div class="bg-red-50 p-3 rounded-xl text-red-900 text-xs font-semibold my-4 border border-red-200">
+                ⚠️ Emergency Rule: In B2B sales emergencies, blaming the client or making reckless legal threats causes immediate loss of contract.
+            </div>
+            <button onclick="clearSaveAndRestart()" class="w-full bg-crimson hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
+                🔁 Restart Sales Simulator
+            </button>
+        </div>
+    </div>
+
+    <!-- VOCABULARY GLOSSARY MODAL -->
+    <div id="glossary-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 max-h-[85vh] flex flex-col shadow-2xl card-slide">
+            <div class="flex justify-between items-center pb-3 border-b border-slate-200">
+                <h3 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                    📖 Sales Vocabulary Guide (B1 Level)
+                </h3>
+                <button onclick="toggleGlossaryModal()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold px-2">
+                    &times;
+                </button>
+            </div>
+            
+            <div class="overflow-y-auto py-4 space-y-3 text-sm flex-grow pr-1" id="glossary-list">
+                <!-- Injected programmatically -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-200 text-right">
+                <button onclick="toggleGlossaryModal()" class="bg-slate-900 hover:bg-slate-800 text-white font-bold px-5 py-2 rounded-lg text-xs">
+                    Close Guide
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESET CONFIRMATION MODAL -->
+    <div id="reset-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 text-center shadow-2xl border-t-4 border-amber">
+            <h3 class="text-lg font-bold text-slate-900">Restart Simulation?</h3>
+            <p class="text-xs text-slate-600 mt-2">Are you sure you want to restart? Your current simulation score and progress will be reset.</p>
+            <div class="flex gap-2 mt-5">
+                <button onclick="clearSaveAndRestart()" class="w-full bg-amber hover:bg-amber-dark text-white font-bold py-2 rounded-lg text-xs shadow">
+                    Yes, Restart
+                </button>
+                <button onclick="closeResetModal()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-semibold py-2 rounded-lg text-xs">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+<script>
+/* ==========================================================================
+   12 ESSENTIAL VOCABULARY ITEMS (B1 LEVEL)
+   ========================================================================== */
+const flashcardsData = [
+    {
+        id: 1,
+        term: "Prospecting",
+        pos: "noun",
+        phonetic: "/ˈprɒspɛktɪŋ/",
+        sentence: "Our sales team spends Monday mornings prospecting new boutique hotel accounts.",
+        definition: "Searching for new potential hotel clients and business buyers.",
+        context: "Prospecting includes finding newly constructed luxury resorts that need children's furniture."
+    },
+    {
+        id: 2,
+        term: "Lead",
+        pos: "noun",
+        phonetic: "/liːd/",
+        sentence: "The trade show generated over 40 qualified leads for our high chair line.",
+        definition: "A person or hotel business that has shown interest in buying your equipment.",
+        context: "A hotel purchasing manager who leaves her business card at your booth is a qualified lead."
+    },
+    {
+        id: 3,
+        term: "Needs Analysis",
+        pos: "noun",
+        phonetic: "/niːdz əˈnæləsɪs/",
+        sentence: "We perform a thorough needs analysis to recommend the right crib sizes for boutique hotel rooms.",
+        definition: "Asking targeted questions to understand what equipment the hotel requires.",
+        context: "During needs analysis, we discover if the hotel dining room needs stackable high chairs or booster seats."
+    },
+    {
+        id: 4,
+        term: "Quote",
+        pos: "noun",
+        phonetic: "/kwəʊt/",
+        sentence: "I will email you an official price quote for 20 wooden cribs before 5 PM.",
+        definition: "An official estimated price statement for requested equipment before purchase.",
+        context: "A sales quote details shipping costs, unit prices, and estimated delivery dates."
+    },
+    {
+        id: 5,
+        term: "Discount",
+        pos: "noun",
+        phonetic: "/ˈdɪskaʊnt/",
+        sentence: "We offer a 10% wholesale discount when hotels order more than 25 play units.",
+        definition: "A price reduction offered to clients (e.g., volume or seasonal discount).",
+        context: "Giving a reasonable discount encourages hotel directors to sign larger equipment orders."
+    },
+    {
+        id: 6,
+        term: "Contract",
+        pos: "noun",
+        phonetic: "/ˈkɒntrækt/",
+        sentence: "Both parties must sign the supply contract before manufacturing begins.",
+        definition: "A legally binding written agreement between seller and buyer.",
+        context: "The sales contract outlines liability terms, payment schedules, and delivery guarantees."
+    },
+    {
+        id: 7,
+        term: "Deposit",
+        pos: "noun",
+        phonetic: "/dɪˈpɒzɪt/",
+        sentence: "The hotel paid a 40% advance deposit upon signing the sales contract.",
+        definition: "An advance partial payment made by the buyer upon signing a contract.",
+        context: "Receiving an advance deposit secures factory materials and protects cash flow."
+    },
+    {
+        id: 8,
+        term: "Delivery",
+        pos: "noun",
+        phonetic: "/dɪˈlɪvəri/",
+        sentence: "Freight delivery is scheduled for Thursday morning at the hotel receiving dock.",
+        definition: "The transport and arrival of ordered equipment at the hotel location.",
+        context: "Timely freight delivery ensures the hotel is ready for holiday family check-ins."
+    },
+    {
+        id: 9,
+        term: "Warranty",
+        pos: "noun",
+        phonetic: "/ˈwɒrənti/",
+        sentence: "All JoeyHospitality cribs include a 3-year full manufacturer warranty.",
+        definition: "A written guarantee promising to repair or replace defective goods within a time limit.",
+        context: "A long product warranty gives hotel owners peace of mind regarding equipment durability."
+    },
+    {
+        id: 10,
+        term: "Liability",
+        pos: "noun",
+        phonetic: "/ˌlaɪəˈbɪlɪti/",
+        sentence: "The contract clearly states liability terms in case of accidental product misuse.",
+        definition: "Legal financial responsibility for damages, injuries, or defects.",
+        context: "Safety testing certificates protect both the manufacturer and the hotel from legal liability."
+    },
+    {
+        id: 11,
+        term: "Refund",
+        pos: "noun",
+        phonetic: "/ˈriːfʌnd/",
+        sentence: "We issued a partial refund to cover shipping fees after a customs delay.",
+        definition: "Returning money back to a client when a product is returned or service fails.",
+        context: "Offering a swift refund for damaged parts preserves good client relations."
+    },
+    {
+        id: 12,
+        term: "Follow-up",
+        pos: "noun / verb",
+        phonetic: "/ˈfɒləʊ ʌp/",
+        sentence: "Our sales representative made a follow-up call two weeks after installation.",
+        definition: "Contacting the client after sales or delivery to ensure satisfaction and build trust.",
+        context: "Effective follow-up calls often lead to account renewals and positive client referrals."
+    }
+];
+
+/* ==========================================================================
+   8 TRUE / FALSE STATEMENTS (B1 LEVEL)
+   ========================================================================== */
+const trueFalseData = [
+    {
+        id: 1,
+        statement: "'Prospecting' means contacting existing long-term clients to say thank you.",
+        isTrue: false,
+        explanation: "False! 'Prospecting' specifically means actively searching for NEW potential hotel buyers and leads."
+    },
+    {
+        id: 2,
+        statement: "A 'quote' is an official document showing estimated costs before buying equipment.",
+        isTrue: true,
+        explanation: "True! A sales quote gives hotel buyers formal price details before they finalize an order."
+    },
+    {
+        id: 3,
+        statement: "Offering a 50% discount immediately to every client is the best sales strategy.",
+        isTrue: false,
+        explanation: "False! Surrendering 50% discounts immediately destroys profit margins. Concede smaller value-adds instead."
+    },
+    {
+        id: 4,
+        statement: "'Liability' refers to legal financial responsibility if someone gets hurt using equipment.",
+        isTrue: true,
+        explanation: "True! Liability clauses in B2B contracts clarify legal responsibility for injuries or defects."
+    },
+    {
+        id: 5,
+        statement: "A 'deposit' is paid after all equipment is delivered and installed at the hotel.",
+        isTrue: false,
+        explanation: "False! A deposit is an ADVANCE partial payment paid upon signing the contract before delivery."
+    },
+    {
+        id: 6,
+        statement: "Asking targeted questions to understand client goals before selling is called 'needs analysis'.",
+        isTrue: true,
+        explanation: "True! A thorough needs analysis helps you pitch the exact high chairs or cribs the hotel requires."
+    },
+    {
+        id: 7,
+        statement: "'Follow-up' calls are only needed if a customer posts a bad review online.",
+        isTrue: false,
+        explanation: "False! Proactive follow-up calls build long-term trust, secure account renewals, and ensure guest satisfaction."
+    },
+    {
+        id: 8,
+        statement: "A 'warranty' protects the buyer if equipment breaks due to manufacturing defects within a set period.",
+        isTrue: true,
+        explanation: "True! Manufacturer warranties reassure hotel buyers regarding safety and build quality."
+    }
+];
+
+/* ==========================================================================
+   CHRONOLOGICAL 1-MONTH NARRATIVE SIMULATION DATA (12 DECISIONS + 2 EMERGENCIES)
+   ========================================================================== */
+const gameData = {
+    d1: {
+        title: "Cold Outreach to Boutique Hotels",
+        timeline: "WEEK 1 • DAY 1",
+        phase: "Prospection Phase",
+        text: "You begin your month by <span class='vocab-term' onclick='openGlossaryTerm(\"prospecting\")'>prospecting</span> luxury boutique hotels. The Grand Vista Hotel is upgrading its family amenities. You want to contact the General Manager. What is your best first step?",
+        choices: [
+            {
+                text: "Send a personalized email highlighting our certified pediatric safety standards and request a brief 15-minute introductory call.",
+                pts: 4,
+                fb: "Excellent! Tailored messaging focusing on guest safety and certified quality captures executive interest."
+            },
+            {
+                text: "Call the hotel front desk directly and ask the receptionist to email our general product catalog.",
+                pts: 3,
+                fb: "Good effort. Receptionists can forward catalogs, though speaking directly to decision-makers is better."
+            },
+            {
+                text: "Send a generic marketing email to info@grandvistahotel.com with attached PDF brochures.",
+                pts: 2,
+                fb: "Neutral strategy. General inbox messages are frequently overlooked by busy hotel managers."
+            },
+            {
+                text: "Arrive at the hotel front lobby without an appointment and ask to meet the manager immediately.",
+                pts: 1,
+                fb: "Weak strategy. Unannounced visits disrupt hotel operations and look unprofessional."
+            },
+            {
+                text: "Send 15 automated identical messages every hour to all hotel staff on social media.",
+                pts: -1,
+                fb: "Bad choice! Spamming hotel employees damages JoeyHospitality's brand reputation."
+            }
+        ],
+        next: "d2"
+    },
+    d2: {
+        title: "Determining Hotel Operational Needs",
+        timeline: "WEEK 1 • DAY 3",
+        phase: "Needs Analysis",
+        text: "The GM agrees to a call. She explains: 'Our restaurant dining space is tight, and parents often complain about bulky high chairs.' How do you conduct your <span class='vocab-term' onclick='openGlossaryTerm(\"needs analysis\")'>needs analysis</span>?",
+        choices: [
+            {
+                text: "Present our stackable wooden high chairs with stain-resistant trays and explain how they save 60% floor space when stored.",
+                pts: 4,
+                fb: "Outstanding! You matched technical specifications directly to the hotel's operational space problem."
+            },
+            {
+                text: "Offer to send two sample high chairs for a 1-week free trial in their main dining room.",
+                pts: 3,
+                fb: "Very good! Letting the hotel test physical samples builds strong buyer confidence."
+            },
+            {
+                text: "List raw dimensions (height, width, weight) in centimeters without explaining operational benefits.",
+                pts: 2,
+                fb: "Neutral. Technical measurements are important, but highlighting operational solutions is more persuasive."
+            },
+            {
+                text: "Tell her that all high chairs take up space and suggest removing extra dining tables.",
+                pts: 1,
+                fb: "Weak pitch. Asking a hotel to remove tables reduces their dining revenue."
+            },
+            {
+                text: "Claim that parents should not bring young children into luxury hotel dining rooms.",
+                pts: -1,
+                fb: "Bad choice! Insulting family guests alienates the hotel manager."
+            }
+        ],
+        next: "d3"
+    },
+    d3: {
+        title: "Product Demonstration at Hospitality Expo",
+        timeline: "WEEK 1 • DAY 5",
+        phase: "Product Demonstration",
+        text: "You meet the hotel's Purchasing Director at a regional hospitality trade show to convert him into a qualified <span class='vocab-term' onclick='openGlossaryTerm(\"lead\")'>lead</span>. How do you demonstrate our play corner sets?",
+        choices: [
+            {
+                text: "Demonstrate live how the non-toxic, antibacterial wooden play modules lock together safely without tools in 3 minutes.",
+                pts: 4,
+                fb: "Perfect! Live interactive demonstrations prove durability, safety, and operational ease."
+            },
+            {
+                text: "Hand him a well-designed printed brochure showing safety test certifications from European laboratories.",
+                pts: 3,
+                fb: "Good approach. Official safety certifications build essential credibility with procurement teams."
+            },
+            {
+                text: "Stand near the play set and wait quietly for trade show attendees to come ask questions.",
+                pts: 2,
+                fb: "Neutral. Being passive at trade shows limits your engagement with potential buyers."
+            },
+            {
+                text: "Tell him that competing play sets use cheap plastic that breaks quickly.",
+                pts: 1,
+                fb: "Weak strategy. Focusing on competitor weaknesses is less effective than highlighting your product quality."
+            },
+            {
+                text: "Offer him cash under the table if he signs an order before leaving the booth.",
+                pts: -1,
+                fb: "Bad choice! Offering informal cash bribes is strictly illegal and unethical."
+            }
+        ],
+        next: "d4"
+    },
+    d4: {
+        title: "Negotiating Price & Wholesale Discounts",
+        timeline: "WEEK 2 • DAY 8",
+        phase: "Negotiation Phase",
+        text: "The Grand Vista Hotel requests a formal <span class='vocab-term' onclick='openGlossaryTerm(\"quote\")'>quote</span> for 30 modular cribs, but asks for an immediate 20% <span class='vocab-term' onclick='openGlossaryTerm(\"discount\")'>discount</span>. How do you respond?",
+        choices: [
+            {
+                text: "Offer a structured 10% volume discount, and add 2 years of free replacement safety harnesses to protect profit margins.",
+                pts: 4,
+                fb: "Brilliant! Trading value-added accessories instead of deep cash discounts preserves profit margins."
+            },
+            {
+                text: "Agree to a 12% discount if the hotel commits to a multi-year exclusive equipment supply agreement.",
+                pts: 3,
+                fb: "Very good! Conceding a smaller discount in exchange for multi-year contract exclusivity is smart."
+            },
+            {
+                text: "Offer a flat 10% discount with standard conditions and no added bonuses.",
+                pts: 2,
+                fb: "Neutral. A standard counter-offer works, but trading added service value is stronger."
+            },
+            {
+                text: "Accept the full 20% discount immediately without asking for anything in return.",
+                pts: 1,
+                fb: "Weak negotiation. Surrendering 20% right away significantly lowers your profit margin."
+            },
+            {
+                text: "Refuse to negotiate and tell the buyer to shop elsewhere if they cannot afford full price.",
+                pts: -1,
+                fb: "Bad choice! Refusing professional negotiation damages client relationships."
+            }
+        ],
+        next: "e1"
+    },
+    e1: {
+        title: "Unreasonable Legal Liability Demands",
+        timeline: "WEEK 2 • DAY 11",
+        phase: "EMERGENCY 1",
+        isEmergency: true,
+        text: "🚨 <strong>URGENT LEGAL CRISIS!</strong> The hotel legal team sends a strict <span class='vocab-term' onclick='openGlossaryTerm(\"liability\")'>liability</span> clause stating: <em>'JoeyHospitality must accept 100% financial liability for any child injury on hotel premises, even if hotel staff misuse equipment.'</em> How do you react?",
+        choices: [
+            {
+                text: "Schedule an immediate conference call between our legal counsel and theirs to draft a balanced clause covering manufacturing defects while requiring hotel staff compliance with user manuals.",
+                type: "good",
+                pts: 2,
+                fb: "EMERGENCY RESOLVED! Professional legal collaboration protected your company while maintaining the contract (+2 Points)."
+            },
+            {
+                text: "Provide certified factory safety compliance documents and offer free mandatory staff safety training upon delivery to resolve their concern.",
+                type: "good",
+                pts: 1,
+                fb: "EMERGENCY RESOLVED! Proactive safety training reassured the legal team effectively (+1 Point)."
+            },
+            {
+                text: "Sign the agreement immediately without legal review just to save the sale before the weekend.",
+                type: "bad",
+                gameOver: true,
+                fb: "GAME OVER! Accepting total injury liability exposed JoeyHospitality to extreme legal risk. Management canceled the contract!"
+            }
+        ],
+        next: "d5"
+    },
+    d5: {
+        title: "Finalizing Contract Terms & Customization",
+        timeline: "WEEK 2 • DAY 13",
+        phase: "Customization Request",
+        text: "The hotel marketing team requests laser-engraved hotel logos on all wooden play gates before signing the final <span class='vocab-term' onclick='openGlossaryTerm(\"contract\")'>contract</span>. How do you handle this?",
+        choices: [
+            {
+                text: "Confirm custom engraving is available, detail the small per-unit cost, and explain it adds 4 business days to total production.",
+                pts: 4,
+                fb: "Perfect! Clear transparent communication on cost and production timeline prevents future delays."
+            },
+            {
+                text: "Include free logo engraving as a signing bonus if they confirm the final contract order today.",
+                pts: 3,
+                fb: "Very good incentive! Offering free customization creates positive closing momentum."
+            },
+            {
+                text: "Accept the logo request verbally without checking factory engraving schedules or costs.",
+                pts: 2,
+                fb: "Neutral. Accepting without confirming factory capacity risks unexpected production bottlenecks."
+            },
+            {
+                text: "Tell the hotel that custom branding is unnecessary because children do not care about hotel logos.",
+                pts: 1,
+                fb: "Weak response. Dismissing the hotel's marketing efforts hurts rapport."
+            },
+            {
+                text: "Charge a 300% markup fee for simple logo laser engraving.",
+                pts: -1,
+                fb: "Bad choice! Unreasonable overcharging makes buyers feel cheated."
+            }
+        ],
+        next: "d6"
+    },
+    d6: {
+        title: "Closing the Deal & Deposit Terms",
+        timeline: "WEEK 2 • DAY 15",
+        phase: "Closing Contract",
+        text: "The contract is ready! You need to establish deposit terms and set firm production expectations. How do you structure the payment?",
+        choices: [
+            {
+                text: "Require a 40% initial <span class='vocab-term' onclick='openGlossaryTerm(\"deposit\")'>deposit</span> upon signing, with 60% due within 30 days after verified delivery.",
+                pts: 4,
+                fb: "Masterful closing! Structured deposit terms protect cash flow while giving the buyer comfortable credit."
+            },
+            {
+                text: "Offer a 2% prompt-payment discount if the hotel pays 100% of the invoice balance upfront.",
+                pts: 3,
+                fb: "Good financial incentive. Full advance payment eliminates credit risk completely."
+            },
+            {
+                text: "Allow 100% post-payment 90 days after delivery with no deposit requirement.",
+                pts: 2,
+                fb: "Neutral. Excessive payment credit places unnecessary financial strain on your company."
+            },
+            {
+                text: "Call the purchasing director 5 times in one afternoon pressuring her to sign.",
+                pts: 1,
+                fb: "Weak closing style. Excessive pressure annoys corporate buyers."
+            },
+            {
+                text: "Tell the client they must pay in physical cash inside an unmarked envelope.",
+                pts: -1,
+                fb: "Bad choice! B2B corporate transactions require official bank wire transfers."
+            }
+        ],
+        next: "d7"
+    },
+    d7: {
+        title: "Managing Freight Delivery Delays",
+        timeline: "WEEK 3 • DAY 18",
+        phase: "Logistics Phase",
+        text: "Customs processing creates a 3-day shipping delay right before the hotel's soft opening. You need to coordinate freight <span class='vocab-term' onclick='openGlossaryTerm(\"delivery\")'>delivery</span>. What is your strategy?",
+        choices: [
+            {
+                text: "Contact the GM immediately, explain the customs bottleneck, and deliver 10 temporary loaner cribs by courier free of charge.",
+                pts: 4,
+                fb: "Outstanding customer service! Proactive transparency and loaner equipment turns a delay into deep trust."
+            },
+            {
+                text: "Provide real-time GPS freight tracking and coordinate directly with the hotel dock manager for express weekend unloading.",
+                pts: 3,
+                fb: "Very good. Active logistics coordination helps the hotel prepare dock staff."
+            },
+            {
+                text: "Send a brief email notification regarding the delay without offering alternative solutions.",
+                pts: 2,
+                fb: "Neutral. Honest notification is basic duty, but providing temporary loaner solutions is far superior."
+            },
+            {
+                text: "Wait until the original delivery date passes and hope customs releases the goods unexpectedly.",
+                pts: 1,
+                fb: "Weak response. Hiding shipping delays until the last minute infuriates hotel management."
+            },
+            {
+                text: "Blame the delivery truck driver and tell the hotel to call customs directly.",
+                pts: -1,
+                fb: "Bad choice! Shirking responsibility destroys professional trust."
+            }
+        ],
+        next: "e2"
+    },
+    e2: {
+        title: "Quality Misunderstanding & Assembly Alarm",
+        timeline: "WEEK 3 • DAY 20",
+        phase: "EMERGENCY 2",
+        isEmergency: true,
+        text: "🚨 <strong>ALERT!</strong> The hotel maintenance head calls in anger: <em>'Your wooden cribs smell strongly of fresh finish, and three frame bolts seem loose! We suspect dangerous quality!'</em> What do you do?",
+        choices: [
+            {
+                text: "Visit the hotel within 2 hours, inspect cribs in person, demonstrate that eco-varnish smell is non-toxic and vanishes in 24 hours, and tighten bolts using the included torque key.",
+                type: "good",
+                pts: 2,
+                fb: "CRISIS SOLVED! Prompt on-site inspection proved non-toxic eco safety and corrected loose assembly (+2 Points)."
+            },
+            {
+                text: "Dispatch our senior technical engineer immediately to conduct a full safety inspection and issue a written quality safety certificate.",
+                type: "good",
+                pts: 1,
+                fb: "CRISIS SOLVED! Sending technical experts restored client safety confidence (+1 Point)."
+            },
+            {
+                text: "Tell the maintenance head over the phone that he is exaggerating and refuse to visit the property.",
+                type: "bad",
+                gameOver: true,
+                fb: "GAME OVER! Dismissing guest safety concerns caused the hotel GM to cancel all contracts!"
+            }
+        ],
+        next: "d8"
+    },
+    d8: {
+        title: "Equipment Warranty & Assembly Support",
+        timeline: "WEEK 3 • DAY 22",
+        phase: "Assembly Support",
+        text: "The hotel maintenance team is struggling to assemble modular play sets and asks about our product <span class='vocab-term' onclick='openGlossaryTerm(\"warranty\")'>warranty</span> coverage for assembly damage. How do you assist?",
+        choices: [
+            {
+                text: "Provide a link to our step-by-step 3D video assembly guide and host a quick video call with our lead technician.",
+                pts: 4,
+                fb: "Excellent technical support! Digital visual guides resolve manual assembly confusion effortlessly."
+            },
+            {
+                text: "Send an experienced regional assembly technician to train hotel maintenance staff on-site tomorrow morning.",
+                pts: 3,
+                fb: "Very good. On-site staff training guarantees correct long-term assembly and maintenance."
+            },
+            {
+                text: "Re-send the PDF instruction manual via email with the key assembly pages highlighted.",
+                pts: 2,
+                fb: "Neutral. Re-sending paper manuals helps, but interactive video support is much clearer."
+            },
+            {
+                text: "Suggest maintenance staff hire an external handyman to assemble the units.",
+                pts: 1,
+                fb: "Weak advice. Asking clients to pay external handymen damages your service reputation."
+            },
+            {
+                text: "Tell the maintenance team that high school students could read the manual easily.",
+                pts: -1,
+                fb: "Bad choice! Insulting client personnel creates hostility."
+            }
+        ],
+        next: "d9"
+    },
+    d9: {
+        title: "Resolving Invoice Billing & Refunds",
+        timeline: "WEEK 3 • DAY 24",
+        phase: "Invoice Resolution",
+        text: "The hotel accounting manager calls: 'There is an extra $150 freight fee on the final invoice!' They ask for a partial <span class='vocab-term' onclick='openGlossaryTerm(\"refund\")'>refund</span> or correction. How do you resolve this?",
+        choices: [
+            {
+                text: "Review the original quote, confirm it was a clerical error, issue an immediate revised invoice, and apologize politely.",
+                pts: 4,
+                fb: "Perfect! Swiftly correcting billing errors builds trust with accounting departments."
+            },
+            {
+                text: "Explain the fee was for Saturday dock delivery, but credit the $150 towards their next maintenance order.",
+                pts: 3,
+                fb: "Good solution. Turning a billing query into future store credit protects client goodwill."
+            },
+            {
+                text: "Send the signed delivery receipt showing weekend delivery without further explanation.",
+                pts: 2,
+                fb: "Neutral. Providing receipts proves facts, but polite verbal clarification is better."
+            },
+            {
+                text: "Tell accounting to pay the full balance first and discuss disputes later.",
+                pts: 1,
+                fb: "Weak response. Forcing clients to pay disputed charges causes accounting friction."
+            },
+            {
+                text: "Threaten to send debt collection agents to the hotel lobby over $150.",
+                pts: -1,
+                fb: "Bad choice! Aggressive threats over minor billing disputes ruin long-term client accounts."
+            }
+        ],
+        next: "d10"
+    },
+    d10: {
+        title: "Recommending After-Sales Maintenance Protocols",
+        timeline: "WEEK 4 • DAY 26",
+        phase: "After-Sales Support",
+        text: "The housekeeping director asks how to clean and sanitize wooden cribs without damaging the protective eco varnish. What maintenance advice do you provide?",
+        choices: [
+            {
+                text: "Provide a customized care guide recommending mild organic soap and microfiber cloths, and send 2 free wood care kits.",
+                pts: 4,
+                fb: "Outstanding support! Providing tailored care guides and complimentary kits preserves product quality."
+            },
+            {
+                text: "Recommend hospital-grade non-bleach sanitizing wipes certified safe for pediatric furniture.",
+                pts: 3,
+                fb: "Very good. Recommending specific certified cleaning products prevents chemical damage."
+            },
+            {
+                text: "Tell her any standard household wood polish will work fine.",
+                pts: 2,
+                fb: "Neutral. General polish works, but specific eco-friendly guidance is safer."
+            },
+            {
+                text: "Tell housekeeping that cleaning wooden equipment too often ruins the wood.",
+                pts: 1,
+                fb: "Weak pitch. Hotels must sanitize guest rooms daily."
+            },
+            {
+                text: "Advise using concentrated industrial bleach on all baby cribs.",
+                pts: -1,
+                fb: "Bad choice! Bleach destroys wood lacquers and leaves harsh chemical residue."
+            }
+        ],
+        next: "d11"
+    },
+    d11: {
+        title: "2-Week Post-Delivery Follow-Up",
+        timeline: "WEEK 4 • DAY 28",
+        phase: "Customer Retention",
+        text: "You conduct a 14-day post-delivery <span class='vocab-term' onclick='openGlossaryTerm(\"follow-up\")'>follow-up</span> call. The hotel reports parents are thrilled with the cribs. How do you capitalize on this?",
+        choices: [
+            {
+                text: "Thank the GM, request a short quote for a joint marketing release, and offer guest feedback QR cards for hotel rooms.",
+                pts: 4,
+                fb: "Proactive excellence! Converting satisfaction into joint marketing strengthens partnership."
+            },
+            {
+                text: "Ask if they would leave a review on a professional hospitality procurement network.",
+                pts: 3,
+                fb: "Good approach. Positive B2B reviews generate valuable social proof for future sales."
+            },
+            {
+                text: "Send a polite email thanking them for their business and close the support ticket.",
+                pts: 2,
+                fb: "Neutral. A simple thank-you email is courteous, but leveraging positive sentiment for growth is better."
+            },
+            {
+                text: "Call immediately to demand they order 50 more units before the end of the month.",
+                pts: 1,
+                fb: "Weak tactic. Pushy re-solicitation right after delivery can annoy clients."
+            },
+            {
+                text: "Ignore the client now that the sale is finished and invoices are settled.",
+                pts: -1,
+                fb: "Bad choice! Neglecting existing accounts leads to customer loss."
+            }
+        ],
+        next: "d12"
+    },
+    d12: {
+        title: "Account Renewal & Winter Upselling",
+        timeline: "WEEK 4 • DAY 30",
+        phase: "Account Renewal",
+        text: "It is the last day of the month! The hotel is planning its winter season. How do you present an account expansion and preventive maintenance contract?",
+        choices: [
+            {
+                text: "Propose an Annual Preventive Maintenance Agreement (quarterly inspections) and introduce our new indoor winter soft-play sets.",
+                pts: 4,
+                fb: "Masterclass B2B sales! Combining recurring maintenance revenue with seasonal product expansion maximizes lifetime account value!"
+            },
+            {
+                text: "Offer a 10% loyalty discount if they equip their sister resort property in the next city.",
+                pts: 3,
+                fb: "Very good! Multi-property cross-selling expands your regional market share."
+            },
+            {
+                text: "Propose a basic 1-year extended warranty package covering accidental finish scratches.",
+                pts: 2,
+                fb: "Neutral. Warranty extensions provide steady income."
+            },
+            {
+                text: "Push them aggressively to double their crib inventory immediately.",
+                pts: 1,
+                fb: "Weak pitch. Recommending items without operational reasoning turns buyers away."
+            },
+            {
+                text: "Inform the client that JoeyHospitality will charge an extra fee for phone calls next month.",
+                pts: -1,
+                fb: "Bad choice! Inventing unexpected service fees destroys client loyalty."
+            }
+        ],
+        next: "final"
+    }
+};
+
+/* ==========================================================================
+   EVALUATION RANKS (POSITIVE & CONSTRUCTIVE FEEDBACK)
+   ========================================================================== */
+const evalTiers = [
+    {
+        min: 0, max: 24,
+        title: "Sales Trainee (Building Skills)",
+        color: "border-amber bg-amber-50 text-amber-900",
+        badgeBg: "bg-amber text-slate-950 font-bold",
+        desc: "Great effort on completing your first month! Sales is a continuous learning journey. You demonstrated good enthusiasm and made valuable customer contacts. Focusing on active listening, asking clear questions during needs analysis, and handling customer concerns with confidence will help you achieve even better results next month."
+    },
+    {
+        min: 25, max: 37,
+        title: "Account Manager (Developing Professional)",
+        color: "border-amber bg-amber-light text-amber-900",
+        badgeBg: "bg-amber text-slate-950 font-black",
+        desc: "Solid performance! You showed a good understanding of hotel client needs, maintained positive relationships, and negotiated fair agreements. With a bit more practice on proactive follow-ups and navigating custom requests, you're well on your way to becoming a top seller!"
+    },
+    {
+        min: 38, max: 45,
+        title: "Senior Sales Representative (Accomplished Professional)",
+        color: "border-sage bg-sage-light text-sage-900",
+        badgeBg: "bg-sage text-white font-bold",
+        desc: "Excellent work! You demonstrated strong B2B sales skills, communicated value clearly, handled customer inquiries smoothly, and protected key client relationships. Your professional approach brings great value to JoeyHospitality!"
+    },
+    {
+        min: 46, max: 50,
+        title: "Director of Global Hospitality Sales (Sales Master)",
+        color: "border-slate-900 bg-slate-100 text-slate-900",
+        badgeBg: "bg-slate-900 text-amber font-extrabold",
+        desc: "Outstanding achievement! You mastered every stage of the sales cycle, resolved emergency situations with exceptional care and professionalism, and maximized account value while keeping clients completely satisfied. You are an inspiration to the team!"
+    }
+];
+
+/* ==========================================================================
+   APP STATE & CONTROL LOGIC
+   ========================================================================== */
+let currentScore = 0;
+let activeStep = "d1";
+let soundEnabled = true;
+let hasAnsweredCurrentStep = false;
+// Flashcards state
+let currentCardIndex = 0;
+let isCardFlipped = false;
+
+// Vocabulary Matching state
+let selectedTermObj = null;
+let selectedDefObj = null;
+let matchedCount = 0;
+let shuffledTermsList = [];
+let shuffledDefsList = [];
+
+// True/False state
+let tfUserAnswers = {};
+
+// Web Audio API Audio Generator
+function playAudioFeedback(type) {
+    if (!soundEnabled) return;
+    try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'success') {
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(659.25, ctx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.12, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.25);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.25);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, ctx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(110, ctx.currentTime + 0.2);
+            gain.gain.setValueAtTime(0.15, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.2);
+        } else if (type === 'emergency') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.linearRampToValueAtTime(440, ctx.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.2, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.3);
+        }
+    } catch(e) {}
+}
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    document.getElementById('sound-btn').innerText = soundEnabled ? '🔊' : '🔇';
+}
+
+function fisherYatesShuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+/* ==========================================================================
+   TAB SWITCHING LOGIC
+   ========================================================================== */
+function switchTab(tabId) {
+    // Hide all tab sections
+    document.getElementById('tab-discussion').classList.add('hidden');
+    document.getElementById('tab-vocabulary').classList.add('hidden');
+    document.getElementById('tab-truefalse').classList.add('hidden');
+    document.getElementById('tab-simulation').classList.add('hidden');
+
+    // Reset button styles
+    const buttons = document.querySelectorAll('.tab-btn');
+    buttons.forEach(btn => {
+        btn.className = "tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 text-slate-300 hover:bg-slate-850";
+    });
+
+    // Show target section & highlight button
+    const targetSection = document.getElementById('tab-' + tabId);
+    targetSection.classList.remove('hidden');
+
+    const activeBtn = document.getElementById('tab-btn-' + tabId);
+    if (activeBtn) {
+        activeBtn.className = "tab-btn px-3.5 py-2 rounded-t-lg text-xs md:text-sm font-bold transition flex items-center gap-1.5 bg-amber text-slate-950 shadow";
+    }
+
+    if (tabId === 'vocabulary') {
+        renderFlashcard();
+    } else if (tabId === 'truefalse') {
+        renderTrueFalse();
+    }
+}
+
+/* ==========================================================================
+   TAB 1: DISCUSSION NOTES AUTO-SAVE
+   ========================================================================== */
+function setupDiscussionNotes() {
+    const area = document.getElementById('discussion-notes');
+    const saved = localStorage.getItem('joeyDiscussionNotes');
+    if (saved) area.value = saved;
+
+    area.addEventListener('input', () => {
+        localStorage.setItem('joeyDiscussionNotes', area.value);
+    });
+}
+
+/* ==========================================================================
+   TAB 2: VOCABULARY FLASHCARDS & MATCHING
+   ========================================================================== */
+function setVocabSubTab(mode) {
+    const flashcardsSec = document.getElementById('vocab-sub-flashcards');
+    const matchingSec = document.getElementById('vocab-sub-matching');
+    const btnFlash = document.getElementById('sub-btn-flashcards');
+    const btnMatch = document.getElementById('sub-btn-matching');
+
+    if (mode === 'flashcards') {
+        flashcardsSec.classList.remove('hidden');
+        matchingSec.classList.add('hidden');
+        btnFlash.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition bg-white shadow text-slate-900";
+        btnMatch.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
+        renderFlashcard();
+    } else {
+        flashcardsSec.classList.add('hidden');
+        matchingSec.classList.remove('hidden');
+        btnMatch.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition bg-white shadow text-slate-900";
+        btnFlash.className = "flex-1 sm:flex-none px-4 py-1.5 rounded-lg text-xs font-extrabold transition text-slate-600 hover:text-slate-900";
+        initMatchingGame();
+    }
+}
+
+function renderFlashcard() {
+    const data = flashcardsData[currentCardIndex];
+    const cardEl = document.getElementById('flashcard-element');
+
+    // Reset card flip state first
+    cardEl.classList.remove('flipped');
+    isCardFlipped = false;
+
+    // Fill Front Content
+    document.getElementById('card-term').innerText = data.term;
+    document.getElementById('card-pos').innerText = data.pos;
+    document.getElementById('card-phonetic').innerText = data.phonetic;
+    document.getElementById('card-sentence').innerText = `"${data.sentence}"`;
+
+    // Fill Back Content
+    document.getElementById('card-back-term').innerText = data.term;
+    document.getElementById('card-definition').innerText = data.definition;
+    document.getElementById('card-context').innerText = `"${data.context}"`;
+
+    // Counter
+    document.getElementById('flashcard-counter').innerText = `Card ${currentCardIndex + 1} of ${flashcardsData.length}`;
+}
+
+function flipCurrentCard() {
+    const cardEl = document.getElementById('flashcard-element');
+    isCardFlipped = !isCardFlipped;
+    if (isCardFlipped) {
+        cardEl.classList.add('flipped');
+    } else {
+        cardEl.classList.remove('flipped');
+    }
+}
+
+function nextCard() {
+    currentCardIndex = (currentCardIndex + 1) % flashcardsData.length;
+    renderFlashcard();
+}
+
+function prevCard() {
+    currentCardIndex = (currentCardIndex - 1 + flashcardsData.length) % flashcardsData.length;
+    renderFlashcard();
+}
+
+function shuffleCards() {
+    currentCardIndex = Math.floor(Math.random() * flashcardsData.length);
+    renderFlashcard();
+}
+
+/* Matching Game Logic */
+function initMatchingGame() {
+    matchedCount = 0;
+    selectedTermObj = null;
+    selectedDefObj = null;
+    document.getElementById('matching-score-badge').innerText = `Matched: 0 / ${flashcardsData.length}`;
+    document.getElementById('matching-complete-banner').classList.add('hidden');
+
+    shuffledTermsList = fisherYatesShuffle(flashcardsData);
+    shuffledDefsList = fisherYatesShuffle(flashcardsData);
+
+    renderMatchingUI();
+}
+
+function resetMatchingGame() {
+    initMatchingGame();
+}
+
+function renderMatchingUI() {
+    const termsCol = document.getElementById('match-terms-column');
+    const defsCol = document.getElementById('match-defs-column');
+
+    termsCol.innerHTML = "";
+    defsCol.innerHTML = "";
+
+    shuffledTermsList.forEach(item => {
+        const btn = document.createElement('button');
+        btn.id = `match-term-${item.id}`;
+        btn.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-amber text-slate-800 font-bold text-xs md:text-sm transition flex justify-between items-center shadow-sm";
+        btn.innerHTML = `<span>📌 ${item.term}</span> <span class="text-[10px] text-slate-400 uppercase font-mono">Term</span>`;
+        btn.onclick = () => selectMatchingTerm(item, btn);
+        termsCol.appendChild(btn);
+    });
+
+    shuffledDefsList.forEach(item => {
+        const btn = document.createElement('button');
+        btn.id = `match-def-${item.id}`;
+        btn.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-sage text-slate-800 text-xs md:text-sm transition shadow-sm leading-snug";
+        btn.innerText = item.definition;
+        btn.onclick = () => selectMatchingDef(item, btn);
+        defsCol.appendChild(btn);
+    });
+}
+
+function selectMatchingTerm(item, btn) {
+    if (btn.disabled) return;
+
+    document.querySelectorAll('.match-term-btn').forEach(b => {
+        if (!b.disabled) b.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-amber text-slate-800 font-bold text-xs md:text-sm transition flex justify-between items-center shadow-sm";
+    });
+
+    btn.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-amber bg-amber-light text-amber-900 font-extrabold text-xs md:text-sm transition flex justify-between items-center shadow-md ring-2 ring-amber/40";
+    selectedTermObj = item;
+
+    checkPairMatch();
+}
+
+function selectMatchingDef(item, btn) {
+    if (btn.disabled) return;
+
+    document.querySelectorAll('.match-def-btn').forEach(b => {
+        if (!b.disabled) b.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-sage text-slate-800 text-xs md:text-sm transition shadow-sm leading-snug";
+    });
+
+    btn.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-sage bg-sage-light text-sage-dark font-semibold text-xs md:text-sm transition shadow-md ring-2 ring-sage/40";
+    selectedDefObj = item;
+
+    checkPairMatch();
+}
+
+function checkPairMatch() {
+    if (!selectedTermObj || !selectedDefObj) return;
+
+    const termBtn = document.getElementById(`match-term-${selectedTermObj.id}`);
+    const defBtn = document.getElementById(`match-def-${selectedDefObj.id}`);
+
+    if (selectedTermObj.id === selectedDefObj.id) {
+        // MATCH SUCCESS
+        playAudioFeedback('success');
+        termBtn.className = "w-full text-left p-3 rounded-xl border-2 border-sage bg-sage-light/80 text-sage-dark font-extrabold text-xs md:text-sm opacity-90 transition shadow-sm cursor-default flex justify-between items-center";
+        defBtn.className = "w-full text-left p-3 rounded-xl border-2 border-sage bg-sage-light/80 text-sage-dark font-semibold text-xs md:text-sm opacity-90 transition shadow-sm cursor-default";
+
+        termBtn.innerHTML = `<span>✅ ${selectedTermObj.term}</span> <span class="text-[10px] bg-sage text-white font-bold px-1.5 py-0.5 rounded">Matched</span>`;
+        
+        termBtn.disabled = true;
+        defBtn.disabled = true;
+
+        matchedCount++;
+        document.getElementById('matching-score-badge').innerText = `Matched: ${matchedCount} / ${flashcardsData.length}`;
+
+        selectedTermObj = null;
+        selectedDefObj = null;
+
+        if (matchedCount === flashcardsData.length) {
+            document.getElementById('matching-complete-banner').classList.remove('hidden');
+        }
+    } else {
+        // MATCH FAIL
+        playAudioFeedback('error');
+        termBtn.classList.add('animate-shake', 'border-crimson', 'bg-red-50');
+        defBtn.classList.add('animate-shake', 'border-crimson', 'bg-red-50');
+
+        const tempTermBtn = termBtn;
+        const tempDefBtn = defBtn;
+
+        setTimeout(() => {
+            if (!tempTermBtn.disabled) {
+                tempTermBtn.className = "match-term-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-amber text-slate-800 font-bold text-xs md:text-sm transition flex justify-between items-center shadow-sm";
+            }
+            if (!tempDefBtn.disabled) {
+                tempDefBtn.className = "match-def-btn w-full text-left p-3 rounded-xl border-2 border-slate-200 bg-white hover:border-sage text-slate-800 text-xs md:text-sm transition shadow-sm leading-snug";
+            }
+        }, 600);
+
+        selectedTermObj = null;
+        selectedDefObj = null;
+    }
+}
+
+/* ==========================================================================
+   TAB 3: TRUE / FALSE CHALLENGE
+   ========================================================================== */
+function renderTrueFalse() {
+    const container = document.getElementById('tf-statements-container');
+    container.innerHTML = "";
+
+    let correctCount = 0;
+    Object.keys(tfUserAnswers).forEach(id => {
+        if (tfUserAnswers[id].isCorrect) correctCount++;
+    });
+    document.getElementById('tf-score').innerText = `${correctCount} / ${trueFalseData.length}`;
+
+    trueFalseData.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-50 border-2 border-slate-200 rounded-2xl p-5 transition shadow-sm";
+
+        const hasAnswered = tfUserAnswers.hasOwnProperty(item.id);
+        const ansInfo = tfUserAnswers[item.id];
+
+        let feedbackHtml = "";
+        if (hasAnswered) {
+            const badgeClass = ansInfo.isCorrect ? "bg-sage text-white" : "bg-crimson text-white";
+            const badgeText = ansInfo.isCorrect ? "Correct! ✅" : "Incorrect ❌";
+            feedbackHtml = `
+                <div class="mt-3 pt-3 border-t border-slate-200 card-slide">
+                    <span class="text-xs font-black px-2.5 py-1 rounded-md uppercase tracking-wider ${badgeClass}">
+                        ${badgeText}
+                    </span>
+                    <p class="text-xs text-slate-700 mt-2 font-medium leading-relaxed">
+                        ${item.explanation}
+                    </p>
+                </div>
+            `;
+        }
+
+        card.innerHTML = `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div class="flex items-start gap-3">
+                    <span class="bg-slate-200 text-slate-800 font-black text-xs px-2.5 py-1 rounded-md flex-shrink-0 mt-0.5">
+                        Statement ${index + 1}
+                    </span>
+                    <p class="text-sm font-bold text-slate-900 leading-snug">
+                        "${item.statement}"
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-2 flex-shrink-0 self-end sm:self-auto">
+                    <button onclick="answerTrueFalse(${item.id}, true)" ${hasAnswered ? 'disabled' : ''} class="px-4 py-1.5 rounded-xl text-xs font-black transition ${hasAnswered && ansInfo.chosen === true ? (ansInfo.isCorrect ? 'bg-sage text-white' : 'bg-crimson text-white') : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'}">
+                        TRUE
+                    </button>
+                    <button onclick="answerTrueFalse(${item.id}, false)" ${hasAnswered ? 'disabled' : ''} class="px-4 py-1.5 rounded-xl text-xs font-black transition ${hasAnswered && ansInfo.chosen === false ? (ansInfo.isCorrect ? 'bg-sage text-white' : 'bg-crimson text-white') : 'bg-white hover:bg-slate-200 text-slate-800 border border-slate-300'}">
+                        FALSE
+                    </button>
+                </div>
+            </div>
+            ${feedbackHtml}
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+function answerTrueFalse(id, choice) {
+    const item = trueFalseData.find(x => x.id === id);
+    if (!item) return;
+
+    const isCorrect = (choice === item.isTrue);
+    if (isCorrect) playAudioFeedback('success'); else playAudioFeedback('error');
+
+    tfUserAnswers[id] = {
+        chosen: choice,
+        isCorrect: isCorrect
+    };
+
+    renderTrueFalse();
+}
+
+/* ==========================================================================
+   TAB 4: SIMULATION GAME CORE LOGIC
+   ========================================================================== */
+function initGame() {
+    buildGlossaryUI();
+    setupDiscussionNotes();
+
+    const savedStep = localStorage.getItem('joeySalesStep');
+    const savedScore = localStorage.getItem('joeySalesScore');
+
+    if (savedStep && savedScore !== null) {
+        activeStep = savedStep;
+        currentScore = Math.min(50, Math.max(0, parseInt(savedScore, 10)));
+        updateScoreDisplay();
+        if (activeStep === "final") {
+            finishSimulation();
+        } else {
+            showScreen('main');
+            loadTask();
+        }
+    }
+}
+
+function saveGame() {
+    localStorage.setItem('joeySalesStep', activeStep);
+    localStorage.setItem('joeySalesScore', currentScore);
+}
+
+function clearSaveAndRestart() {
+    localStorage.removeItem('joeySalesStep');
+    localStorage.removeItem('joeySalesScore');
+    location.reload();
+}
+
+function confirmReset() {
+    document.getElementById('reset-modal').classList.remove('hidden');
+}
+
+function closeResetModal() {
+    document.getElementById('reset-modal').classList.add('hidden');
+}
+
+function beginGame() {
+    currentScore = 0;
+    activeStep = "d1";
+    updateScoreDisplay();
+    saveGame();
+    showScreen('main');
+    loadTask();
+}
+
+function showScreen(screenId) {
+    document.getElementById('screen-intro').classList.add('hidden');
+    document.getElementById('screen-main').classList.add('hidden');
+    document.getElementById('screen-end').classList.add('hidden');
+
+    const target = document.getElementById('screen-' + screenId);
+    target.classList.remove('hidden');
+    target.classList.remove('card-slide');
+    void target.offsetWidth;
+    target.classList.add('card-slide');
+}
+
+function updateScoreDisplay() {
+    currentScore = Math.min(50, Math.max(0, currentScore));
+    document.getElementById('global-score').innerText = currentScore;
+}
+
+function loadTask() {
+    const data = gameData[activeStep];
+    if (!data) return;
+
+    hasAnsweredCurrentStep = false;
+
+    document.getElementById('timeline-badge').innerText = data.timeline;
+    document.getElementById('phase-badge').innerText = data.phase;
+    document.getElementById('question-title').innerText = data.title;
+    document.getElementById('question-text').innerHTML = data.text;
+
+    const emIndicator = document.getElementById('emergency-indicator');
+    const scenarioCard = document.getElementById('scenario-card');
+
+    if (data.isEmergency) {
+        emIndicator.classList.remove('hidden');
+        scenarioCard.classList.add('emergency-card');
+        playAudioFeedback('emergency');
+    } else {
+        emIndicator.classList.add('hidden');
+        scenarioCard.classList.remove('emergency-card');
+    }
+
+    const grid = document.getElementById('options-grid');
+    grid.innerHTML = "";
+    document.getElementById('result-feedback').classList.add('hidden');
+    document.getElementById('nav-action-bar').classList.add('hidden');
+
+    const randomized = fisherYatesShuffle(data.choices);
+
+    randomized.forEach(choice => {
+        const btn = document.createElement('button');
+        btn.className = "w-full text-left bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-slate-800 p-4 rounded-xl font-medium text-slate-800 text-sm md:text-base transition-all duration-200 shadow-sm flex items-start gap-3 active:scale-[0.99]";
+        
+        btn.innerHTML = `
+            <span class="bg-slate-100 text-slate-700 font-extrabold text-xs px-2.5 py-1 rounded-md border border-slate-300 mt-0.5 flex-shrink-0">
+                Option
+            </span>
+            <span class="flex-grow">${choice.text}</span>
+        `;
+        
+        btn.onclick = () => selectOption(choice, btn);
+        grid.appendChild(btn);
+    });
+}
+
+function selectOption(choice, btn) {
+    if (hasAnsweredCurrentStep && choice.pts !== -1) return;
+    const data = gameData[activeStep];
+    const fbPanel = document.getElementById('result-feedback');
+    const badge = document.getElementById('point-tag');
+    const ratingText = document.getElementById('feedback-rating');
+    const msg = document.getElementById('feedback-msg');
+
+    if (choice.gameOver) {
+        playAudioFeedback('error');
+        document.getElementById('game-over-msg').innerText = choice.fb;
+        document.getElementById('game-over-modal').classList.remove('hidden');
+        return;
+    }
+
+    if (choice.pts === -1) {
+        playAudioFeedback('error');
+        currentScore -= 1;
+        updateScoreDisplay();
+
+        badge.innerText = "-1 Point";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-crimson";
+        ratingText.innerText = "Ineffective Sales Answer";
+        msg.innerText = choice.fb;
+
+        fbPanel.className = "bg-red-50 rounded-2xl p-5 shadow-md border-l-8 border-crimson mb-6 card-slide";
+        fbPanel.classList.remove('hidden');
+
+        btn.disabled = true;
+        btn.classList.add('opacity-40', 'line-through', 'border-red-300', 'bg-red-50');
+        btn.classList.remove('hover:border-slate-800', 'hover:bg-slate-50');
+
+        saveGame();
+        return;
+    }
+
+    hasAnsweredCurrentStep = true;
+    playAudioFeedback('success');
+    document.querySelectorAll('#options-grid button').forEach(b => b.disabled = true);
+
+    btn.classList.add('border-sage', 'bg-sage-light', 'ring-2', 'ring-sage/40');
+
+    currentScore += choice.pts;
+    updateScoreDisplay();
+
+    if (data.isEmergency) {
+        badge.innerText = "+" + choice.pts + (choice.pts === 1 ? " Point" : " Points");
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-sage";
+        ratingText.innerText = "Emergency Successfully Resolved!";
+        fbPanel.className = "bg-sage-light/70 rounded-2xl p-5 shadow-md border-l-8 border-sage mb-6 card-slide";
+    } else if (choice.pts === 4) {
+        badge.innerText = "+4 Points";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-sage";
+        ratingText.innerText = "Best Professional Strategy!";
+        fbPanel.className = "bg-sage-light/70 rounded-2xl p-5 shadow-md border-l-8 border-sage mb-6 card-slide";
+    } else if (choice.pts === 3) {
+        badge.innerText = "+3 Points";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-slate-950 uppercase tracking-wider bg-amber";
+        ratingText.innerText = "Good Alternative Solution";
+        fbPanel.className = "bg-amber-light/70 rounded-2xl p-5 shadow-md border-l-8 border-amber mb-6 card-slide";
+    } else {
+        badge.innerText = "+" + choice.pts + " Points";
+        badge.className = "px-3 py-1 rounded-md text-xs font-black text-white uppercase tracking-wider bg-slate-600";
+        ratingText.innerText = "Acceptable Response";
+        fbPanel.className = "bg-slate-100 rounded-2xl p-5 shadow-md border-l-8 border-slate-500 mb-6 card-slide";
+    }
+
+    msg.innerText = choice.fb;
+    fbPanel.classList.remove('hidden');
+
+    const navBar = document.getElementById('nav-action-bar');
+    const nextBtn = document.getElementById('next-step-btn');
+    navBar.classList.remove('hidden');
+
+    nextBtn.onclick = () => {
+        activeStep = data.next;
+        saveGame();
+        if (activeStep === "final") {
+            finishSimulation();
+        } else {
+            loadTask();
+        }
+    };
+}
+
+function finishSimulation() {
+    showScreen('end');
+
+    currentScore = Math.min(50, Math.max(0, currentScore));
+    document.getElementById('final-total').innerText = currentScore + " / 50";
+    const percentage = Math.min(100, Math.max(0, Math.round((currentScore / 50) * 100)));
+    document.getElementById('final-percentage').innerText = percentage + "% Success Rate";
+
+    const tier = evalTiers.find(t => currentScore >= t.min && currentScore <= t.max) || evalTiers[0];
+    const box = document.getElementById('evaluation-box');
+    
+    box.className = `p-6 rounded-2xl mb-6 text-left shadow-md border-2 ${tier.color}`;
+    box.innerHTML = `
+        <div class="flex items-center justify-between gap-2 mb-3">
+            <span class="text-xs uppercase font-extrabold tracking-wider">Official Title Earned</span>
+            <span class="text-xs px-3 py-1 rounded-full ${tier.badgeBg}">${tier.title}</span>
+        </div>
+        <h3 class="text-xl font-black mb-2">${tier.title}</h3>
+        <p class="text-sm leading-relaxed">${tier.desc}</p>
+    `;
+
+    localStorage.removeItem('joeySalesStep');
+    localStorage.removeItem('joeySalesScore');
+}
+
+/* ==========================================================================
+   GLOSSARY MODAL GENERATOR
+   ========================================================================== */
+function buildGlossaryUI() {
+    const list = document.getElementById('glossary-list');
+    list.innerHTML = "";
+
+    flashcardsData.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "p-3 rounded-xl bg-slate-50 border border-slate-200 hover:border-amber transition";
+        div.id = 'vocab-' + item.term.toLowerCase().replace(/\s+/g, '-');
+        div.innerHTML = `
+            <div class="font-bold text-slate-900 text-sm capitalize flex items-center justify-between">
+                <span>📌 ${item.term}</span>
+                <span class="text-[10px] bg-amber-light text-amber-900 font-extrabold px-2 py-0.5 rounded uppercase">${item.pos}</span>
+            </div>
+            <p class="text-xs text-slate-700 font-semibold mt-1">${item.definition}</p>
+            <p class="text-[11px] text-slate-500 italic mt-0.5">${item.context}</p>
+        `;
+        list.appendChild(div);
+    });
+}
+
+function toggleGlossaryModal() {
+    document.getElementById('glossary-modal').classList.toggle('hidden');
+}
+
+function openGlossaryTerm(termKey) {
+    const modal = document.getElementById('glossary-modal');
+    modal.classList.remove('hidden');
+    const element = document.getElementById('vocab-' + termKey.toLowerCase().replace(/\s+/g, '-'));
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        element.classList.add('ring-2', 'ring-amber');
+        setTimeout(() => element.classList.remove('ring-2', 'ring-amber'), 2000);
+    }
+}
+
+// Window load initialization
+window.onload = initGame;
+</script>
+</body>
+</html>
