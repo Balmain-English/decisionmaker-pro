@@ -1,0 +1,465 @@
+<!-- bnb-french-getaway-b1.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Countryside Escape: Provence B&B Manager</title>
+<style>
+    :root {
+        --primary: #1a3a5f;
+        --accent: #c5a059;
+        --bg: #fdfaf6;
+        --card-bg: #ffffff;
+        --text: #2c3e50;
+        --success: #27ae60;
+        --warning: #f39c12;
+        --danger: #c0392b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.6; padding-bottom: 2rem; }
+    header { background: var(--primary); color: white; padding: 1rem 1.5rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+    .header-content { max-width: 900px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+    .dashboard { max-width: 900px; margin: 1.5rem auto 0; padding: 0 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+    .stat-card { background: var(--card-bg); padding: 0.8rem 1rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: #64748b; }
+    .stat-value { font-size: 1.25rem; font-weight: 800; margin: 0.2rem 0; }
+    .bar-bg { background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; }
+    .bar-fill { height: 100%; transition: width 0.4s ease, background-color 0.4s ease; }
+    .container { max-width: 900px; margin: 1.5rem auto; padding: 0 1rem; }
+    .card { background: var(--card-bg); padding: 2rem; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: none; }
+    .card.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1rem; }
+    .badge-std { background: #e0f2fe; color: #0369a1; }
+    .badge-emergency { background: #fee2e2; color: #b91c1c; }
+    h1, h2 { color: var(--primary); margin-bottom: 1rem; }
+    .choices-grid { display: grid; gap: 0.8rem; margin: 1.5rem 0; }
+    .btn { background: #f8fafc; border: 2px solid #cbd5e1; padding: 1rem; border-radius: 8px; text-align: left; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; color: var(--text); width: 100%; }
+    .btn:hover:not(:disabled) { border-color: var(--accent); background: #fffdfa; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; text-decoration: line-through; }
+    .btn-action { background: var(--primary); color: white; border: none; text-align: center; padding: 0.9rem; margin-top: 1rem; font-size: 1rem; display: none; }
+    .btn-action:hover { background: #112742; }
+    .feedback-box { padding: 1.2rem; border-radius: 8px; margin-top: 1rem; display: none; border-left: 6px solid; }
+    .fb-excel { background: #f0fdf4; border-color: var(--success); color: #166534; }
+    .fb-good { background: #f0f9ff; border-color: #0284c7; color: #075985; }
+    .fb-avg { background: #fffbeb; border-color: var(--warning); color: #92400e; }
+    .fb-poor { background: #fef2f2; border-color: var(--danger); color: #991b1b; }
+    .debrief-band { margin-top: 1rem; padding: 1.2rem; border-radius: 8px; background: #f8fafc; border: 1px solid #cbd5e1; }
+    .early-win { background: #f0fdf4; border: 2px solid var(--success); padding: 1.5rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-content">
+        <div>
+            <h2 style="color:white; margin:0; font-size:1.3rem;">The Countryside Escape</h2>
+            <p style="font-size:0.8rem; color:var(--accent); margin:0;">B1 Hospitality English • Provence B&B</p>
+        </div>
+        <div id="step-indicator" style="font-weight:bold; font-size:0.9rem;">Step 1 / 12</div>
+    </div>
+</header>
+
+<div class="dashboard">
+    <div class="stat-card">
+        <div class="stat-label">Rating</div>
+        <div class="stat-value" id="val-rating">4.0 ⭐</div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-rating" style="width:80%; background-color:var(--success);"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Energy</div>
+        <div class="stat-value" id="val-energy">100%</div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-energy" style="width:100%; background-color:var(--success);"></div></div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Budget</div>
+        <div class="stat-value" id="val-budget">€1,500</div>
+        <div class="bar-bg"><div class="bar-fill" id="bar-budget" style="width:100%; background-color:var(--success);"></div></div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="card active" id="screen-start">
+        <h1>B&B Manager Scenario: Provence</h1>
+        <p><strong>CEFR Level:</strong> B1 (Intermediate Hospitality English)</p>
+        <p><strong>Goal:</strong> Successfully manage guest arrivals, cultural customs, and daily operations over 12 chronological steps. Maintain your rating and resources to achieve Master Host status.</p>
+        <p><strong>Initial Resources:</strong> Rating: 4.0 Stars | Energy: 100% | Budget: €1,500</p>
+        <button class="btn btn-action" style="display:block;" onclick="startGame()">Begin Shift</button>
+    </div>
+
+    <div class="card" id="screen-game">
+        <span class="badge badge-std" id="step-badge">Standard Decision</span>
+        <h2 id="step-title">Scenario Title</h2>
+        <p id="step-desc">Scenario Description</p>
+
+        <div class="choices-grid" id="choices-container"></div>
+
+        <div class="feedback-box" id="feedback-box">
+            <strong id="fb-title">Outcome</strong>
+            <p id="fb-text" style="margin-top:0.3rem; font-size:0.95rem;"></p>
+        </div>
+
+        <button class="btn btn-action" id="btn-next" onclick="nextStep()">Proceed to Next Step</button>
+    </div>
+
+    <div class="card" id="screen-debrief">
+        <h1>Performance Debriefing</h1>
+        <div id="early-win-container"></div>
+        <div id="debrief-summary"></div>
+        <div class="debrief-band" id="debrief-details"></div>
+        <button class="btn btn-action" style="display:block;" onclick="location.reload()">Restart Simulation</button>
+    </div>
+</div>
+
+<script>
+const scenarios = [
+    {
+        isEmergency: false,
+        title: "Step 1: Early Arrival Request",
+        desc: "A tired family arrives 3 hours before standard check-in. They ask politely: 'Could we possibly check in early? The children are exhausted.'",
+        choices: [
+            { type: "excellent", text: "Welcome them warmly, offer iced lavender tea, and prioritize preparing one room immediately.", rating: 0.2, energy: -5, budget: -20, fb: "Polite welcoming and diplomatic problem-solving make guests feel valued immediately without setting unrealistic expectations." },
+            { type: "good", text: "Store their luggage safely in the lobby and suggest a recommended local cafe nearby.", rating: 0.1, energy: -2, budget: 0, fb: "Offering luggage storage is standard B1 hospitality service that maintains professional boundaries gracefully." },
+            { type: "average", text: "Inform them strictly that standard check-in is at 3:00 PM and ask them to return later.", rating: 0.0, energy: 0, budget: 0, fb: "Factually correct language, but lacks warmth and proactive customer care phrasing expected in hospitality." },
+            { type: "poor", text: "Tell them they failed to read the booking policy carefully and must wait outside.", rating: -0.4, energy: -10, budget: 0, fb: "Blaming customers creates negative sentiment. Use polite hedging like 'I'm afraid...' instead of direct confrontation." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 2: Breakfast Preferences",
+        desc: "A guest looks confused by the traditional French breakfast and asks: 'Do you have eggs and bacon available?'",
+        choices: [
+            { type: "excellent", text: "Explain local customs politely while offering: 'I'd be happy to prepare fresh eggs for you.'", rating: 0.2, energy: -5, budget: -15, fb: "Using 'I'd be happy to...' demonstrates upper-intermediate courteous service language while bridging cultural differences." },
+            { type: "good", text: "Offer regional goat cheese, ham, and fresh baguettes as alternative savory options.", rating: 0.1, energy: -2, budget: -5, fb: "Suggesting alternative options expands guest choices professionally using descriptive culinary vocabulary." },
+            { type: "average", text: "State simply: 'We only serve continental French breakfast here.'", rating: 0.0, energy: 0, budget: 0, fb: "Direct refusal sounds curt. Rephrase using polite customer-service formulas to improve satisfaction." },
+            { type: "poor", text: "Laugh and inform them that eating hot meat for breakfast in France is wrong.", type: "poor", rating: -0.4, energy: -10, budget: 0, fb: "Cultural condescension damages host reputation severely. Never judge guest dietary habits publicly." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 3: Excursion Consultation",
+        desc: "Guests ask for scenic day trips: 'What would you recommend for a relaxing afternoon in the area?'",
+        choices: [
+            { type: "excellent", text: "Provide tailored advice: 'I strongly recommend the Vineyard Trail; I can reserve a private table for you.'", rating: 0.2, energy: -5, budget: 0, fb: "Tailored recommendations paired with proactive offer of assistance represent premium concierge communication." },
+            { type: "good", text: "Hand them a printed regional map with highlighted walking routes and popular viewpoints.", rating: 0.1, energy: -2, budget: -5, fb: "Providing clear visual references with basic descriptions helps B1 learners convey practical geographic directions." },
+            { type: "average", text: "Suggest they explore the main town square on their own.", rating: 0.0, energy: 0, budget: 0, fb: "Vague advice lacks enthusiasm and missed an opportunity to highlight local B&B value." },
+            { type: "poor", text: "Tell them you are far too busy with house chores to answer sightseeing questions.", rating: -0.4, energy: -10, budget: 0, fb: "Dismissing guest inquiries ruins hospitality ratings. Prioritize guest communication politely." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 4: Air Conditioning Malfunction",
+        desc: "Guests report: 'The bedroom unit isn't cooling properly, and the room feels very humid.'",
+        choices: [
+            { type: "excellent", text: "Apologize sincerely: 'I'm so sorry for the inconvenience. I will inspect it right now and provide portable fans.'", rating: 0.2, energy: -10, budget: -30, fb: "Combining an immediate apology with action-oriented phrases ('I will inspect it right now') de-escalates guest frustration." },
+            { type: "good", text: "Schedule an HVAC repair technician for the morning and offer a complimentary bottle of wine.", rating: 0.1, energy: -5, budget: -50, fb: "Good resolution strategy, though providing immediate cooling remedies is preferable during hot nights." },
+            { type: "average", text: "Instruct them to open the windows wider and check the remote control batteries.", rating: 0.0, energy: -2, budget: 0, fb: "Basic troubleshooting is okay, but leaves the primary discomfort unresolved during peak summer hours." },
+            { type: "poor", text: "Claim the system works fine and insist the countryside heat is normal.", rating: -0.4, energy: -10, budget: 0, fb: "Invalidating guest feedback causes swift review penalties. Validate concerns before offering technical fixes." }
+        ]
+    },
+    {
+        isEmergency: true,
+        title: "Step 5: EMERGENCY - Water Pipe Burst",
+        desc: "A water pipe bursts in the main hallway at 10 PM! Water is leaking toward guest suites.",
+        choices: [
+            { type: "viable1", text: "Shut off main water valve immediately, guide guests safely, and call 24/7 emergency repair.", rating: 0.1, energy: -20, budget: -200, fb: "Decisive emergency leadership minimizes property damage and reassures guests during operational crises." },
+            { type: "viable2", text: "Relocate affected guests to the annex suite immediately and call emergency plumbing services.", rating: 0.1, energy: -15, budget: -250, fb: "Prioritizing guest comfort and safety during infrastructure emergencies protects overall business reputation." },
+            { type: "critical", text: "Ignore the leak until morning because emergency plumber callout rates are too expensive.", rating: -3.0, energy: -50, budget: 0, fb: "Critical Failure: Severe property destruction and safety violations forced immediate closure of the establishment." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 6: Late Night Noise Complaint",
+        desc: "At 11 PM, a guest calls complaining that neighboring guests are playing loud music on the patio.",
+        choices: [
+            { type: "excellent", text: "Address the patio group firmly yet politely: 'Excuse me, quiet hours begin at 10 PM. Please bring the music inside.'", rating: 0.2, energy: -5, budget: 0, fb: "Assertive, polite boundary-setting balances rule enforcement with respectful customer service register." },
+            { type: "good", text: "Offer the complaining guest complimentary earplugs and an upgraded quiet room facing the garden.", rating: 0.1, energy: -10, budget: 0, fb: "Accommodating the sensitive guest resolves the dispute, though addressing the noise source directly is required." },
+            { type: "average", text: "Send a text message to all current guests reminding them of quiet hours policy.", rating: 0.0, energy: -2, budget: 0, fb: "Indirect communication delays resolution for guests experiencing active sleep disturbance." },
+            { type: "poor", text: "Shout angrily at the patio guests and threaten to call police immediately.", rating: -0.4, energy: -15, budget: 0, fb: "Aggressive conflict handling escalates tension. Professional hosts maintain calm authority." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 7: Dietary Restrictions at Dinner",
+        desc: "A guest attending your table d'hôte dinner announces sudden severe gluten and dairy allergies.",
+        choices: [
+            { type: "excellent", text: "Reassure them calmly: 'No problem at all; I can adjust our fresh regional dish to be completely allergen-free.'", rating: 0.2, energy: -10, budget: -20, fb: "Reassuring language coupled with culinary adaptability highlights superior hospitality awareness." },
+            { type: "good", text: "Prepare a fresh gourmet green salad with grilled local chicken and olive oil dressing.", rating: 0.1, energy: -5, budget: -10, fb: "Providing safe alternative meal options demonstrates attentiveness to guest health requirements." },
+            { type: "average", text: "Apologize and suggest they skip the dinner course to avoid allergic reactions.", rating: 0.0, energy: 0, budget: 0, fb: "Fails to deliver service value. Hospitality professionals anticipate custom dietary adjustments." },
+            { type: "poor", text: "Argue that authentic French cuisine requires butter and wheat flour and refuse changes.", rating: -0.4, energy: -10, budget: 0, fb: "Refusing health-related adjustments poses physical risks and generates terrible reviews." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 8: Transport Assistance",
+        desc: "Guests need transportation to the local train station at 6 AM, but local taxi services are fully booked.",
+        choices: [
+            { type: "excellent", text: "Offer personal driver service: 'I would be glad to drive you to the station myself at 6 AM.'", rating: 0.2, energy: -15, budget: -10, fb: "Going 'above and beyond' generates exceptional guest loyalty and memorable reviews." },
+            { type: "good", text: "Contact a private shuttle partner company and pre-pay their early morning transfer fee.", rating: 0.1, energy: -5, budget: -40, fb: "Resourceful problem-solving using professional third-party networks ensures reliable guest travel." },
+            { type: "average", text: "Give them the local bus timetable and wish them good luck with the early schedule.", rating: 0.0, energy: 0, budget: 0, fb: "Provides bare minimum information without resolving the practical risk of missed connections." },
+            { type: "poor", text: "Tell them transport is entirely their responsibility and close the desk.", rating: -0.4, energy: -10, budget: 0, fb: "Unhelpful attitudes during stressful travel situations severely harm host credibility." }
+        ]
+    },
+    {
+        isEmergency: true,
+        title: "Step 9: EMERGENCY - Food Contamination Suspect",
+        desc: "A local dairy supplier calls reporting a recall on raw cheese served at breakfast. Two guests feel slightly unwell.",
+        choices: [
+            { type: "viable1", text: "Contact affected guests immediately, offer medical support access, and dispose of all recalled batches.", rating: 0.1, energy: -15, budget: -100, fb: "Proactive health management and transparent communication prevent serious medical and legal escalations." },
+            { type: "viable2", text: "Provide bottled water, mild tea, arrange a doctor visit, and refund today's breakfast fee.", rating: 0.1, energy: -20, budget: -150, fb: "Taking full responsibility and providing healthcare access protects guest safety and operational integrity." },
+            { type: "critical", text: "Deny serving the cheese and tell sick guests they probably picked up a bug elsewhere.", rating: -3.0, energy: -50, budget: 0, fb: "Critical Failure: Health inspection audit revealed negligence, leading to health penalties and emergency shutdown." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 10: Billing & Extra Services",
+        desc: "During checkout, a guest disputes wine charges on their final bill: 'I don't recall ordering this bottle.'",
+        choices: [
+            { type: "excellent", text: "Review the receipt gently: 'Let me double-check our log. If there's an error, I'll remove it immediately.'", rating: 0.2, energy: -5, budget: -15, fb: "Gentle verification phrases maintain trust while preventing argumentative financial discussions." },
+            { type: "good", text: "Remove the charge immediately as a courtesy gesture to ensure a peaceful checkout experience.", rating: 0.1, energy: 0, budget: -25, fb: "Prioritizing long-term goodwill over minor billing disputes is a proven hospitality strategy." },
+            { type: "average", text: "Show them the signature sheet firmly and insist that the charge is final.", rating: 0.0, energy: 0, budget: 0, fb: "Strict enforcement may protect small revenue, but leaves an unpleasant final impression." },
+            { type: "poor", text: "Accuse the guest of trying to cheat the business out of wine payments.", rating: -0.4, energy: -15, budget: 0, fb: "Accusatory tone destroys host credibility instantly. Always maintain professional billing composure." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 11: Lost Item Inquiry",
+        desc: "A departed guest emails: 'I think I left my expensive camera on the garden patio terrace!'",
+        choices: [
+            { type: "excellent", text: "Search immediately, confirm item safety, and state: 'I have secured it and will send tracking info today.'", rating: 0.2, energy: -5, budget: -15, fb: "Prompt response and reassuring action convert stressful guest mistakes into positive host loyalty." },
+            { type: "good", text: "Locate the camera and offer to store it safely until their next visit or friend pickup.", rating: 0.1, energy: -2, budget: 0, fb: "Reliable lost-and-found management shows fundamental honesty and operational discipline." },
+            { type: "average", text: "Reply that you will check the garden whenever staff cleans the area tomorrow.", rating: 0.0, energy: 0, budget: 0, fb: "Lacks sense of urgency required for valuable personal possessions." },
+            { type: "poor", text: "Ignore the email, assuming lost items are not your operational responsibility.", rating: -0.4, energy: -10, budget: 0, fb: "Ignoring guest inquiries triggers negative online review complaints rapidly." }
+        ]
+    },
+    {
+        isEmergency: false,
+        title: "Step 12: Season Finale & Review Request",
+        desc: "It is the final departure of the summer season. How do you close the guest experience?",
+        choices: [
+            { type: "excellent", text: "Present a small gift of local lavender sachets with a handwritten note thanking them for their stay.", rating: 0.2, energy: -5, budget: -20, fb: "Personalized farewell gifts combined with warm written expressions lock in 5-star review ratings." },
+            { type: "good", text: "Politely request an online review and present a 10% discount code for their next visit.", rating: 0.1, energy: -2, budget: 0, fb: "Standard, effective marketing language encouraging repeat direct bookings." },
+            { type: "average", text: "Wish them a safe trip home and hand over standard departure receipts.", rating: 0.0, energy: 0, budget: 0, fb: "Polite but unmemorable farewell closing." },
+            { type: "poor", text: "Complain about how exhausting the summer season was and ask them to leave quickly.", rating: -0.4, energy: -10, budget: 0, fb: "Unprofessional venting ruins guest impressions in the final moments." }
+        ]
+    }
+];
+
+let state = {
+    stepIdx: 0,
+    rating: 4.0,
+    energy: 100,
+    budget: 1500,
+    excellentCount: 0,
+    gameOver: false
+};
+
+function startGame() {
+    state = { stepIdx: 0, rating: 4.0, energy: 100, budget: 1500, excellentCount: 0, gameOver: false };
+    showScreen("game");
+    renderStep();
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+}
+
+function updateDashboard() {
+    state.rating = Math.max(0, Math.min(5.0, state.rating));
+    state.energy = Math.max(0, Math.min(100, state.energy));
+    state.budget = Math.max(0, state.budget);
+
+    document.getElementById('val-rating').innerText = state.rating.toFixed(1) + " ⭐";
+    document.getElementById('val-energy').innerText = state.energy + "%";
+    document.getElementById('val-budget').innerText = "€" + state.budget;
+
+    const rBar = document.getElementById('bar-rating');
+    rBar.style.width = (state.rating / 5.0 * 100) + "%";
+    rBar.style.backgroundColor = state.rating >= 4.0 ? "var(--success)" : state.rating >= 3.0 ? "var(--warning)" : "var(--danger)";
+
+    const eBar = document.getElementById('bar-energy');
+    eBar.style.width = state.energy + "%";
+    eBar.style.backgroundColor = state.energy >= 50 ? "var(--success)" : state.energy >= 25 ? "var(--warning)" : "var(--danger)";
+
+    const bBar = document.getElementById('bar-budget');
+    bBar.style.width = Math.min(100, (state.budget / 1500 * 100)) + "%";
+    bBar.style.backgroundColor = state.budget >= 500 ? "var(--success)" : state.budget >= 200 ? "var(--warning)" : "var(--danger)";
+
+    document.getElementById('step-indicator').innerText = `Step ${state.stepIdx + 1} / 12`;
+}
+
+function shuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function renderStep() {
+    updateDashboard();
+    const data = scenarios[state.stepIdx];
+
+    const badge = document.getElementById('step-badge');
+    if (data.isEmergency) {
+        badge.className = "badge badge-emergency";
+        badge.innerText = "⚠️ Surprise Emergency Event";
+    } else {
+        badge.className = "badge badge-std";
+        badge.innerText = "Standard Decision Step";
+    }
+
+    document.getElementById('step-title').innerText = data.title;
+    document.getElementById('step-desc').innerText = data.desc;
+
+    const container = document.getElementById('choices-container');
+    container.innerHTML = "";
+
+    document.getElementById('feedback-box').style.display = "none";
+    document.getElementById('btn-next').style.display = "none";
+
+    const shuffledChoices = shuffle(data.choices);
+
+    shuffledChoices.forEach((choice) => {
+        const btn = document.createElement('button');
+        btn.className = "btn";
+        btn.innerText = choice.text;
+        btn.onclick = () => handleChoice(choice, btn);
+        container.appendChild(btn);
+    });
+}
+
+function handleChoice(choice, btnElement) {
+    const fbBox = document.getElementById('feedback-box');
+    const fbTitle = document.getElementById('fb-title');
+    const fbText = document.getElementById('fb-text');
+
+    if (choice.type === "poor") {
+        state.rating += choice.rating;
+        state.energy += choice.energy;
+        state.budget += choice.budget;
+        updateDashboard();
+
+        btnElement.disabled = true;
+        fbBox.className = "feedback-box fb-poor";
+        fbBox.style.display = "block";
+        fbTitle.innerText = "Poor Choice (-0.4 ⭐) - Try Again!";
+        fbText.innerText = choice.fb;
+
+        if (state.rating <= 1.0 || state.energy <= 0) {
+            triggerGameOver("Resource Exhaustion: Your rating or energy dropped critically low!");
+        }
+        return;
+    }
+
+    if (choice.type === "critical") {
+        state.rating = 0;
+        updateDashboard();
+        triggerGameOver(choice.fb);
+        return;
+    }
+
+    // Process valid options
+    if (choice.type === "excellent") state.excellentCount++;
+    state.rating += choice.rating;
+    state.energy += choice.energy;
+    state.budget += choice.budget;
+    updateDashboard();
+
+    document.querySelectorAll('.choices-grid .btn').forEach(b => b.disabled = true);
+
+    fbBox.style.display = "block";
+    if (choice.type === "excellent") {
+        fbBox.className = "feedback-box fb-excel";
+        fbTitle.innerText = "Excellent Choice! (+0.2 ⭐)";
+    } else if (choice.type === "good" || choice.type === "viable1" || choice.type === "viable2") {
+        fbBox.className = "feedback-box fb-good";
+        fbTitle.innerText = "Good Decision (+0.1 ⭐)";
+    } else {
+        fbBox.className = "feedback-box fb-avg";
+        fbTitle.innerText = "Average Choice (+0.0 ⭐)";
+    }
+    fbText.innerText = choice.fb;
+
+    // Check early victory (8 Excellent choices before final step)
+    if (state.excellentCount >= 8 && state.stepIdx < 11) {
+        document.getElementById('btn-next').innerText = "Claim Early Victory!";
+    } else {
+        document.getElementById('btn-next').innerText = state.stepIdx === 11 ? "View Final Debriefing" : "Proceed to Next Step";
+    }
+    document.getElementById('btn-next').style.display = "block";
+}
+
+function triggerGameOver(reason) {
+    state.gameOver = true;
+    showScreen("debrief");
+    document.getElementById('early-win-container').innerHTML = "";
+    document.getElementById('debrief-summary').innerHTML = `<h2 style="color:var(--danger)">Simulation Over - Critical Failure</h2><p>${reason}</p>`;
+    document.getElementById('debrief-details').innerHTML = `
+        <h3>Band 4: Unsuccessful Manager</h3>
+        <p>Your B&B operations failed due to unaddressed emergencies or accumulated negative ratings. Review polite customer service phrasing, hedging techniques ('I am afraid...'), and proactive crisis communication to rebuild guest trust.</p>
+    `;
+}
+
+function nextStep() {
+    if (state.excellentCount >= 8 && state.stepIdx < 11) {
+        showDebrief(true);
+        return;
+    }
+
+    state.stepIdx++;
+    if (state.stepIdx >= scenarios.length) {
+        showDebrief(false);
+    } else {
+        renderStep();
+    }
+}
+
+function showDebrief(isEarlyWin) {
+    showScreen("debrief");
+    const winContainer = document.getElementById('early-win-container');
+    const summary = document.getElementById('debrief-summary');
+    const details = document.getElementById('debrief-details');
+
+    if (isEarlyWin) {
+        winContainer.innerHTML = `
+            <div class="early-win">
+                <h2>🏆 Early Victory Unlocked!</h2>
+                <p>You achieved 8 Excellent choices before the final step! Exceptional hospitality mastery.</p>
+            </div>
+        `;
+    } else {
+        winContainer.innerHTML = "";
+    }
+
+    summary.innerHTML = `
+        <h2>Final Performance Summary</h2>
+        <p><strong>Final Rating:</strong> ${state.rating.toFixed(1)} / 5.0 ⭐ | <strong>Remaining Energy:</strong> ${state.energy}% | <strong>Remaining Budget:</strong> €${state.budget}</p>
+        <p><strong>Excellent Choices Made:</strong> ${state.excellentCount} / 10</p>
+    `;
+
+    let bandTitle = "";
+    let bandFeedback = "";
+
+    if (state.rating >= 4.5 && state.energy >= 50) {
+        bandTitle = "Band 1: Master Host";
+        bandFeedback = "You demonstrated superior intermediate English fluency and outstanding hospitality management. Your warm, diplomatic phrasing de-escalated guest issues effortlessly while preserving resources. Excellent work applying polite expressions, effective recommendations, and decisive emergency leadership.";
+    } else if (state.rating >= 3.8 && state.energy >= 30) {
+        bandTitle = "Band 2: Competent Manager";
+        bandFeedback = "Solid operational performance across all scenarios. You communicated effectively in B1 English and maintained high customer satisfaction. To reach Master status, refine your use of proactive hedging ('I would be happy to...') during high-pressure guest requests.";
+    } else if (state.rating >= 2.5) {
+        bandTitle = "Band 3: Survivor Host";
+        bandFeedback = "You completed the season, but heavy resource expenditure and minor guest conflicts reduced your overall rating. Focus on expanding your customer service vocabulary, avoiding abrupt refusals, and prioritizing immediate resolution strategies.";
+    } else {
+        bandTitle = "Band 4: Unsuccessful Manager";
+        bandFeedback = "Your B&B rating fell below acceptable professional hospitality standards. Re-study essential B1 functional language for handling complaints, delivering polite refusals, and managing emergency communications effectively.";
+    }
+
+    details.innerHTML = `<h3>${bandTitle}</h3><p>${bandFeedback}</p>`;
+}
+</script>
+</body>
+</html>

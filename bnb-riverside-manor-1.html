@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Riverside Manor: 24-Hour Innkeeper Challenge</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --navy: #1a3a5f;
+        --burgundy: #721c24;
+        --gold: #c5a059;
+        --cream: #fdfaf6;
+        --green: #2d5a27;
+        --error: #a94442;
+        --text: #2c3e50;
+        --card-bg: #ffffff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--cream);
+        color: var(--text);
+        line-height: 1.6;
+        padding-bottom: 2rem;
+    }
+
+    header {
+        background: var(--navy);
+        color: white;
+        padding: 1.2rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        position: sticky; 
+        top: 0; 
+        z-index: 1000;
+    }
+
+    .header-title h2 {
+        font-family: 'Playfair Display', serif;
+        color: white;
+        font-size: 1.4rem;
+        margin: 0;
+    }
+
+    .header-subtitle {
+        font-size: 0.8rem;
+        color: var(--gold);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .tally-box {
+        background: rgba(255, 255, 255, 0.12);
+        padding: 0.4rem 1.2rem;
+        border-radius: 30px;
+        border: 1px solid var(--gold);
+        text-align: center;
+    }
+
+    .tally-score { 
+        font-size: 1.4rem; 
+        font-weight: 700; 
+        color: var(--gold); 
+    }
+
+    .container { 
+        max-width: 850px; 
+        margin: 2rem auto; 
+        padding: 0 1.5rem; 
+    }
+
+    .card {
+        background: var(--card-bg);
+        padding: 2.5rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+    }
+    
+    .card.active { display: block; }
+
+    @keyframes fadeIn { 
+        from { opacity: 0; transform: translateY(12px); } 
+        to { opacity: 1; transform: translateY(0); } 
+    }
+
+    h1, h2 { 
+        font-family: 'Playfair Display', serif; 
+        color: var(--navy); 
+        margin-bottom: 1rem; 
+    }
+    
+    p { margin-bottom: 1.2rem; font-size: 1.02rem; }
+
+    .time-badge {
+        display: inline-block;
+        background: #eef3f8;
+        color: var(--navy);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .emergency-banner {
+        background: var(--burgundy);
+        color: white;
+        padding: 0.4rem 0.9rem;
+        border-radius: 6px;
+        display: inline-block;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.75; }
+        100% { opacity: 1; }
+    }
+
+    .choices-grid { 
+        display: grid; 
+        gap: 0.9rem; 
+        margin: 1.5rem 0; 
+    }
+
+    .choice-btn {
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        padding: 1.1rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.25s ease;
+        text-align: left;
+        font-size: 0.95rem;
+        font-family: 'Poppins', sans-serif;
+        color: var(--text);
+        line-height: 1.5;
+    }
+
+    .choice-btn:hover:not(:disabled) { 
+        border-color: var(--gold); 
+        background: #fffdf9; 
+        transform: translateY(-2px);
+    }
+    
+    .choice-btn:disabled { 
+        opacity: 0.55; 
+        cursor: not-allowed; 
+        transform: none;
+    }
+
+    .feedback-area {
+        margin-top: 1.5rem;
+        padding: 1.4rem;
+        border-radius: 12px;
+        display: none;
+        border-left: 6px solid;
+    }
+
+    .fb-best { background: #f0f9eb; border-color: var(--green); color: #1e3d1a; }
+    .fb-avg { background: #fffcf0; border-color: var(--gold); color: #694e03; }
+    .fb-poor { background: #f4f6f7; border-color: #78909c; color: #2c3e50; }
+    .fb-worst { background: #fdf2f2; border-color: var(--error); color: #721c24; }
+
+    .points-reveal { 
+        font-weight: 700; 
+        display: block; 
+        margin-bottom: 0.4rem; 
+        text-transform: uppercase; 
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+    }
+
+    .next-btn {
+        margin-top: 1.5rem;
+        background: var(--navy);
+        color: white;
+        border: none;
+        padding: 0.9rem 2rem;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem;
+        display: none;
+        width: 100%;
+        transition: background 0.2s;
+    }
+
+    .next-btn:hover { background: #122842; }
+
+    .progress-bar-container {
+        width: 100%;
+        background-color: #e9ecef;
+        height: 8px;
+        border-radius: 4px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background-color: var(--gold);
+        width: 0%;
+        transition: width 0.3s ease;
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="header-title">
+        <h2>The Riverside Manor</h2>
+        <span class="header-subtitle">24-Hour Executive Management Simulation</span>
+    </div>
+    <div class="tally-box">
+        <div class="tally-score" id="scoreDisplay">4.0 ⭐</div>
+    </div>
+</header>
+
+<div class="container">
+
+    <!-- START SCREEN -->
+    <div class="card active" id="screen-start">
+        <h1>Welcome, General Manager</h1>
+        <p>You are stepping into your role at <strong>The Riverside Manor</strong>, a distinguished 5-star boutique countryside hotel. Ahead of you lies a grueling 24-hour shift filled with delicate guest interactions, operational challenges, and unpredictable emergencies.</p>
+        <p>Your goal is to maintain and elevate the inn's standard. You begin with a reputation score of <strong>4.0 ⭐</strong>. Exceptional decisions will earn guest loyalty and boost your score up to <strong>5.0 ⭐</strong>, while poor judgment will ruin your reputation.</p>
+        <p>Navigate 14 shift scenarios—including 2 critical emergency situations—to see if you have what it takes to run an elite establishment!</p>
+        <button class="next-btn" style="display:block;" onclick="startGame()">Begin Your Shift</button>
+    </div>
+
+    <!-- GAMEPLAY SCREEN -->
+    <div class="card" id="screen-game">
+        <div class="progress-bar-container">
+            <div class="progress-bar-fill" id="progress-fill"></div>
+        </div>
+        <div id="step-content"></div>
+        <div class="choices-grid" id="choices-grid"></div>
+        <div class="feedback-area" id="feedback-box">
+            <span class="points-reveal" id="points-text"></span>
+            <p id="feedback-content" style="margin:0;"></p>
+        </div>
+        <button class="next-btn" id="btn-next">Proceed to Next Incident</button>
+    </div>
+
+    <!-- FINAL SCREEN -->
+    <div class="card" id="screen-final">
+        <h1>Shift Performance Evaluation</h1>
+        <div id="final-stats"></div>
+        <div id="band-content" style="margin: 2rem 0; padding: 1.5rem; border-radius: 12px; background: #f8f9fa;"></div>
+        <button class="next-btn" style="display:block;" onclick="startGame()">Restart Shift Simulation</button>
+    </div>
+
+</div>
+
+<script>
+let currentStepIndex = 0;
+let score = 4.0;
+
+// Chronological 24-Hour Narrative Scenarios (12 standard + 2 emergency)
+const scenarios = [
+    {
+        time: "07:00 AM — Morning Shift Kickoff",
+        title: "The Breakfast Kitchen Crisis",
+        desc: "Your head pastry chef sent a late-night text resigning, leaving the morning kitchen in chaos. Guests will enter the dining room for continental breakfast in 15 minutes, expecting luxury baked goods.",
+        isEmergency: false,
+        choices: [
+            { text: "Guide the junior line cook to quickly assemble fresh fruit platters, warm baguettes, and craft artisanal toast while you warmly greet guests.", type: "best", fb: "Outstanding leadership! You turned a missing chef scenario into a praised, fresh breakfast concept." },
+            { text: "Order pre-packaged pastries from the local bakery down the road and re-plate them on luxury silverware.", type: "avg", fb: "Acceptable quick thinking. The pastries are standard, but guests remain content." },
+            { text: "Cancel hot baked goods entirely and offer guests simple cold cereal with an apology.", type: "poor", fb: "Disappointing. Premium guests expect higher standards for breakfast." },
+            { text: "Burst into the kitchen shouting at the junior staff, causing the sous-chef to walk out in frustration.", type: "worst", fb: "Disastrous! Panic destroys morale and ruins breakfast service completely." }
+        ]
+    },
+    {
+        time: "09:00 AM — Front Desk Arrivals",
+        title: "The VIP Early Arrival",
+        desc: "Lord Archibald arrives six hours before official check-in time. His luxury suite is still occupied by departing guests. He demands immediate access and threatens to write a damning review if delayed.",
+        isEmergency: false,
+        choices: [
+            { text: "Graciously store his luggage, invite him to a complimentary gourmet brunch in the sunroom, and prioritize cleaning his suite.", type: "best", fb: "Impeccable hospitality! You transformed potential frustration into a VIP experience." },
+            { text: "Temporarily assign him to a clean standard room for resting until his primary suite is thoroughly prepared.", type: "avg", fb: "Practical solution. He gets privacy, though he complains slightly about the temporary downgrade." },
+            { text: "Inform him dryly that standard check-in is strictly 3:00 PM and suggest he walk around the nearby village.", type: "poor", fb: "Too rigid. High-end guests expect flexible service and thoughtful accommodations." },
+            { text: "Lecture him on hotel policy and tell him that arrogance will not speed up housekeeping.", type: "worst", fb: "Offensive! You alienated an influential patron and guaranteed a scathing review." }
+        ]
+    },
+    {
+        time: "11:00 AM — Garden Grounds",
+        title: "The Double-Booked Pavilion",
+        desc: "Due to a front-desk calendar mistake, both a private garden club and a family celebrating an 80th birthday arrive to claim the Victorian Pavilion at the exact same hour.",
+        isEmergency: false,
+        choices: [
+            { text: "Divide the spacious garden into two elegant private sections and offer both groups complimentary sparkling wine.", type: "best", fb: "Brilliant compromise! Both parties feel valued and enjoy their customized spaces." },
+            { text: "Offer the garden club an upgraded move to the indoor library with complimentary tea pastry towers.", type: "avg", fb: "Good negotiation. The garden club agrees, resolving the immediate schedule conflict." },
+            { text: "Flip a coin in front of both event organizers to decide fairly who gets the space.", type: "poor", fb: "Unprofessional! Guests feel like their important events are reduced to a game of chance." },
+            { text: "Tell both parties to negotiate between themselves while you step back into your office.", type: "worst", fb: "Abdication of responsibility! An argument breaks out on the lawn in full view of other guests." }
+        ]
+    },
+    {
+        time: "12:30 PM — Lunch Service Emergency",
+        title: "🚨 EMERGENCY: Kitchen Grease Fire",
+        desc: "A hot pan of frying oil flares up violently in the main kitchen, igniting grease filters under the exhaust hood. Flames are creeping toward the wooden rafters!",
+        isEmergency: true,
+        choices: [
+            { text: "Pull the main fire alarm, execute the kitchen evacuation plan immediately, and use the Class K grease extinguisher.", type: "best", fb: "Flawless emergency protocol! You contained the fire safely without placing anyone in harm's way." },
+            { text: "Grab a fire blanket and try to smother the flames yourself while telling staff to finish plating lunch.", type: "avg", fb: "Risky! You contained the fire, but endangered your personal safety in the process." },
+            { text: "Throw a bucket of cold tap water directly onto the flaming grease pan to extinguish it.", type: "poor", fb: "Hazardous mistake! Water causes grease fires to explode violently, spreading fire further." },
+            { text: "Flee the building screaming without alerting staff or pulling the fire suppression system.", type: "worst", fb: "Complete panic! You endangered the lives of every staff member and guest in the manor." }
+        ]
+    },
+    {
+        time: "02:00 PM — Luggage Services",
+        title: "The Missing Vintage Luggage",
+        desc: "A prominent guest’s priceless vintage trunk has disappeared between room delivery and concierge drop-off. The guest is hysterical, claiming it contains priceless family jewelry.",
+        isEmergency: false,
+        choices: [
+            { text: "Launch an immediate, calm search of holding areas, locate the trunk in room 204 by mistake, and personally deliver it with flowers.", type: "best", fb: "Excellent problem recovery! Prompt personal attention saved the day." },
+            { text: "Offer immediate access to luxury boutique items while your team audits luggage tags.", type: "avg", fb: "Reasonable care. The luggage is found shortly after, easing the guest's anxiety." },
+            { text: "Advise the guest to call local law enforcement directly, claiming luggage tracking isn't management responsibility.", type: "poor", fb: "Cold and unhelpful. It shows total neglect for guest property." },
+            { text: "Accuse the guest of misplacing the trunk themselves before arriving at the inn.", type: "worst", fb: "Unacceptable! Accusing guests directly guarantees severe reputational damage." }
+        ]
+    },
+    {
+        time: "03:30 PM — Supply Logistics",
+        title: "The Local Sourcing Dilemma",
+        desc: "Your Head Chef insists on switching to local organic micro-farms for dinner ingredients, but it will raise weekly food expenses by 20%. Budget reviews are due tomorrow.",
+        isEmergency: false,
+        choices: [
+            { text: "Approve the switch, update menus to feature 'Farm-to-Table' local stories, and adjust prices slightly to cover margins.", type: "best", fb: "Masterful strategy! Premium guests love authentic local narratives and gladly pay for quality." },
+            { text: "Approve organic sourcing exclusively for high-margin dinner specials rather than the full menu.", type: "avg", fb: "Sensible fiscal middle-ground. Protects the budget while improving key dishes." },
+            { text: "Decline the request outright and force the kitchen to stick with cheap wholesale industrial distributors.", type: "poor", fb: "Missed opportunity. Standard ingredients dull the manor's luxury reputation." },
+            { text: "Deduct the extra food cost directly from the kitchen team's monthly tips and bonus pool.", type: "worst", fb: "Unethical! Distributing operating costs onto employee earnings destroys staff retention." }
+        ]
+    },
+    {
+        time: "05:00 PM — Reception & Marketing",
+        title: "The Social Media Influencer",
+        desc: "A travel influencer with 8,000 followers demands three nights in your top suite for free, threatening to post bad reviews if you refuse.",
+        isEmergency: false,
+        choices: [
+            { text: "Politely decline the free stay, but offer a standard media package rate with mutual cross-promotion terms.", type: "best", fb: "Firm and professional! You protected revenue while maintaining polite business diplomacy." },
+            { text: "Offer a complimentary dinner at the inn's restaurant in exchange for a featured story post.", type: "avg", fb: "Fair compromise. Low outlay costs for decent regional digital exposure." },
+            { text: "Panic and grant the full free penthouse suite stay, displacing a paying customer.", type: "poor", fb: "Weak management. Giving away prime inventory under pressure damages profitability." },
+            { text: "Publicly insult the influencer on the hotel's official social media channel.", type: "worst", fb: "Unprofessional conduct! Engaging in online public drama damages brand dignity." }
+        ]
+    },
+    {
+        time: "06:30 PM — Dining Room Peak",
+        title: "The Overbooked Restaurant",
+        desc: "An unexpected system glitch double-booked four main tables during peak dinner service. Guests with confirmed reservations are standing in the crowded lobby.",
+        isEmergency: false,
+        choices: [
+            { text: "Set up intimate dining spaces in the historic fireside lounge and serve complimentary appetizers while they wait.", type: "best", fb: "Brilliant adaptability! Guests found the cozy lounge setting unique and charming." },
+            { text: "Partner with the high-end bistro down the street, covering taxi fare and sending complimentary wine.", type: "avg", fb: "Thoughtful alternative. Guests appreciated your active assistance despite the mistake." },
+            { text: "Tell delayed guests their bookings are invalid tonight and recommend fast food down the highway.", type: "poor", fb: "Insulting advice for a high-end countryside inn." },
+            { text: "Seat guests at empty administration desks in the staff office.", type: "worst", fb: "Absurd! Dining beside office supplies completely ruins luxury hospitality." }
+        ]
+    },
+    {
+        time: "08:00 PM — Evening Reception",
+        title: "The Loud Wedding Party",
+        desc: "A wedding celebration in the ballroom is growing rowdy. Bass music is vibrating into the guest rooms directly above where elderly guests are sleeping.",
+        isEmergency: false,
+        choices: [
+            { text: "Relocate affected sleeping guests to quiet North Wing suites and ask the DJ to calibrate lower bass frequencies.", type: "best", fb: "Tactful balance! You preserved the wedding atmosphere while ensuring peace for overnight guests." },
+            { text: "Provide noise-canceling headsets and complimentary spa passes to the affected guests with a sincere apology.", type: "avg", fb: "Creative effort. Most guests accepted the compensation graciously." },
+            { text: "Send armed security guards into the ballroom to pull the main power plug at 8:15 PM.", type: "poor", fb: "Aggressive! You ruined a wedding celebration and created a massive public scene." },
+            { text: "Inform complaining guests that weddings bring high revenue, so they must endure the noise.", type: "worst", fb: "Dismissive! Telling paying guests they are secondary ruins customer trust." }
+        ]
+    },
+    {
+        time: "09:30 PM — Nighttime Emergency",
+        title: "🚨 EMERGENCY: Severe Storm Power Outage",
+        desc: "A sudden lightning storm strikes the estate, shutting off city power. The main backup generator fails to engage automatically, leaving the entire hotel in pitch darkness!",
+        isEmergency: true,
+        choices: [
+            { text: "Dispatch staff with emergency LED lanterns, guide guests safely, and manually reset the main generator breaker.", type: "best", fb: "Exceptional crisis handling! Calm staff guidance prevented panic across the estate." },
+            { text: "Hand out emergency flashlights to rooms and request guests stay in bed while calling an electrician.", type: "avg", fb: "Basic emergency compliance. Safe, though guests remained chilly without heating." },
+            { text: "Instruct guests over the emergency megaphone to light personal candles unattended in their rooms.", type: "poor", fb: "Extremely dangerous! Open flames during storm blackouts create massive fire risks." },
+            { text: "Lock yourself inside the manager's office until morning light returns.", type: "worst", fb: "Total failure of leadership! Leaving guests helpless in total darkness is unpardonable." }
+        ]
+    },
+    {
+        time: "11:00 PM — Late Night Mystery",
+        title: "The Mystery Hotel Inspector",
+        desc: "You notice a guest in Room 12 discreetly taking timed notes, inspecting carpet corners, and running white-glove checks on banisters.",
+        isEmergency: false,
+        choices: [
+            { text: "Brief staff quietly to maintain pristine luxury standards for ALL guests without acting nervous or unnatural.", type: "best", fb: "Flawless standard! True luxury consistency shines when staff perform naturally." },
+            { text: "Send a luxury fruit basket and rare vintage cognac to Room 12 with a card from management.", type: "avg", fb: "A bit obvious, but the gesture was appreciated nevertheless." },
+            { text: "Assign a staff member to follow the inspector around continuously, staring at everything they write down.", type: "poor", fb: "Uncomfortable! Intimidating a reviewer makes the hotel appear desperate and insecure." },
+            { text: "Confront the guest at their table and demand to read their personal notebook.", type: "worst", fb: "Severe breach of privacy! You violated guest boundaries." }
+        ]
+    },
+    {
+        time: "01:00 AM — Late Night Disturbance",
+        title: "The Midnight Barking Incident",
+        desc: "An eccentric guest’s prize dog begins barking uncontrollably at 1:00 AM, waking guests in neighboring rooms.",
+        isEmergency: false,
+        choices: [
+            { text: "Deliver a soothing pet pack, offer dog-walking assistance, and grant neighboring rooms complimentary breakfast vouchers.", type: "best", fb: "Empathetic resolution! You resolved the root cause while comforting affected neighbors." },
+            { text: "Relocate the dog owner and pet to a secluded ground-floor garden cottage.", type: "avg", fb: "Practical solution. Isolating noise solved the late-night complaint." },
+            { text: "Pound loudly on the door and threaten to evict the owner into the night air immediately.", type: "poor", fb: "Escalated tension unnecessarily during late hours." },
+            { text: "Call animal control to impound the animal without speaking to the owner first.", type: "worst", fb: "Cruel and heavy-handed! Caused extreme distress and outrage." }
+        ]
+    },
+    {
+        time: "04:00 AM — Early Morning Maintenance",
+        title: "The Historic Pipe Leak",
+        desc: "A pipe bursts above Room 102, dripping dirty water rapidly onto the historic ceiling directly over the guest's bed.",
+        isEmergency: false,
+        choices: [
+            { text: "Immediately move guests to the Executive Suite, arrange laundry for wet garments, and shut off the localized water valve.", type: "best", fb: "Swift, decisive customer care! Guests were deeply impressed by your overnight support." },
+            { text: "Place collection buckets, shift the bed across the room, and call emergency plumbers for 6:00 AM.", type: "avg", fb: "Adequate temporary fix, though guests suffered minor sleep disruption." },
+            { text: "Hand the guest extra towels and tell them plumbing staff arrive at 9:00 AM.", type: "poor", fb: "Negligent. Guests shouldn't endure active ceiling leaks in high-end accommodation." },
+            { text: "Blame the guest for filling their bathtub too full and causing structural stress.", type: "worst", fb: "Absurd shifting of blame for aging building infrastructure." }
+        ]
+    },
+    {
+        time: "07:00 AM — Shift Finale & Checkout",
+        title: "The Disputed Final Invoice",
+        desc: "A departing guest angrily claims they were charged $150 for minibar snacks they never touched, demanding a total refund for their stay.",
+        isEmergency: false,
+        choices: [
+            { text: "Remove the minibar charge instantly, apologize graciously for the error, and offer a safe journey home.", type: "best", fb: "Classy departure! Ending on a positive note secures long-term loyalty." },
+            { text: "Verify minibar logs swiftly with housekeeping while serving the guest complimentary gourmet espresso.", type: "avg", fb: "Thorough procedure. The error was confirmed and corrected without friction." },
+            { text: "Refuse to modify the bill until a 14-day internal audit team completes an investigation.", type: "poor", fb: "Bureaucratic nightmare! Petty delays destroy guest goodwill at checkout." },
+            { text: "Call hotel security guards to block the exit until the guest pays every penny.", type: "worst", fb: "Illegal detention threat! Hostile behavior at checkout ruins an entire stay." }
+        ]
+    }
+];
+
+// Fisher-Yates Randomization Algorithm
+function shuffleArray(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+
+function startGame() {
+    score = 4.0;
+    currentStepIndex = 0;
+    updateScore();
+    showScreen("game");
+    renderStep();
+}
+
+function updateScore() {
+    document.getElementById('scoreDisplay').innerText = score.toFixed(1) + " ⭐";
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
+    document.getElementById('screen-' + id).classList.add('active');
+}
+
+function renderStep() {
+    const data = scenarios[currentStepIndex];
+    const container = document.getElementById('step-content');
+    const grid = document.getElementById('choices-grid');
+    const fbBox = document.getElementById('feedback-box');
+    const nextBtn = document.getElementById('btn-next');
+
+    // Update progress bar
+    const progressPercent = ((currentStepIndex) / scenarios.length) * 100;
+    document.getElementById('progress-fill').style.width = progressPercent + "%";
+
+    fbBox.style.display = "none";
+    nextBtn.style.display = "none";
+    grid.innerHTML = "";
+
+    container.innerHTML = `
+        <span class="time-badge">${data.time}</span><br>
+        ${data.isEmergency ? '<span class="emergency-banner">🚨 CRITICAL EMERGENCY INCIDENT</span>' : ''}
+        <h2>${data.title}</h2>
+        <p>${data.desc}</p>
+    `;
+
+    // Apply Fisher-Yates algorithm to randomize choice order
+    const randomizedChoices = shuffleArray(data.choices);
+
+    randomizedChoices.forEach((choice, index) => {
+        const btn = document.createElement('button');
+        btn.className = "choice-btn";
+        btn.id = "opt-" + index;
+        btn.innerText = choice.text;
+        btn.onclick = () => handleChoice(choice, index);
+        grid.appendChild(btn);
+    });
+}
+
+function handleChoice(choice, btnIndex) {
+    const fbBox = document.getElementById('feedback-box');
+    const ptText = document.getElementById('points-text');
+
+    if (choice.type === "worst") {
+        score = Math.max(1.0, score - 0.3);
+        ptText.innerText = "-0.3 Stars — Severe Error!";
+        fbBox.className = "feedback-area fb-worst";
+        // Disable only this option to force a re-think
+        document.getElementById("opt-" + btnIndex).disabled = true;
+    } else {
+        if (choice.type === "best") {
+            score = Math.min(5.0, score + 0.1);
+            ptText.innerText = "+0.1 Stars — Excellent Choice!";
+            fbBox.className = "feedback-area fb-best";
+        } else if (choice.type === "avg") {
+            ptText.innerText = "+0.0 Stars — Acceptable Standard";
+            fbBox.className = "feedback-area fb-avg";
+        } else if (choice.type === "poor") {
+            score = Math.max(1.0, score - 0.15);
+            ptText.innerText = "-0.15 Stars — Poor Judgment";
+            fbBox.className = "feedback-area fb-poor";
+        }
+
+        // Disable all option buttons once valid choice made
+        document.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+        document.getElementById('btn-next').style.display = "block";
+    }
+
+    document.getElementById('feedback-content').innerText = choice.fb;
+    fbBox.style.display = "block";
+    updateScore();
+
+    document.getElementById('btn-next').onclick = () => {
+        currentStepIndex++;
+        if (currentStepIndex >= scenarios.length) {
+            showFinal();
+        } else {
+            renderStep();
+        }
+    };
+}
+
+function showFinal() {
+    showScreen("final");
+    document.getElementById('progress-fill').style.width = "100%";
+    document.getElementById('final-stats').innerHTML = `<h2 style="text-align:center; font-size: 2rem;">Final Rating: ${score.toFixed(1)} / 5.0 ⭐</h2>`;
+    const bc = document.getElementById('band-content');
+    
+    if (score >= 4.7) {
+        bc.innerHTML = `
+            <h3 style="color: var(--navy); font-family: 'Playfair Display', serif;">🏆 Diamond Hospitality Legend</h3>
+            <p>Astonishing work! You navigated a high-pressure 24-hour shift with remarkable poise, elite customer service skills, and flawless emergency management. The owners of Riverside Manor are offering you a full partnership!</p>
+        `;
+    } else if (score >= 4.0) {
+        bc.innerHTML = `
+            <h3 style="color: var(--navy); font-family: 'Playfair Display', serif;">🥇 Gold Standard General Manager</h3>
+            <p>Solid performance! You handled complex situations smoothly and kept guests satisfied. With minor refinements in high-stress crisis moments, you'll be unstoppable.</p>
+        `;
+    } else if (score >= 3.0) {
+        bc.innerHTML = `
+            <h3 style="color: var(--navy); font-family: 'Playfair Display', serif;">🥈 Assistant Innkeeper</h3>
+            <p>A respectable effort, but operational lapses and communication missteps cost the hotel key points. Focus on guest diplomacy and calm crisis management next season.</p>
+        `;
+    } else {
+        bc.innerHTML = `
+            <h3 style="color: var(--burgundy); font-family: 'Playfair Display', serif;">⚠️ Management Trainee Required</h3>
+            <p>A disastrous shift! Fire hazards, angry VIPs, and communication failures harmed the manor's reputation. Review your hospitality handbook and try again!</p>
+        `;
+    }
+}
+</script>
+</body>
+</html>
